@@ -68,5 +68,23 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\geometry3Sharp\geometry3Sharp.csproj">
+      <Project>{0c518dda-28fe-44ca-9ab0-f9773974f13a}</Project>
+      <Name>geometry3Sharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gsGCode\gsGCode.csproj">
+      <Project>{25de77c9-14a4-4562-9a24-0bf1e612d9a9}</Project>
+      <Name>gsGCode</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gsSlicer\gsSlicer.csproj">
+      <Project>{6c2e415e-37d9-4c5a-8fd5-60b0133872cf}</Project>
+      <Name>gsSlicer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\gsSlicer\thirdparty\clipper_library\clipper_library.csproj">
+      <Project>{9b062971-a88e-4a3d-b3c9-12b78d15fa66}</Project>
+      <Name>clipper_library</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
