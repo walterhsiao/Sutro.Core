@@ -1,11 +1,11 @@
 using System;
 using System.IO;
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Newtonsoft.Json;
 using CommandLine;
 
 using g3;
@@ -18,14 +18,14 @@ namespace smSlicerCLI
     {
         public class Options
         {
-            [Option('v', "verbose", Required=false, HelpText ="Set output to verbose messages.")]
-            public bool Verbose { get; set; }
-
             [Value(0, MetaName="mesh", HelpText="Path to input mesh file.")]
             public string MeshFilePath { get; set; }
 
             [Value(1, MetaName = "gcode", HelpText = "Path to output gcode file.")]
             public string GCodeFilePath { get; set; }
+
+            [Option('s', "settings", Required=false, HelpText = "Settings file(s).")]
+            public IEnumerable<string> SettingsFiles { get; set; }
         }
 
         [STAThread]
@@ -43,6 +43,13 @@ namespace smSlicerCLI
                 {
                     Console.WriteLine("Must provide valid gcode file path as second argument.");
                     return;
+                }
+                foreach (string s in o.SettingsFiles)
+                {
+                    if (!File.Exists(s)){
+                        Console.WriteLine("Must provide valid settings file path.");
+                        return;
+                    }
                 }
 
                 string fMeshFilePath = Path.GetFullPath(o.MeshFilePath);
@@ -64,8 +71,30 @@ namespace smSlicerCLI
 
                 // create settings
                 RepRapSettings settings = new RepRapSettings(RepRap.Models.Unknown);
-                settings.GenerateSupport = false;
 
+                JsonSerializerSettings jsonSerializeSettings = new JsonSerializerSettings
+                {
+                    MissingMemberHandling = MissingMemberHandling.Error,
+
+                };
+                
+                // load settings from files
+                foreach (string s in o.SettingsFiles)
+                {
+                    try
+                    {
+                        string settingsText = File.ReadAllText(s);
+                        // TODO: Make this more strict to avoid converting values unintentionally
+                        JsonConvert.PopulateObject(settingsText, settings, jsonSerializeSettings);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error processing settings file: ");
+                        Console.WriteLine(Path.GetFullPath(s));
+                        Console.WriteLine(e.Message);
+                        return;
+                    }
+                }
 
                 Console.Write("Slicing mesh...");
 
