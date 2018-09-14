@@ -24,8 +24,11 @@ namespace smSlicerCLI
             [Value(1, MetaName = "gcode", HelpText = "Path to output gcode file.")]
             public string GCodeFilePath { get; set; }
 
-            [Option('s', "settings", Required=false, HelpText = "Settings file(s).")]
+            [Option('s', "settings_files", Required=false, HelpText = "Settings file(s).")]
             public IEnumerable<string> SettingsFiles { get; set; }
+
+            [Option('o', "settings_override", Required = false, HelpText = "Override individual settings")]
+            public IEnumerable<string> SettingsOverride{ get; set; }
         }
 
         [STAThread]
@@ -51,23 +54,6 @@ namespace smSlicerCLI
                         return;
                     }
                 }
-
-                string fMeshFilePath = Path.GetFullPath(o.MeshFilePath);
-                string fGCodeFilePath = Path.GetFullPath(o.GCodeFilePath);
-
-                Console.Write("Loading mesh " + fMeshFilePath + "...");
-                DMesh3 mesh = StandardMeshReader.ReadMesh(fMeshFilePath);
-                Console.WriteLine(" loaded.");
-
-
-                // center mesh above origin
-                AxisAlignedBox3d bounds = mesh.CachedBounds;
-                Vector3d baseCenterPt = bounds.Center - bounds.Extents.z * Vector3d.AxisZ;
-                MeshTransforms.Translate(mesh, -baseCenterPt);
-
-                // create print mesh set
-                PrintMeshAssembly meshes = new PrintMeshAssembly();
-                meshes.AddMesh(mesh, PrintMeshOptions.Default());
 
                 // create settings
                 RepRapSettings settings = new RepRapSettings(RepRap.Models.Unknown);
@@ -95,6 +81,46 @@ namespace smSlicerCLI
                         return;
                     }
                 }
+
+                // override settings from command-line arguments
+                foreach (string s in o.SettingsOverride)
+                {
+                    try
+                    {
+                        // TODO: Make this more strict to avoid converting values unintentionally
+
+                        string[] keyValue = s.Split(':');
+                        if (keyValue.Length != 2)
+                            throw new Exception("Need setting in \"KeyName:Value\" format; got " + s);
+                        string sFormatted = "{\"" + keyValue[0] + "\":" + keyValue[1] + "}";
+
+                        JsonConvert.PopulateObject(sFormatted, settings, jsonSerializeSettings);
+                    }
+                    catch (Exception)
+                    {
+                        // TODO: Make error message more useful regarding format
+                        Console.WriteLine("Error processing settings override from command line argument: ");
+                        Console.WriteLine(s);
+                        return;
+                    }
+                }
+
+                string fMeshFilePath = Path.GetFullPath(o.MeshFilePath);
+                string fGCodeFilePath = Path.GetFullPath(o.GCodeFilePath);
+
+                Console.Write("Loading mesh " + fMeshFilePath + "...");
+                DMesh3 mesh = StandardMeshReader.ReadMesh(fMeshFilePath);
+                Console.WriteLine(" loaded.");
+
+
+                // center mesh above origin
+                AxisAlignedBox3d bounds = mesh.CachedBounds;
+                Vector3d baseCenterPt = bounds.Center - bounds.Extents.z * Vector3d.AxisZ;
+                MeshTransforms.Translate(mesh, -baseCenterPt);
+
+                // create print mesh set
+                PrintMeshAssembly meshes = new PrintMeshAssembly();
+                meshes.AddMesh(mesh, PrintMeshOptions.Default());
 
                 Console.Write("Slicing mesh...");
 
