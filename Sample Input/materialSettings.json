@@ -1,0 +1,5 @@
+{
+  "ExtruderTempC": 230,
+  "HeatedBedTempC": 60,
+  "MinExtrudeSpeed": 400
+}

@@ -1,0 +1,28 @@
+{
+  "Machine": {
+    "ManufacturerName": "RepRap",
+    "ManufacturerUUID": "e95dcaaa-4315-412f-bd80-5049fb74f384",
+    "ModelIdentifier": "Unknown",
+    "ModelUUID": "bb097486-bb07-4a95-950f-1a1de992e782",
+    "Class": "PlasticFFFPrinter",
+    "BedSizeXMM": 200.0,
+    "BedSizeYMM": 200.0,
+    "MaxHeightMM": 200.0,
+    "FilamentDiamMM": 1.75,
+    "NozzleDiamMM": 0.6,
+    "MinExtruderTempC": 20,
+    "MaxExtruderTempC": 230,
+    "HasHeatedBed": true,
+    "MinBedTempC": 0,
+    "MaxBedTempC": 60,
+    "MinLayerHeightMM": 0.1,
+    "MaxLayerHeightMM": 0.3,
+    "EnableAutoBedLeveling": false,
+    "HasAutoBedLeveling": false,
+    "MaxExtrudeSpeedMMM": 3000,
+    "MaxRetractSpeedMMM": 2400,
+    "MaxTravelSpeedMMM": 9000,
+    "MaxZTravelSpeedMMM": 6000,
+    "MinPointSpacingMM": 0.1
+  }
+}
