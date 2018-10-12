@@ -1,4 +1,7 @@
 {
+  "TravelLiftEnabled": true,
+  "TravelLiftHeight": 0.3,
+  "TravelLiftDistanceThreshold": 5,
   "BridgeExtrudeSpeedX": 0.5,
   "BridgeFillNozzleDiamStepX": 0.85,
   "BridgeVolumeScale": 1.0,
