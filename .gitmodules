@@ -1,9 +1,0 @@
-[submodule "gsGCode"]
-	path = gsGCode
-	url = git@github.com:SutroMachine/gsGCode.git
-[submodule "gsSlicer"]
-	path = gsSlicer
-	url = git@github.com:SutroMachine/gsSlicer.git
-[submodule "geometry3Sharp"]
-	path = geometry3Sharp
-	url = git@github.com:SutroMachine/geometry3Sharp.git
