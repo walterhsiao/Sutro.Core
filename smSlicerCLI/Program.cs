@@ -40,6 +40,7 @@ namespace smSlicerCLI
                 if (o.MeshFilePath is null || !File.Exists(o.MeshFilePath))
                 {
                     Console.WriteLine("Must provide valid mesh file path as first argument.");
+                    Console.WriteLine(Path.GetFullPath(o.MeshFilePath));
                     return;
                 }
                 else if (o.GCodeFilePath is null || !Directory.Exists(Directory.GetParent(o.GCodeFilePath).ToString()))
