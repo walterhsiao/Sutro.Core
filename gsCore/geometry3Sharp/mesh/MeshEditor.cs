@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 
 namespace g3
@@ -155,12 +156,11 @@ namespace g3
 
                 int tid1 = Mesh.AppendTriangle(t1, group_id);
                 int tid2 = Mesh.AppendTriangle(t2, group_id);
+                new_tris[2 * i] = tid1;
+                new_tris[2 * i + 1] = tid2;
 
                 if (tid1 < 0 || tid2 < 0)
                     goto operation_failed;
-
-                new_tris[2 * i] = tid1;
-                new_tris[2 * i + 1] = tid2;
             }
 
             return new_tris;
@@ -169,11 +169,53 @@ namespace g3
             operation_failed:
                 // remove what we added so far
                 if (i > 0) {
-                    if (remove_triangles(new_tris, 2*(i-1)) == false)
+                    if (remove_triangles(new_tris, 2*i+1) == false)
                         throw new Exception("MeshEditor.StitchLoop: failed to add all triangles, and also failed to back out changes.");
                 }
                 return null;
         }
+
+
+
+
+
+
+
+        /// <summary>
+        /// Trivial back-and-forth stitch between two vertex loops with same length. 
+        /// If nearest vertices of input loops would not be matched, cycles loops so
+        /// that this is the case. 
+        /// Loops must have appropriate orientation.
+        /// </summary>
+        public virtual int[] StitchVertexLoops_NearestV(int[] loop0, int[] loop1, int group_id = -1)
+        {
+            int N = loop0.Length;
+            Index2i iBestPair = Index2i.Zero;
+            double best_dist = double.MaxValue;
+            for (int i = 0; i < N; ++i) {
+                Vector3d v0 = Mesh.GetVertex(loop0[i]);
+                for (int j = 0; j < N; ++j) {
+                    double dist_sqr = v0.DistanceSquared(Mesh.GetVertex(loop1[j]));
+                    if (dist_sqr < best_dist) {
+                        best_dist = dist_sqr;
+                        iBestPair = new Index2i(i, j);
+                    }
+                }
+            }
+            if (iBestPair.a != iBestPair.b) {
+                int[] newLoop0 = new int[N];
+                int[] newLoop1 = new int[N];
+                for (int i = 0; i < N; ++i) {
+                    newLoop0[i] = loop0[(iBestPair.a + i) % N];
+                    newLoop1[i] = loop1[(iBestPair.b + i) % N];
+                }
+                return StitchLoop(newLoop0, newLoop1, group_id);
+            } else {
+                return StitchLoop(loop0, loop1, group_id);
+            }
+
+        }
+
 
 
 
@@ -834,6 +876,12 @@ namespace g3
             f.AlignAxis(2, (Vector3f)seg.Direction);
             AppendBox(f, new Vector3f(size, size, seg.Extent));
         }
+        public void AppendLine(Segment3d seg, float size, Colorf color)
+        {
+            Frame3f f = new Frame3f(seg.Center);
+            f.AlignAxis(2, (Vector3f)seg.Direction);
+            AppendBox(f, new Vector3f(size, size, seg.Extent), color);
+        }
         public static void AppendBox(DMesh3 mesh, Vector3d pos, float size)
         {
             MeshEditor editor = new MeshEditor(mesh);
@@ -866,6 +914,22 @@ namespace g3
             f.AlignAxis(2, (Vector3f)seg.Direction);
             MeshEditor editor = new MeshEditor(mesh);
             editor.AppendBox(f, new Vector3f(size, size, seg.Extent));
+        }
+
+
+
+
+        public void AppendPathSolid(IEnumerable<Vector3d> vertices, double radius, Colorf color)
+        {
+            TubeGenerator tubegen = new TubeGenerator() {
+                Vertices = new List<Vector3d>(vertices),
+                Polygon = Polygon2d.MakeCircle(radius, 6),
+                NoSharedVertices = false
+            };
+            DMesh3 mesh = tubegen.Generate().MakeDMesh();
+            if (Mesh.HasVertexColors)
+                mesh.EnableVertexColors(color);
+            AppendMesh(mesh, Mesh.AllocateTriangleGroup());
         }
 
 
@@ -964,6 +1028,8 @@ namespace g3
         bool remove_triangles(int[] tri_list, int count)
         {
             for (int i = 0; i < count; ++i) {
+                if (Mesh.IsTriangle(tri_list[i]) == false)
+                    continue;
                 MeshResult result = Mesh.RemoveTriangle(tri_list[i], false, false);
                 if (result != MeshResult.Ok)
                     return false;
