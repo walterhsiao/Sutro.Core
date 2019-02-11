@@ -116,6 +116,7 @@ namespace gs
 
             HomeSequenceF(Builder);
 
+            PositionShift = 0.5 * new Vector2d(Settings.Machine.BedSizeXMM, Settings.Machine.BedSizeYMM);
             currentPos = Vector3d.Zero;
 
 			HeaderCustomizerF(HeaderState.BeforePrime, Builder);

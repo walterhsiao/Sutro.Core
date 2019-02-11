@@ -25,20 +25,6 @@ namespace gs
         public double BedSizeYMM = 100;
         public double MaxHeightMM = 100;
 
-        // These factors define the output coordinate system
-
-        // BedOriginFactorX:
-        // 0   : the origin is at the left of the build plate
-        // 0.5 : the origin is at the middle of the build plate
-        // 1   : the origin is at the right of the build plate
-
-        // BedOriginFactorY:
-        // 0   : the origin is at the front of the build plate
-        // 0.5 : the origin is at the middle of the build plate
-        // 1   : the origin is at the back of the build plate
-
-        public double BedOriginFactorX = 0;
-        public double BedOriginFactorY = 0;
 
         public abstract T CloneAs<T>() where T : class;
         protected virtual void CopyFieldsTo(MachineInfo to)
@@ -140,8 +126,6 @@ namespace gs
             to.BedSizeXMM = this.BedSizeXMM;
             to.BedSizeYMM = this.BedSizeYMM;
             to.MaxHeightMM = this.MaxHeightMM;
-            to.BedOriginFactorX = this.BedOriginFactorX;
-            to.BedOriginFactorY = this.BedOriginFactorY;
         }
     }
 
@@ -235,12 +219,6 @@ namespace gs
 		public double OuterPerimeterSpeedX = 0.5;
 
         public double FanSpeedX = 1.0;                  // default fan speed, fraction of max speed (generally unknown)
-
-
-        // Settings for z-lift on rapid travel moves 
-        public bool TravelLiftEnabled { get; set; } = true;
-        public double TravelLiftHeight { get; set; } = 0.2;
-        public double TravelLiftDistanceThreshold { get; set; } = 5d;
 
         /*
          * Shells
@@ -365,10 +343,6 @@ namespace gs
             to.MinExtrudeSpeed = this.MinExtrudeSpeed;
             to.OuterPerimeterSpeedX = this.OuterPerimeterSpeedX;
             to.FanSpeedX = this.FanSpeedX;
-
-            to.TravelLiftEnabled = this.TravelLiftEnabled;
-            to.TravelLiftHeight = this.TravelLiftHeight;
-            to.TravelLiftDistanceThreshold = this.TravelLiftDistanceThreshold;
 
             to.Shells = this.Shells;
             to.InteriorSolidRegionShells = this.InteriorSolidRegionShells;

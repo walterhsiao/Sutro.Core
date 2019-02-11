@@ -94,10 +94,6 @@ namespace gs
 			extruderA = 0;
 			currentFeed = 0;
 
-            Vector2d originRepositioning = new Vector2d(machineInfo.BedOriginFactorX, machineInfo.BedOriginFactorY);
-            Vector2d bedSize = new Vector2d(machineInfo.BedSizeXMM, machineInfo.BedSizeYMM);
-            PositionShift = originRepositioning*bedSize;
-
             MinExtrudeStepDistance = machineInfo.MinPointSpacingMM;
         }
 
