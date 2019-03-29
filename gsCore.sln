@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gsSlicerPro", "gsCore\gsSli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gsGeometry", "gsCore\gsGeometry\gsGeometry.csproj", "{C5B9D744-2FC5-4810-BD85-78FB73FB1E8D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gsCore.UnitTests", "gsCore\gsCore.UnitTests\gsCore.UnitTests.csproj", "{6E9B0EE0-DD49-4A56-B320-64CCE3E3FE2E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,14 @@ Global
 		{C5B9D744-2FC5-4810-BD85-78FB73FB1E8D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C5B9D744-2FC5-4810-BD85-78FB73FB1E8D}.Release|x64.ActiveCfg = Release|x64
 		{C5B9D744-2FC5-4810-BD85-78FB73FB1E8D}.Release|x64.Build.0 = Release|x64
+		{6E9B0EE0-DD49-4A56-B320-64CCE3E3FE2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E9B0EE0-DD49-4A56-B320-64CCE3E3FE2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E9B0EE0-DD49-4A56-B320-64CCE3E3FE2E}.Debug|x64.ActiveCfg = Debug|x64
+		{6E9B0EE0-DD49-4A56-B320-64CCE3E3FE2E}.Debug|x64.Build.0 = Debug|x64
+		{6E9B0EE0-DD49-4A56-B320-64CCE3E3FE2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E9B0EE0-DD49-4A56-B320-64CCE3E3FE2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E9B0EE0-DD49-4A56-B320-64CCE3E3FE2E}.Release|x64.ActiveCfg = Release|x64
+		{6E9B0EE0-DD49-4A56-B320-64CCE3E3FE2E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +110,7 @@ Global
 		{9B062971-A88E-4A3D-B3C9-12B78D15FA66} = {830770FD-D2E5-4335-9DCC-2F273C0CE841}
 		{EDD4E175-E76B-4590-AF2F-52BACA7DD071} = {830770FD-D2E5-4335-9DCC-2F273C0CE841}
 		{C5B9D744-2FC5-4810-BD85-78FB73FB1E8D} = {830770FD-D2E5-4335-9DCC-2F273C0CE841}
+		{6E9B0EE0-DD49-4A56-B320-64CCE3E3FE2E} = {830770FD-D2E5-4335-9DCC-2F273C0CE841}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {41DDC2D0-1F9A-4A97-91F7-0D095927E6BC}
