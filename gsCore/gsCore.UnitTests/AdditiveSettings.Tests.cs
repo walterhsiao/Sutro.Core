@@ -22,6 +22,7 @@ namespace gsCore.UnitTests
             Assert.AreEqual(10, copy.Shells);
             Assert.AreEqual(20, copy.Machine.NozzleDiamMM);
             Assert.AreEqual("A", orig.Machine.ManufacturerName);
+            Assert.AreNotSame(copy.Machine, orig.Machine);
         }
 
         [TestMethod]
@@ -38,11 +39,12 @@ namespace gsCore.UnitTests
             copy.Shells *= 2;
             copy.Machine.NozzleDiamMM *= 20;
             copy.Machine.ManufacturerName = "B";
-
+                
             // assert
             Assert.AreEqual(10, orig.Shells);
             Assert.AreEqual(20, orig.Machine.NozzleDiamMM);
             Assert.AreEqual("A", orig.Machine.ManufacturerName);
+            Assert.AreNotSame(copy.Machine, orig.Machine);
         }
     }
 }
