@@ -79,10 +79,6 @@
       <Project>{25de77c9-14a4-4562-9a24-0bf1e612d9a9}</Project>
       <Name>gsGCode</Name>
     </ProjectReference>
-    <ProjectReference Include="..\gsGeometry\gsGeometry.csproj">
-      <Project>{c5b9d744-2fc5-4810-bd85-78fb73fb1e8d}</Project>
-      <Name>gsGeometry</Name>
-    </ProjectReference>
     <ProjectReference Include="..\gsSlicer\gsSlicer.csproj">
       <Project>{6c2e415e-37d9-4c5a-8fd5-60b0133872cf}</Project>
       <Name>gsSlicer</Name>

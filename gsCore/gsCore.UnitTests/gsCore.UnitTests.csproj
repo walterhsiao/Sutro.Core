@@ -17,7 +17,6 @@
   <ItemGroup>
     <ProjectReference Include="..\geometry3Sharp\geometry3Sharp.csproj" />
     <ProjectReference Include="..\gsGCode\gsGCode.csproj" />
-    <ProjectReference Include="..\gsGeometry\gsGeometry.csproj" />
     <ProjectReference Include="..\gsSlicerPro\gsSlicerPro.csproj" />
     <ProjectReference Include="..\gsSlicer\gsSlicer.csproj" />
     <ProjectReference Include="..\gsSlicer\thirdparty\clipper_library\clipper_library.csproj" />
