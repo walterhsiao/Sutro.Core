@@ -49,6 +49,16 @@ namespace gs
     }
 
 
+    public interface IPrintGeneratorInitialize
+    {
+        void Initialize(
+            PrintMeshAssembly meshes,
+            PlanarSliceStack slices,
+            SingleMaterialFFFSettings settings,
+            AssemblerFactoryF overrideAssemblerF);
+    }
+
+
     /// <summary>
     /// This is the top-level class that generates a GCodeFile for a stack of slices.
     /// Currently must subclass to provide resulting GCodeFile.
