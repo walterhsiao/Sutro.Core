@@ -23,13 +23,11 @@ namespace gs.info
             configure_unknown();
         }
 
-
         public override T CloneAs<T>() {
-            GenericPrinterSettings copy = new GenericPrinterSettings(ManufacturerName, ManufacturerUUID, DefaultMachineUUID);
-            this.CopyFieldsTo(copy);
-            return copy as T;
+            var clone = (GenericPrinterSettings)MemberwiseClone();
+            clone.Machine = this.machineInfo.CloneAs<FFFMachineInfo>();
+            return clone as T;
         }
-
 
         void configure_unknown()
         {
