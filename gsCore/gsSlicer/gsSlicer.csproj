@@ -8,8 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="thirdparty\**" />
+    <EmbeddedResource Remove="thirdparty\**" />
+    <None Remove="thirdparty\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\geometry3Sharp\geometry3Sharp.csproj" />
     <ProjectReference Include="..\gsGCode\gsGCode.csproj" />
+    <ProjectReference Include="thirdparty\clipper_library\clipper_library.csproj" />
   </ItemGroup>
 
 </Project>
