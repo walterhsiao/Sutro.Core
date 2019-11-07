@@ -44,6 +44,7 @@
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -53,7 +54,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BasicGeneratorCLI.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -62,10 +62,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\client\client.Lib\client.Lib.csproj">
-      <Project>{6e21e738-915a-41fd-8aea-8058660437ea}</Project>
-      <Name>client.Lib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\geometry3Sharp\geometry3Sharp.csproj">
       <Project>{7046cf61-d5d8-4c11-9e4b-959102ae131c}</Project>
       <Name>geometry3Sharp</Name>
