@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace gs
+namespace gs.interfaces
 {
     public interface IEngineData
     {
@@ -13,5 +13,11 @@ namespace gs
         IGenerator Generator { get; }
         ISettingsManager SettingsManager { get; }
         List<IVisualizer> Visualizers { get; }
+    }
+
+    public interface IEngine<TSettings> : IEngine
+    {
+        new IGenerator<TSettings> Generator { get; }
+        new ISettingsManager<TSettings> SettingsManager { get; }
     }
 }

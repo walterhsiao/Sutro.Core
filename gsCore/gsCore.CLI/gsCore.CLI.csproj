@@ -70,6 +70,10 @@
       <Project>{89f5ffe5-e150-4404-8e0b-6595551fc73a}</Project>
       <Name>gsGCode</Name>
     </ProjectReference>
+    <ProjectReference Include="..\gsInterface\gsInterface.csproj">
+      <Project>{5ac09bd3-0ec4-47be-9342-4dd471031229}</Project>
+      <Name>gsInterface</Name>
+    </ProjectReference>
     <ProjectReference Include="..\gsSlicer\gsSlicer.csproj">
       <Project>{872020fb-86f1-4945-b106-567537bddb4c}</Project>
       <Name>gsSlicer</Name>

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
+using gs.interfaces;
 
 namespace gsCore.CLI
 {
@@ -125,7 +126,7 @@ namespace gsCore.CLI
                     }
                 }
 
-                var settings = engine.SettingsManager.DefaultSettings;
+                var settings = engine.SettingsManager.FactorySettings[0];
 
                 // Load settings from files
                 foreach (string s in o.SettingsFiles)
@@ -159,60 +160,28 @@ namespace gsCore.CLI
                     }
                 }
 
-                //string fMeshFilePath = Path.GetFullPath(o.MeshFilePath);
-                //string fGCodeFilePath = Path.GetFullPath(o.GCodeFilePath);
+                string fMeshFilePath = Path.GetFullPath(o.MeshFilePath);
+                string fGCodeFilePath = Path.GetFullPath(o.GCodeFilePath);
 
-                //Console.Write("Loading mesh " + fMeshFilePath + "...");
-                //DMesh3 mesh = StandardMeshReader.ReadMesh(fMeshFilePath);
-                //Console.WriteLine(" loaded.");
+                Console.Write("Loading mesh " + fMeshFilePath + "...");
+                DMesh3 mesh = StandardMeshReader.ReadMesh(fMeshFilePath);
+                Console.WriteLine(" done.");
 
+                // Center mesh above origin.
+                AxisAlignedBox3d bounds = mesh.CachedBounds;
+                Vector3d baseCenterPt = bounds.Center - bounds.Extents.z * Vector3d.AxisZ;
+                MeshTransforms.Translate(mesh, -baseCenterPt);
 
-                //// center mesh above origin
-                //AxisAlignedBox3d bounds = mesh.CachedBounds;
-                //Vector3d baseCenterPt = bounds.Center - bounds.Extents.z * Vector3d.AxisZ;
-                //MeshTransforms.Translate(mesh, -baseCenterPt);
+                var part = new Tuple<DMesh3, object>(mesh, null);
+                var parts = new List<Tuple<DMesh3, object>>() { part };
 
-                //// create print mesh set
-                //PrintMeshAssembly meshes = new PrintMeshAssembly();
-                //meshes.AddMesh(mesh, PrintMeshOptions.Default());
+                Console.Write("Generating gcode...");
+                var gcode = engine.Generator.GenerateGCode(parts, settings);
+                Console.WriteLine(" done.");
 
-                //Console.Write("Slicing mesh...");
-
-                //// do slicing
-                //MeshPlanarSlicer slicer = new MeshPlanarSlicer()
-                //{
-                //    LayerHeightMM = settings.LayerHeightMM
-                //};
-                //slicer.Add(meshes);
-                //PlanarSliceStack slices = slicer.Compute();
-                //Console.WriteLine(" sliced.");
-
-
-                //Console.Write("Generating print...");
-                //// run print generator
-                //SingleMaterialFFFPrintGenerator printGen =
-                //    new SingleMaterialFFFPrintGenerator(meshes, slices, settings);
-                //if (printGen.Generate())
-                //{
-                //    Console.WriteLine(" generated.");
-                //    // export gcode
-
-                //    Console.Write("Writing gcode...");
-
-                //    GCodeFile gcode = printGen.Result;
-                //    using (StreamWriter w = new StreamWriter(fGCodeFilePath))
-                //    {
-                //        StandardGCodeWriter writer = new StandardGCodeWriter();
-                //        writer.WriteFile(gcode, w);
-                //    }
-                //    Console.WriteLine(" done.");
-
-                //    Console.WriteLine("".PadRight(79, '-'));
-                //    foreach (string line in printGen.TotalPrintTimeStatistics.ToStringList())
-                //    {
-                //        Console.WriteLine(line);
-                //    }
-                //    Console.WriteLine("".PadRight(79, '-'));
+                Console.Write("Writing gcode...");
+                engine.Generator.SaveGCode(fGCodeFilePath, gcode);
+                Console.WriteLine(" done.");
             });
         
             parserResult.WithNotParsed(errs => 

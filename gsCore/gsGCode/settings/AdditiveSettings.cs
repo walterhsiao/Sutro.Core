@@ -125,14 +125,11 @@ namespace gs
 
 
 
-    public class SingleMaterialFFFSettings : PlanarAdditiveSettings
+    public abstract class SingleMaterialFFFSettings : PlanarAdditiveSettings
 	{
         // This is a bit of an odd place for this, but settings are where we actually
         // know what assembler we should be using...
-        public virtual AssemblerFactoryF AssemblerType() {
-            throw new NotImplementedException("Settings.AssemblerType() not provided");
-        }
-
+        public abstract AssemblerFactoryF AssemblerType();
 
         protected FFFMachineInfo machineInfo;
         public FFFMachineInfo Machine {
