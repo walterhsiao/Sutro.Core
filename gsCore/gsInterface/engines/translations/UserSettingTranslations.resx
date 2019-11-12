@@ -123,6 +123,9 @@
   <data name="FloorLayers.Name" xml:space="preserve">
     <value>Floor Layers</value>
   </data>
+  <data name="GroupBasic" xml:space="preserve">
+    <value>Basic</value>
+  </data>
   <data name="RoofLayers.Description" xml:space="preserve">
     <value />
   </data>

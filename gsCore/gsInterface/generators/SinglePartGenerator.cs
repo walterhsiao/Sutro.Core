@@ -31,27 +31,18 @@ namespace gs
 
         public GCodeFile GenerateGCode(IList<Tuple<DMesh3, TPrintSettings>> parts, TPrintSettings globalSettings, Action<GCodeLine> gcodeLineReadyF = null, Action<PrintLayerData> layerReadyF = null, Action<string> progressMessageF = null)
         {
-            progressMessageF?.Invoke("Centering mesh above origin...");
-
-            if (parts.Count != 1)
-                throw new ArgumentException($"Argument `parts` needs exactly one entry; input has {parts.Count}");
-
-            if (parts[0].Item2 != null)
-                throw new ArgumentException($"Entries for the `parts` arguments must have a null second item since this generator does not handle per-part settings.");
-
-            var mesh = parts[0].Item1;
-
-            // Center mesh above origin
-            // TODO: move this to CLI; generator should be faithful to input coordinate space.
-            AxisAlignedBox3d bounds = mesh.CachedBounds;
-            Vector3d baseCenterPt = bounds.Center - bounds.Extents.z * Vector3d.AxisZ;
-            MeshTransforms.Translate(mesh, -baseCenterPt);
-
-            progressMessageF?.Invoke("Creating print mesh set...");
+            if (AcceptsParts == false && parts != null && parts.Count > 0)
+                throw new Exception("Must pass null or empty list of parts to generator that does not accept parts.");
 
             // Create print mesh set
             PrintMeshAssembly meshes = new PrintMeshAssembly();
-            meshes.AddMesh(mesh, PrintMeshOptions.Default());
+
+            foreach (var part in parts)
+            {
+                if (part.Item2 != null)
+                    throw new ArgumentException($"Entries for the `parts` arguments must have a null second item since this generator does not handle per-part settings.");
+                meshes.AddMesh(part.Item1, PrintMeshOptions.Default());
+            }
 
             progressMessageF?.Invoke("Slicing...");
 
@@ -67,7 +58,7 @@ namespace gs
             // Run the print generator
             progressMessageF?.Invoke("Running print generator...");
             var printGenerator = new TPrintGenerator();
-            AssemblerFactoryF overrideAssemblerF = null;
+            AssemblerFactoryF overrideAssemblerF = globalSettings.AssemblerType();
             printGenerator.Initialize(meshes, slices, globalSettings, overrideAssemblerF);
             if (printGenerator.Generate())
                 return printGenerator.Result;

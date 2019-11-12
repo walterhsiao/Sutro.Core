@@ -3,7 +3,7 @@ using gs.info;
 
 namespace gs.interfaces
 {
-    public class SingleMaterialFFFSettingsManager : SettingsManager<SingleMaterialFFFSettings>
+    public class SettingsManagerFFF : SettingsManager<SingleMaterialFFFSettings>
     {
         public override List<SingleMaterialFFFSettings> FactorySettings { get
             {
@@ -20,6 +20,6 @@ namespace gs.interfaces
             } }
 
         public override IUserSettingCollection<SingleMaterialFFFSettings> UserSettings =>
-            new UserSettingsSingleMaterialFFF();
+            new UserSettingsFFF();
     }
 }

@@ -14,6 +14,6 @@ namespace gs.interfaces
             new SinglePartGenerator<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>();
 
         public override ISettingsManager<SingleMaterialFFFSettings> SettingsManager => 
-            new SingleMaterialFFFSettingsManager();
+            new SettingsManagerFFF();
     }
 }

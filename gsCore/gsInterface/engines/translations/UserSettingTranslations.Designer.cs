@@ -79,6 +79,15 @@ namespace gs.interfaces {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Basic.
+        /// </summary>
+        internal static string GroupBasic {
+            get {
+                return ResourceManager.GetString("GroupBasic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         internal static string RoofLayers_Description {

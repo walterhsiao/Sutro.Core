@@ -1,27 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 
 namespace gs.interfaces
 {
     public abstract class UserSetting
     {
-        public readonly Func<string> NameF;
-        public readonly Func<string> DescriptionF;
+        private readonly Func<string> NameF;
+        private readonly Func<string> DescriptionF;
+
+        public string Name => NameF();
+        public string Description => DescriptionF();
+
+        public readonly UserSettingGroup Group;
+
         public abstract void LoadFromRaw(object settings);
         public abstract void ApplyToRaw(object settings);
         public abstract ValidationResult Validation { get; }
-        public UserSetting(Func<string> nameF, Func<string> descriptionF = null)
+        public UserSetting(Func<string> nameF, Func<string> descriptionF = null, UserSettingGroup group = null)
         {
             NameF = nameF;
             DescriptionF = descriptionF;
+            Group = group;
         }
     }
 
     public abstract class UserSetting<TSettings> : UserSetting
     {
-        public UserSetting(Func<string> nameF, Func<string> descriptionF = null) : base(nameF, descriptionF)
+        public UserSetting(Func<string> nameF,
+                           Func<string> descriptionF = null,
+                           UserSettingGroup group = null) : base(nameF, descriptionF, group)
         {
         }
 
@@ -49,9 +55,10 @@ namespace gs.interfaces
         public UserSetting(
             Func<string> nameF,
             Func<string> descriptionF,
+            UserSettingGroup group,
             Func<TSettings, TValue> loadF,
             Action<TSettings, TValue> applyF,
-            Func<TValue, ValidationResult> validateF = null) : base(nameF, descriptionF)
+            Func<TValue, ValidationResult> validateF = null) : base(nameF, descriptionF, group)
         {
             this.validateF = validateF;
             this.applyF = applyF;

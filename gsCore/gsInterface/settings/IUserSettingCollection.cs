@@ -92,7 +92,7 @@ namespace gs.interfaces
 
                 if (validation.Severity != ValidationResult.Level.None)
                 {
-                    validations.Add(new ValidationResult(validation.Severity, validation.Message, userSetting.NameF()));
+                    validations.Add(new ValidationResult(validation.Severity, validation.Message, userSetting.Name));
                 }
             }
             return validations;

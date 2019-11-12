@@ -8,9 +8,10 @@ namespace gs.interfaces
         public UserSettingString(
             Func<string> nameF,
             Func<string> descriptionF,
+            UserSettingGroup group,
             Func<TSettings, string> loadF,
             Action<TSettings, string> applyF,
-            Func<string, ValidationResult> validateF = null) : base(nameF, descriptionF, loadF, applyF, validateF)
+            Func<string, ValidationResult> validateF = null) : base(nameF, descriptionF, group, loadF, applyF, validateF)
         {
         }
     }
