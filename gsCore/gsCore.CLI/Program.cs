@@ -184,6 +184,7 @@ namespace gsCore.CLI
             {
                 try
                 {
+                    Console.WriteLine($"Loading file {Path.GetFullPath(s)}");
                     string settingsText = File.ReadAllText(s);
                     engine.SettingsManager.ApplyJSON(settings, settingsText);
                 }
@@ -269,11 +270,20 @@ namespace gsCore.CLI
             Console.WriteLine();
 
             Console.WriteLine("Generating gcode...");
-            var gcode = engine.Generator.GenerateGCode(parts, settings, null, null, (s) => Console.WriteLine("\t" + s));
+            var gcode = engine.Generator.GenerateGCode(parts, settings, out var generationReport, 
+                null, null, (s) => Console.WriteLine("\t" + s));
 
-            Console.Write("Writing gcode...");
+            Console.WriteLine($"Writing gcode to {fGCodeFilePath}");
             engine.Generator.SaveGCode(fGCodeFilePath, gcode);
-            Console.WriteLine(" done.");
+
+            ConsoleWriteSeparator();
+            foreach (var s in generationReport)
+            {
+                Console.WriteLine(s);
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Print generation complete.");
         }
 
         protected static void ParsingUnsuccessful(IEnumerable<Error> errs, ParserResult<Options> parserResult)

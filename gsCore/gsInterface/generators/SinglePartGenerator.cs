@@ -35,7 +35,12 @@ namespace gs
                 return parser.Parse(fileReader);
         }
 
-        public GCodeFile GenerateGCode(IList<Tuple<DMesh3, TPrintSettings>> parts, TPrintSettings globalSettings, Action<GCodeLine> gcodeLineReadyF = null, Action<PrintLayerData> layerReadyF = null, Action<string> progressMessageF = null)
+        public GCodeFile GenerateGCode(IList<Tuple<DMesh3, TPrintSettings>> parts,
+                                       TPrintSettings globalSettings,
+                                       out IEnumerable<string> generationReport,
+                                       Action<GCodeLine> gcodeLineReadyF = null,
+                                       Action<PrintLayerData> layerReadyF = null,
+                                       Action<string> progressMessageF = null)
         {
             if (AcceptsParts == false && parts != null && parts.Count > 0)
                 throw new Exception("Must pass null or empty list of parts to generator that does not accept parts.");
@@ -66,13 +71,31 @@ namespace gs
             var printGenerator = new TPrintGenerator();
             AssemblerFactoryF overrideAssemblerF = globalSettings.AssemblerType();
             printGenerator.Initialize(meshes, slices, globalSettings, overrideAssemblerF);
+
             if (printGenerator.Generate())
+            {
+                generationReport = CreateGenerationReport(printGenerator.TotalPrintTimeStatistics);
                 return printGenerator.Result;
+            }
             else
+            {
                 throw new Exception("PrintGenerator failed to generate gcode!");
+            }
         }
 
-        public GCodeFile GenerateGCode(IList<Tuple<DMesh3, object>> parts, object globalSettings, Action<GCodeLine> gcodeLineReadyF = null, Action<PrintLayerData> layerReadyF = null, Action<string> progressMessageF = null)
+        public virtual List<string> CreateGenerationReport(PrintTimeStatistics printTimeStatistics)
+        {
+            var report = new List<string>();
+            report.AddRange(printTimeStatistics.ToStringList());
+            return report;
+        }
+
+        public GCodeFile GenerateGCode(IList<Tuple<DMesh3, object>> parts,
+                                       object globalSettings,
+                                       out IEnumerable<string> generationReport,
+                                       Action<GCodeLine> gcodeLineReadyF = null,
+                                       Action<PrintLayerData> layerReadyF = null,
+                                       Action<string> progressMessageF = null)
         {
             var partsTypedSettings = new List<Tuple<DMesh3, TPrintSettings>>();
             foreach (var part in parts)
@@ -80,7 +103,8 @@ namespace gs
                 partsTypedSettings.Add(Tuple.Create(part.Item1, (TPrintSettings)(part.Item2)));
             }
 
-            return GenerateGCode(partsTypedSettings, (TPrintSettings)globalSettings, gcodeLineReadyF, layerReadyF, progressMessageF);
+            return GenerateGCode(partsTypedSettings, (TPrintSettings)globalSettings, out generationReport,
+                                 gcodeLineReadyF, layerReadyF, progressMessageF);
         }
     }
 }

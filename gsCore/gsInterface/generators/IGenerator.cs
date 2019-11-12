@@ -16,6 +16,7 @@ namespace gs
         /// <returns></returns>
         GCodeFile GenerateGCode(IList<Tuple<DMesh3, object>> parts,
                                 object globalSettings,
+                                out IEnumerable<string> generationReport,
                                 Action<GCodeLine> gcodeLineReadyF = null,
                                 Action<PrintLayerData> layerReadyF = null,
                                 Action<string> progressMessageF = null);
@@ -42,10 +43,9 @@ namespace gs
         /// <returns></returns>
         GCodeFile GenerateGCode(IList<Tuple<DMesh3, TSettings>> parts,
                                 TSettings globalSettings,
+                                out IEnumerable<string> generationReport,
                                 Action<GCodeLine> gcodeLineReadyF = null,
                                 Action<PrintLayerData> layerReadyF = null,
                                 Action<string> progressMessageF = null);
-
-
     }
 }
