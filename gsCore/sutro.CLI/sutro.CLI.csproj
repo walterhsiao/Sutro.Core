@@ -7,8 +7,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F1F3F3C9-4BD6-48F4-A60B-19524C05B1ED}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>gsCore.CLI</RootNamespace>
-    <AssemblyName>gsCore.CLI</AssemblyName>
+    <RootNamespace>sutro.CLI</RootNamespace>
+    <AssemblyName>sutro.CLI</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

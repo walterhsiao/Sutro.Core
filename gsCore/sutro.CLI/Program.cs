@@ -1,16 +1,17 @@
 using CommandLine;
 using CommandLine.Text;
-using g3;
-using gs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
-using gs.interfaces;
 using System.Reflection;
 
-namespace gsCore.CLI
+using g3;
+using gs;
+using gs.interfaces;
+
+namespace sutro.CLI
 {
     class Program
     {
