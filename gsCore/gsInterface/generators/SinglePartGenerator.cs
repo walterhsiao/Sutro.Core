@@ -31,7 +31,7 @@ namespace gs
 
         public GCodeFile GenerateGCode(IList<Tuple<DMesh3, TPrintSettings>> parts, TPrintSettings globalSettings, Action<GCodeLine> gcodeLineReadyF = null, Action<PrintLayerData> layerReadyF = null, Action<string> progressMessageF = null)
         {
-             progressMessageF?.Invoke("Centering mesh above origin...");
+            progressMessageF?.Invoke("Centering mesh above origin...");
 
             if (parts.Count != 1)
                 throw new ArgumentException($"Argument `parts` needs exactly one entry; input has {parts.Count}");

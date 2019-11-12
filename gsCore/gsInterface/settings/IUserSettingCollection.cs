@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 
 namespace gs.interfaces
@@ -18,19 +19,23 @@ namespace gs.interfaces
     {
         IEnumerable<UserSetting> Settings();
 
-        List<ValidationResult> Validate();
+        List<ValidationResult> Validate(object rawSettings);
 
         void LoadFromRaw(object rawSettings,
                          IEnumerable<UserSetting> userSettings);
 
         void ApplyToRaw(object rawSettings, 
                         IEnumerable<UserSetting> userSettings);
+
+        void SetCulture(CultureInfo cultureInfo);
     }
 
     public interface IUserSettingCollection<TSettings> : IUserSettingCollection
     {
         new IEnumerable<UserSetting<TSettings>> Settings();
-        
+
+        List<ValidationResult> Validate(TSettings rawSettings);
+
         void LoadFromRaw(TSettings rawSettings, 
                          IEnumerable<UserSetting<TSettings>> userSettings);
         
@@ -45,10 +50,15 @@ namespace gs.interfaces
         /// </summary>
         public IEnumerable<UserSetting<TSettings>> Settings()
         {
-            PropertyInfo[] properties = typeof(UserSettingCollection<TSettings>).GetProperties();
+            PropertyInfo[] properties = GetType().GetProperties();
             foreach (PropertyInfo property in properties)
                 if (typeof(UserSetting<TSettings>).IsAssignableFrom(property.PropertyType))
                     yield return (UserSetting<TSettings>)property.GetValue(this);
+            
+            FieldInfo[] fields = GetType().GetFields();
+            foreach (FieldInfo field in fields)
+                if (typeof(UserSetting<TSettings>).IsAssignableFrom(field.FieldType))
+                    yield return (UserSetting<TSettings>)field.GetValue(this);
         }
 
         /// <summary>
@@ -72,19 +82,27 @@ namespace gs.interfaces
         /// This method can be overridden in derived classes to add validations
         /// between combinations of user settings in addition to the individual checks.
         /// </remarks>
-        public virtual List<ValidationResult> Validate()
+        public virtual List<ValidationResult> Validate(TSettings settings)
         {
             var validations = new List<ValidationResult>();
-            foreach (var setting in Settings())
+            foreach (var userSetting in Settings())
             {
-                var validation = setting.Validation;
+                userSetting.LoadFromRaw(settings);
+                var validation = userSetting.Validation;
+
                 if (validation.Severity != ValidationResult.Level.None)
                 {
-                    validations.Add(validation);
+                    validations.Add(new ValidationResult(validation.Severity, validation.Message, userSetting.NameF()));
                 }
             }
             return validations;
         }
+
+        public List<ValidationResult> Validate(object rawSettings)
+        {
+            return Validate((TSettings)rawSettings);
+        }
+
 
         /// <summary>
         /// Loads values from raw settings into a collection of user settings.
@@ -102,7 +120,10 @@ namespace gs.interfaces
         /// </summary>
         public void LoadFromRaw(object rawSettings, IEnumerable<UserSetting> userSettings)
         {
-            LoadFromRaw((TSettings)rawSettings, (IEnumerable<UserSetting<TSettings>>)userSettings);
+            var userSettingsTyped = new List<UserSetting<TSettings>>();
+            foreach (var setting in userSettings)
+                userSettingsTyped.Add((UserSetting<TSettings>)setting);
+            LoadFromRaw((TSettings)rawSettings, userSettingsTyped);
         }
 
         /// <summary>
@@ -123,6 +144,8 @@ namespace gs.interfaces
         {
             ApplyToRaw((TSettings)rawSettings, (IEnumerable<UserSetting<TSettings>>)userSettings);
         }
+
+        public abstract void SetCulture(CultureInfo cultureInfo);
     }
 
 

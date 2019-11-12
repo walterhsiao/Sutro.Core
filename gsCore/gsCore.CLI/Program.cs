@@ -71,14 +71,18 @@ namespace gsCore.CLI
             [Option('s', "settings_files", Required=false, HelpText = "Settings file(s).")]
             public IEnumerable<string> SettingsFiles { get; set; }
 
+            [Option('o', "settings_override", Required = false, HelpText = "Override individual settings")]
+            public IEnumerable<string> SettingsOverride { get; set; }
+
             [Option('m', "machine_manufacturer", Default ="RepRap", Required = false, HelpText = "Machine manufacturer.")]
             public string MachineManufacturer { get; set; }
 
             [Option('d', "machine_model", Default = "Generic", Required = false, HelpText = "Machine model.")]
             public string MachineModel { get; set; }
 
-            [Option('o', "settings_override", Required = false, HelpText = "Override individual settings")]
-            public IEnumerable<string> SettingsOverride{ get; set; }
+            [Option('f', "force_invalid_settings", Default = false, Required = false, 
+                HelpText = "Unless true, settings will be validated against UserSettings for the settings type; the generator will not run with invalid settings. If true, invalid settings will still be used.")]
+            public bool ForceInvalidSettings { get; set; }
         }
 
         [STAThread]
@@ -107,6 +111,7 @@ namespace gsCore.CLI
                     Console.WriteLine("");
                     foreach (string s in ListEngines(p))
                         Console.WriteLine(s);
+                    return;
                 }
                 var engine = engineEntry.Value;
     
@@ -162,6 +167,37 @@ namespace gsCore.CLI
                     {
                         Console.WriteLine("Error processing settings override from command line argument: ");
                         Console.WriteLine(s);
+                        return;
+                    }
+                }
+
+
+                // Perform setting validations
+                Console.WriteLine("Validating settings:");
+                var validations = engine.SettingsManager.UserSettings.Validate(settings);
+                int errorCount = 0;
+                foreach (var v in validations)
+                {                    
+                    if (v.Severity == ValidationResult.Level.Warning)
+                    {
+                        Console.WriteLine($"\tWarning - {v.SettingName}: {v.Message}");
+                    }
+                    else if (v.Severity == ValidationResult.Level.Error)
+                    {
+                        Console.WriteLine($"\tError - {v.SettingName}: {v.Message}");
+                        errorCount++;
+                    }
+                }
+
+                if (errorCount > 0)
+                {
+                    if (o.ForceInvalidSettings)
+                    {
+                        Console.WriteLine("Invalid settings found; proceeding anyway since -f flag is enabled.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid settings found; canceling generation. To override validation, use the -f flag.");
                         return;
                     }
                 }

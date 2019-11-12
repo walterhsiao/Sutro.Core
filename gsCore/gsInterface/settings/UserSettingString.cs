@@ -6,10 +6,11 @@ namespace gs.interfaces
     {
 
         public UserSettingString(
-            string translationKey,
+            Func<string> nameF,
+            Func<string> descriptionF,
             Func<TSettings, string> loadF,
             Action<TSettings, string> applyF,
-            Func<string, ValidationResult> validateF = null) : base(translationKey, loadF, applyF, validateF)
+            Func<string, ValidationResult> validateF = null) : base(nameF, descriptionF, loadF, applyF, validateF)
         {
         }
     }

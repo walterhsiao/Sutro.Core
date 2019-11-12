@@ -1,49 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace gs.interfaces
 {
     public abstract class UserSetting
     {
-        public abstract string Name { get; }
-        public abstract string Description { get; }
+        public readonly Func<string> NameF;
+        public readonly Func<string> DescriptionF;
         public abstract void LoadFromRaw(object settings);
         public abstract void ApplyToRaw(object settings);
         public abstract ValidationResult Validation { get; }
+        public UserSetting(Func<string> nameF, Func<string> descriptionF = null)
+        {
+            NameF = nameF;
+            DescriptionF = descriptionF;
+        }
     }
 
     public abstract class UserSetting<TSettings> : UserSetting
     {
-        public readonly string TranslationKey;
-        public override string Name
+        public UserSetting(Func<string> nameF, Func<string> descriptionF = null) : base(nameF, descriptionF)
         {
-            get
-            {
-                var name = TranslationKey + ".Name";
-                var result = ""; // TODO: Reenable translations
-                //var result = WrapperClassTranslations.ResourceManager.GetString(name);
-                if (string.IsNullOrEmpty(result))
-                    result = name;
-                return result;
-            }
-        }
-
-        public override string Description
-        {
-            get
-            {
-                var name = TranslationKey + ".Description";
-                var result = ""; // TODO: Reenable translations
-                //var result = WrapperClassTranslations.ResourceManager.GetString(name);
-                if (string.IsNullOrEmpty(result))
-                    result = name;
-                return result;
-            }
-        }
-        public UserSetting(string translationKey)
-        {
-            TranslationKey = translationKey;
         }
 
         public override void LoadFromRaw(object settings)
@@ -67,10 +46,12 @@ namespace gs.interfaces
         private readonly Func<TSettings, TValue> loadF;
         private readonly Action<TSettings, TValue> applyF;
 
-        public UserSetting(string translationKey,
+        public UserSetting(
+            Func<string> nameF,
+            Func<string> descriptionF,
             Func<TSettings, TValue> loadF,
             Action<TSettings, TValue> applyF,
-            Func<TValue, ValidationResult> validateF = null) : base(translationKey)
+            Func<TValue, ValidationResult> validateF = null) : base(nameF, descriptionF)
         {
             this.validateF = validateF;
             this.applyF = applyF;

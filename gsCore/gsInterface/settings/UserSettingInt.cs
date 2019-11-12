@@ -7,44 +7,45 @@ namespace gs.interfaces
     public class UserSettingInt<TSettings> : UserSetting<TSettings, int> where TSettings : PlanarAdditiveSettings
     {
         public UserSettingInt(
-            string translationKey,
+            Func<string> nameF,
+            Func<string> descriptionF,
             Func<TSettings, int> loadF,
             Action<TSettings, int> applyF,
-            Func<int, ValidationResult> validateF = null) : base(translationKey, loadF, applyF, validateF)
+            Func<int, ValidationResult> validateF = null) : base(nameF, descriptionF, loadF, applyF, validateF)
         {
 
         }
     }
 
-    public static class UserSettingIntValidations
+    public static class UserSettingNumericValidations<T> where T : IComparable<T>
     {
-        public static Func<int, ValidationResult> ValidateMin(int min)
+        public static Func<T, ValidationResult> ValidateMin(T min, ValidationResult.Level level)
         {
             return (val) =>
             {
-                if (val < min)
-                    return new ValidationResult(ValidationResult.Level.Warning, string.Format("Must be at least {0}", min));
+                if (val.CompareTo(min) < 0)
+                    return new ValidationResult(level, string.Format("Must be at least {0}", min));
                 return new ValidationResult();
             };
         }
 
-        public static Func<int, ValidationResult> ValidateMax(int max)
+        public static Func<T, ValidationResult> ValidateMax(T max, ValidationResult.Level level)
         {
             return (val) =>
             {
-                if (val > max)
-                    return new ValidationResult(ValidationResult.Level.Warning, string.Format("Must be no more than {0}", max));
+                if (val.CompareTo(max) > 0)
+                    return new ValidationResult(level, string.Format("Must be no more than {0}", max));
                 return new ValidationResult();
             };
         }
 
-        public static Func<int, ValidationResult> ValidateMinMax(int min, int max)
+        public static Func<T, ValidationResult> ValidateMinMax(T min, T max, ValidationResult.Level level)
         {
             return (val) =>
             {
-                var result = ValidateMin(min).Invoke(val);
+                var result = ValidateMin(min, level).Invoke(val);
                 if (result.Severity == ValidationResult.Level.None)
-                    result = ValidateMax(max).Invoke(val);
+                    result = ValidateMax(max, level).Invoke(val);
                 return result;
             };
         }

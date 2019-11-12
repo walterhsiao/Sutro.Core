@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace gs.interfaces.engines.translations {
+namespace gs.interfaces {
     using System;
     
     
@@ -57,6 +57,60 @@ namespace gs.interfaces.engines.translations {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string FloorLayers_Description {
+            get {
+                return ResourceManager.GetString("FloorLayers.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Floor Layers.
+        /// </summary>
+        internal static string FloorLayers_Name {
+            get {
+                return ResourceManager.GetString("FloorLayers.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string RoofLayers_Description {
+            get {
+                return ResourceManager.GetString("RoofLayers.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Roof Layers.
+        /// </summary>
+        internal static string RoofLayers_Name {
+            get {
+                return ResourceManager.GetString("RoofLayers.Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Shells_Description {
+            get {
+                return ResourceManager.GetString("Shells.Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Perimeters.
+        /// </summary>
+        internal static string Shells_Name {
+            get {
+                return ResourceManager.GetString("Shells.Name", resourceCulture);
             }
         }
     }

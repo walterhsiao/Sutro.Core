@@ -24,6 +24,7 @@
     <EmbeddedResource Update="engines\translations\UserSettingTranslations.resx">
       <LastGenOutput>UserSettingTranslations.Designer.cs</LastGenOutput>
       <Generator>ResXFileCodeGenerator</Generator>
+      <CustomToolNamespace>gs.interfaces</CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>
 
