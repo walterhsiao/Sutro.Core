@@ -105,7 +105,7 @@ namespace gs.info
         {
             Machine.ManufacturerName = "Printrbot";
             Machine.ManufacturerUUID = Printrbot.UUID;
-            Machine.ModelIdentifier = "(Unknown)";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = Printrbot.UUID_Unknown;
             Machine.Class = MachineClass.PlasticFFFPrinter;
             Machine.BedSizeXMM = 100;

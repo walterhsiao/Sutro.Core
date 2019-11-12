@@ -108,7 +108,7 @@ namespace gs.info
         {
             Machine.ManufacturerName = "Flashforge";
             Machine.ManufacturerUUID = Flashforge.UUID;
-            Machine.ModelIdentifier = "(Unknown)";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = Flashforge.UUID_Unknown;
             Machine.Class = MachineClass.PlasticFFFPrinter;
 

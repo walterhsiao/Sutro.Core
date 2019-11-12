@@ -1,18 +1,19 @@
-﻿using g3;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using gs.interfaces;
 
-namespace gs
+namespace gs.interfaces
 {
     [Export(typeof(IEngine))]
-    [ExportMetadata("Name", "core_fff")]
+    [ExportMetadata("Name", "fff")]
     [ExportMetadata("Description", "Provides access to the basic print generator included in gsCore. Can only create gcode for a single mesh with single material.")]
-    public class EngineFFF : IEngine
+    public class EngineFFF : Engine<SingleMaterialFFFSettings>
     {
-        public IGenerator Generator => new SinglePartGenerator<SingleMaterialFFFPrintGenerator, GenericRepRapSettings>();
-        public ISettingsManager SettingsManager => new SingleMaterialFFFSettingsManager();
-        public List<IVisualizer> Visualizers => null;
+        public override List<IVisualizer> Visualizers => null;
+
+        public override IGenerator<SingleMaterialFFFSettings> Generator => 
+            new SinglePartGenerator<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>();
+
+        public override ISettingsManager<SingleMaterialFFFSettings> SettingsManager => 
+            new SingleMaterialFFFSettingsManager();
     }
 }

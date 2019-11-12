@@ -71,6 +71,12 @@ namespace gsCore.CLI
             [Option('s', "settings_files", Required=false, HelpText = "Settings file(s).")]
             public IEnumerable<string> SettingsFiles { get; set; }
 
+            [Option('m', "machine_manufacturer", Default ="RepRap", Required = false, HelpText = "Machine manufacturer.")]
+            public string MachineManufacturer { get; set; }
+
+            [Option('d', "machine_model", Default = "Generic", Required = false, HelpText = "Machine model.")]
+            public string MachineModel { get; set; }
+
             [Option('o', "settings_override", Required = false, HelpText = "Override individual settings")]
             public IEnumerable<string> SettingsOverride{ get; set; }
         }
@@ -126,7 +132,7 @@ namespace gsCore.CLI
                     }
                 }
 
-                var settings = engine.SettingsManager.FactorySettings[0];
+                var settings = engine.SettingsManager.FactorySettingByManufacturerAndModel(o.MachineManufacturer, o.MachineModel);
 
                 // Load settings from files
                 foreach (string s in o.SettingsFiles)

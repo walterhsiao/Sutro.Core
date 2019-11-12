@@ -33,7 +33,7 @@ namespace gs.info
         {
             Machine.ManufacturerName = ManufacturerName;
             Machine.ManufacturerUUID = ManufacturerUUID;
-            Machine.ModelIdentifier = "Unknown";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = DefaultMachineUUID;
             Machine.Class = MachineClass.PlasticFFFPrinter;
             Machine.BedSizeXMM = 80;

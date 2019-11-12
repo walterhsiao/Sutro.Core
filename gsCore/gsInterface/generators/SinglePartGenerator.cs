@@ -8,7 +8,7 @@ namespace gs
 {
     public class SinglePartGenerator<TPrintGenerator, TPrintSettings> : IGenerator<TPrintSettings>
             where TPrintGenerator : ThreeAxisPrintGenerator, IPrintGeneratorInitialize, new()
-            where TPrintSettings : SingleMaterialFFFSettings, new() 
+            where TPrintSettings : SingleMaterialFFFSettings
     {
         public bool AcceptsParts { get; } = true;
         public bool AcceptsPartSettings { get; } = false;
@@ -60,6 +60,7 @@ namespace gs
             {
                 LayerHeightMM = globalSettings.LayerHeightMM
             };
+
             slicer.Add(meshes);
             PlanarSliceStack slices = slicer.Compute();
 

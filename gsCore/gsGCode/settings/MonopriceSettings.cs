@@ -100,7 +100,7 @@ namespace gs.info
         {
             Machine.ManufacturerName = "Monoprice";
             Machine.ManufacturerUUID = Monoprice.UUID;
-            Machine.ModelIdentifier = "(Unknown)";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = Monoprice.UUID_Unknown;
             Machine.Class = MachineClass.PlasticFFFPrinter;
             Machine.BedSizeXMM = 100;

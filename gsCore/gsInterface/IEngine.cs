@@ -20,4 +20,14 @@ namespace gs.interfaces
         new IGenerator<TSettings> Generator { get; }
         new ISettingsManager<TSettings> SettingsManager { get; }
     }
+
+    public abstract class Engine<TSettings> : IEngine<TSettings>
+    {
+        public abstract IGenerator<TSettings> Generator { get; }
+        public abstract ISettingsManager<TSettings> SettingsManager { get; }
+        public abstract List<IVisualizer> Visualizers { get; }
+
+        IGenerator IEngine.Generator => Generator;
+        ISettingsManager IEngine.SettingsManager => SettingsManager;
+    }
 }

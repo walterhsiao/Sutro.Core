@@ -50,7 +50,7 @@ namespace gs.info
         {
             Machine.ManufacturerName = "RepRap";
             Machine.ManufacturerUUID = RepRap.UUID;
-            Machine.ModelIdentifier = "Unknown";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = RepRap.UUID_Unknown;
             Machine.Class = MachineClass.PlasticFFFPrinter;
             Machine.BedSizeXMM = 80;
