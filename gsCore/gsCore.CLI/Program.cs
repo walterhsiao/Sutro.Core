@@ -8,6 +8,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using gs.interfaces;
+using System.Reflection;
 
 namespace gsCore.CLI
 {
@@ -140,6 +141,14 @@ namespace gsCore.CLI
                 return;
             }
             var engine = engineEntry.Value;
+            var settings = engine.SettingsManager.FactorySettingByManufacturerAndModel(o.MachineManufacturer, o.MachineModel);
+
+            ConsoleWriteSeparator();
+            Version cliVersion = Assembly.GetEntryAssembly().GetName().Version;
+            Console.WriteLine("gsCore.CLI " + VersionToString(cliVersion));
+            Console.WriteLine();
+
+            Console.WriteLine($"Using engine {engine.GetType()} {VersionToString(engine.Generator.Version)}");
 
             if (engine.Generator.AcceptsParts && (o.MeshFilePath is null || !File.Exists(o.MeshFilePath)))
             {
@@ -163,8 +172,13 @@ namespace gsCore.CLI
                 }
             }
 
-            var settings = engine.SettingsManager.FactorySettingByManufacturerAndModel(o.MachineManufacturer, o.MachineModel);
-
+            ConsoleWriteSeparator();
+            Console.WriteLine($"SETTINGS");
+            Console.WriteLine();
+            string manufacturerName = ((PlanarAdditiveSettings)settings).BaseMachine.ManufacturerName;
+            string modelName = ((PlanarAdditiveSettings)settings).BaseMachine.ModelIdentifier;
+            Console.WriteLine($"Starting with factory profile {manufacturerName} {modelName}");
+            
             // Load settings from files
             foreach (string s in o.SettingsFiles)
             {
@@ -197,9 +211,8 @@ namespace gsCore.CLI
                 }
             }
 
-
             // Perform setting validations
-            Console.WriteLine("Validating settings:");
+            Console.WriteLine("Validating settings...");
             var validations = engine.SettingsManager.UserSettings.Validate(settings);
             int errorCount = 0;
             foreach (var v in validations)
@@ -231,6 +244,10 @@ namespace gsCore.CLI
             string fMeshFilePath = Path.GetFullPath(o.MeshFilePath);
             string fGCodeFilePath = Path.GetFullPath(o.GCodeFilePath);
 
+            ConsoleWriteSeparator();
+            Console.WriteLine($"PARTS");
+            Console.WriteLine();
+
             Console.Write("Loading mesh " + fMeshFilePath + "...");
             DMesh3 mesh = StandardMeshReader.ReadMesh(fMeshFilePath);
             Console.WriteLine(" done.");
@@ -246,6 +263,10 @@ namespace gsCore.CLI
 
             var part = new Tuple<DMesh3, object>(mesh, null);
             var parts = new List<Tuple<DMesh3, object>>() { part };
+
+            ConsoleWriteSeparator();
+            Console.WriteLine($"GENERATION");
+            Console.WriteLine();
 
             Console.WriteLine("Generating gcode...");
             var gcode = engine.Generator.GenerateGCode(parts, settings, null, null, (s) => Console.WriteLine("\t" + s));
@@ -271,6 +292,16 @@ namespace gsCore.CLI
             Console.WriteLine("");
             foreach (string s in ListEngines())
                 Console.WriteLine(s);
+        }
+
+        protected static void ConsoleWriteSeparator()
+        {
+            Console.WriteLine("".PadRight(79, '-'));
+        }
+
+        protected static string VersionToString(Version v)
+        {
+            return $"v{v.Major}.{v.Minor}.{v.Revision}";
         }
     }
 }

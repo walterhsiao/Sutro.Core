@@ -6,6 +6,8 @@
     <Authors>Ryan Schmidt</Authors>
     <Company>gradientspace</Company>
     <RootNamespace>gs</RootNamespace>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

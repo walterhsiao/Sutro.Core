@@ -26,6 +26,8 @@ namespace gs
 
         bool AcceptsParts { get; }
         bool AcceptsPartSettings { get; }
+
+        Version Version { get; }
     }
 
     public interface IGenerator<TSettings> : IGenerator

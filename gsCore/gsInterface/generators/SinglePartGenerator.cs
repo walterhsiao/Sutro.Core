@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace gs
 {
@@ -12,6 +13,11 @@ namespace gs
     {
         public bool AcceptsParts { get; } = true;
         public bool AcceptsPartSettings { get; } = false;
+
+        public Version Version { get {
+                var assembly = Assembly.GetAssembly(typeof(TPrintGenerator));
+                return assembly.GetName().Version;
+            } }
 
         public void SaveGCode(string path, GCodeFile file)
         {
