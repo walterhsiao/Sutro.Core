@@ -23,25 +23,26 @@ namespace gs.info
     {
 		public Prusa.Models ModelEnum;
 
-        public override AssemblerFactoryF AssemblerType() {
+        public override AssemblerFactoryF AssemblerType()
+        {
 			return MakePrusaAssembler;
         }
 
+        public PrusaSettings()
+        {
+            ModelEnum = Prusa.Models.Unknown;
+            configure_unknown();
+        }
 
-		public PrusaSettings(Prusa.Models model) {
+
+        public PrusaSettings(Prusa.Models model)
+        {
 			ModelEnum = model;
 
             if (model == Prusa.Models.i3_MK3)
                 configure_i3_MK3();
             else
                 configure_unknown();
-        }
-
-        public override T CloneAs<T>()
-        {
-            var clone = (PrusaSettings)MemberwiseClone();
-            clone.Machine = this.machineInfo.CloneAs<FFFMachineInfo>();
-            return clone as T;
         }
 
 

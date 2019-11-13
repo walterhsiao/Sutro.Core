@@ -1,13 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using g3;
-
-namespace gs.info
+﻿namespace gs.info
 {
-	public class GenericPrinterSettings : GenericRepRapSettings
+    public class GenericPrinterSettings : GenericRepRapSettings
     {
-        public override AssemblerFactoryF AssemblerType() {
+        public override AssemblerFactoryF AssemblerType()
+        {
             return RepRapAssembler.Factory;
         }
 
@@ -15,18 +11,17 @@ namespace gs.info
         public string ManufacturerUUID;
         public string DefaultMachineUUID;
 
-		public GenericPrinterSettings(string mfgName, string mfgUUID, string defaultMachineUUID) {
+        public GenericPrinterSettings()
+        {
+            configure_unknown();
+        }
+
+        public GenericPrinterSettings(string mfgName, string mfgUUID, string defaultMachineUUID) {
             ManufacturerName = mfgName;
             ManufacturerUUID = mfgUUID;
             DefaultMachineUUID = defaultMachineUUID;
 
             configure_unknown();
-        }
-
-        public override T CloneAs<T>() {
-            var clone = (GenericPrinterSettings)MemberwiseClone();
-            clone.Machine = this.machineInfo.CloneAs<FFFMachineInfo>();
-            return clone as T;
         }
 
         void configure_unknown()

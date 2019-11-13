@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using g3;
 
 namespace gs.info
 {
-	public static class Monoprice
+    public static class Monoprice
 	{
         public const string UUID = "860432eb-dec6-4b20-8f97-3643a50daf1d";
 
@@ -23,12 +20,19 @@ namespace gs.info
     {
 		public Monoprice.Models ModelEnum;
 
-        public override AssemblerFactoryF AssemblerType() {
+        public override AssemblerFactoryF AssemblerType()
+        {
             return RepRapAssembler.Factory;
         }
 
+        public MonopriceSettings()
+        {
+            ModelEnum = Monoprice.Models.Unknown;
+            configure_unknown();
+        }
 
-		public MonopriceSettings(Monoprice.Models model) {
+        public MonopriceSettings(Monoprice.Models model)
+        {
 			ModelEnum = model;
 
             if (model == Monoprice.Models.MP_Select_Mini_V2)
@@ -37,20 +41,11 @@ namespace gs.info
                 configure_unknown();
         }
 
-        public override T CloneAs<T>()
-        {
-            var clone = (MonopriceSettings)MemberwiseClone();
-            clone.Machine = this.machineInfo.CloneAs<FFFMachineInfo>();
-            return clone as T;
-        }
-
         public static IEnumerable<SingleMaterialFFFSettings> EnumerateDefaults()
         {
             yield return new MonopriceSettings(Monoprice.Models.MP_Select_Mini_V2);
             yield return new MonopriceSettings(Monoprice.Models.Unknown);
         }
-
-
 
         void configure_MP_Select_Mini_V2()
         {
@@ -92,9 +87,6 @@ namespace gs.info
             RapidExtrudeSpeed = Machine.MaxExtrudeSpeedMMM;
             OuterPerimeterSpeedX = 0.5;
         }
-
-
-
 
         void configure_unknown()
         {
@@ -138,7 +130,5 @@ namespace gs.info
             RapidExtrudeSpeed = Machine.MaxExtrudeSpeedMMM;
             OuterPerimeterSpeedX = 0.5;
         }
-
-
     }
 }

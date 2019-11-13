@@ -11,7 +11,7 @@ namespace gs
     }
 
 
-    public abstract class MachineInfo
+    public abstract class MachineInfo : Settings
     {
         protected static string UnknownUUID = "00000000-0000-0000-0000-000000000000";
 
@@ -39,10 +39,7 @@ namespace gs
 
         public double BedOriginFactorX = 0;
         public double BedOriginFactorY = 0;
-
-        public abstract T CloneAs<T>() where T : class;
     }
-
 
 
     public class FFFMachineInfo : MachineInfo
@@ -93,17 +90,10 @@ namespace gs
                                                         // configured using CalibrationModelGenerator.MakePrintStepSizeTest() with
                                                         // all other cleanup steps disabled.
                                                         // [TODO] this is actually speed-dependent...
-
-        public override T CloneAs<T>()
-        {
-            var fi = MemberwiseClone();
-            return fi as T;
-        }
     }
 
 
-
-    public abstract class PlanarAdditiveSettings
+    public abstract class PlanarAdditiveSettings : Settings
 	{
         /// <summary>
         /// This is the "name" of this settings (eg user identifier)
@@ -112,24 +102,19 @@ namespace gs
 
 		public double LayerHeightMM = 0.2;
 
-
-        public string ClassTypeName {
-            get { return GetType().ToString(); }
-        }
-
-
         public abstract MachineInfo BaseMachine { get; set; }
-
-        public abstract T CloneAs<T>() where T : class;
     }
 
 
 
-    public abstract class SingleMaterialFFFSettings : PlanarAdditiveSettings
+    public class SingleMaterialFFFSettings : PlanarAdditiveSettings
 	{
         // This is a bit of an odd place for this, but settings are where we actually
         // know what assembler we should be using...
-        public abstract AssemblerFactoryF AssemblerType();
+        public virtual AssemblerFactoryF AssemblerType()
+        {
+            throw new NotImplementedException($"{GetType()}.AssemblerType() not provided");
+        }
 
         protected FFFMachineInfo machineInfo;
         public FFFMachineInfo Machine {
@@ -286,20 +271,6 @@ namespace gs
         public double BridgeFillPathSpacingMM() {
 			return Machine.NozzleDiamMM * BridgeFillNozzleDiamStepX;
         }
-
-
-        public override T CloneAs<T>()
-        {
-            var clone = (SingleMaterialFFFSettings) MemberwiseClone();
-
-            // NOTE: If you add reference type members to the class, 
-            // you need to create copies here, otherwise they will be copied by reference.
-            // `string` members are okay because they are readonly.
-            clone.Machine = this.machineInfo.CloneAs<FFFMachineInfo>();
-
-            return clone as T;
-        }
-
     }
 
 
@@ -311,16 +282,6 @@ namespace gs
         public override AssemblerFactoryF AssemblerType() {
             return RepRapAssembler.Factory;
         }
-
-
-        public override T CloneAs<T>()
-        {
-            var clone = (GenericRepRapSettings)MemberwiseClone();
-            clone.Machine = this.machineInfo.CloneAs<FFFMachineInfo>();
-            return clone as T; 
-        }
-        
-
     }
 
 }

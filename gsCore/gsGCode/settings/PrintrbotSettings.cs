@@ -23,25 +23,25 @@ namespace gs.info
     {
 		public Printrbot.Models ModelEnum;
 
-        public override AssemblerFactoryF AssemblerType() {
+        public override AssemblerFactoryF AssemblerType()
+        {
 			return MakePrintrbotAssembler;
         }
 
+        public PrintrbotSettings()
+        {
+            ModelEnum = Printrbot.Models.Unknown;
+            configure_unknown();
+        }
 
-		public PrintrbotSettings(Printrbot.Models model) {
+        public PrintrbotSettings(Printrbot.Models model)
+        {
 			ModelEnum = model;
 
 			if (model == Printrbot.Models.Plus)
                 configure_Plus();
             else
                 configure_unknown();
-        }
-
-        public override T CloneAs<T>() {
-
-            var clone = (PrintrbotSettings)MemberwiseClone();
-            clone.Machine = this.machineInfo.CloneAs<FFFMachineInfo>();
-            return clone as T;
         }
 
 

@@ -16,6 +16,13 @@ namespace gs
         }
     }
 
+
+    /// <summary>
+    /// Base class for settings objects.
+    /// </summary>
+    /// <remarks>
+    /// Allows bi-directional copying and cloning between parent and child classes, as well as sibling classes. This facilitates working with settings instances, but should be used with caution. The CopyValuesFrom and CloneAs methods use reflection to copy any public properties or fields that are present in both types. Reference types (except for string) must derive from Settings also, to allow recursive deep copying.
+    /// </remarks>
     public abstract class Settings
     {
         public virtual void CopyValuesFrom<T>(T other) where T : Settings

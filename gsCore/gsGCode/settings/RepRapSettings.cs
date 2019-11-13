@@ -21,24 +21,25 @@ namespace gs.info
     {
 		public RepRap.Models ModelEnum;
 
-        public override AssemblerFactoryF AssemblerType() {
+        public override AssemblerFactoryF AssemblerType()
+        {
             return RepRapAssembler.Factory;
         }
 
+        public RepRapSettings()
+        {
+            ModelEnum = RepRap.Models.Unknown;
+            configure_unknown();
+        }
 
-		public RepRapSettings(RepRap.Models model) {
+		public RepRapSettings(RepRap.Models model)
+        {
 			ModelEnum = model;
 
             if (model == RepRap.Models.Unknown)
                 configure_unknown();
         }
 
-        public override T CloneAs<T>()
-        {
-            var clone = (RepRapSettings)MemberwiseClone();
-            clone.Machine = this.machineInfo.CloneAs<FFFMachineInfo>();
-            return clone as T;
-        }
 
         public static IEnumerable<SingleMaterialFFFSettings> EnumerateDefaults()
         {
