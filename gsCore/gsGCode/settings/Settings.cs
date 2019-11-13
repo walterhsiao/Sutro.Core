@@ -1,7 +1,21 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace gs
 {
+    public class SettingsContainsReferenceType : Exception
+    {
+        public SettingsContainsReferenceType() : base() { }
+
+        public SettingsContainsReferenceType(string message) : base(message)
+        {
+        }
+
+        public SettingsContainsReferenceType(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+    }
+
     public abstract class Settings
     {
         public virtual void CopyValuesFrom<T>(T other) where T : Settings
@@ -13,7 +27,7 @@ namespace gs
                     PropertyInfo prop_other = other.GetType().GetProperty(prop_this.Name);
                     if (prop_other != null)
                     {
-                        prop_this.SetValue(this, prop_other.GetValue(other));
+                        prop_this.SetValue(this, CopyValue(prop_other.GetValue(other)));
                     }
                 }
             }
@@ -23,7 +37,36 @@ namespace gs
                 FieldInfo field_other = other.GetType().GetField(field_this.Name);
                 if (field_other != null)
                 {
-                    field_this.SetValue(this, field_other.GetValue(other));
+                    field_this.SetValue(this, CopyValue(field_other.GetValue(other)));
+                }
+            }
+        }
+
+        private object CopyValue(object v)
+        {
+            var type = v.GetType();
+            if (type.IsValueType)
+            {
+                return v;
+            }
+            else
+            {
+                if (type == typeof(string))
+                {
+                    return v;
+                }
+                else if (v is Settings v_typed)
+                {
+                    var instance = Activator.CreateInstance(type);
+                    ((Settings)instance).CopyValuesFrom(v_typed);
+                    return instance;
+                }
+                else
+                {
+                    throw new SettingsContainsReferenceType(
+                        $"All reference types in classes derived from Settings should also inherit from Settings to " +
+                        $"allow recursive deep copying. Type {type} was found on a public property or field; " +
+                        $"to resolve, make {type} inherit from abstract base class Settings");
                 }
             }
         }
