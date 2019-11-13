@@ -19,18 +19,21 @@ namespace gs.interfaces
         List<PrintVertex> toolpath = null;
         PrintVertex lastVertex = default;
 
-        public SingleMaterialFFFSettings settings;
+        public SingleMaterialFFFSettings settings = null;
 
         public event Action<ToolpathPreviewVertex[], int[], int> OnMeshGenerated;
         public event Action<List<Vector3d>, int> OnLineGenerated;
 
-        public VolumetricBeadVisualizer(SingleMaterialFFFSettings settings)
+        public VolumetricBeadVisualizer()
         {
-            this.settings = settings;
         }
 
         public void BeginGCodeLineStream()
         {
+            // TODO: Find a more decoupled way of passing in bed info.
+            if (settings == null)
+                throw new Exception("Should assign settings field before starting stream");
+
             dimensions.x = settings.Machine.NozzleDiamMM;
             dimensions.y = settings.LayerHeightMM;
 
