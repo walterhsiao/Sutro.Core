@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>gs.interfaces</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\geometry3Sharp\geometry3Sharp.csproj" />
+    <ProjectReference Include="..\gsGCode\gsGCode.csproj" />
+    <ProjectReference Include="..\gsSlicer\gsSlicer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="engines\translations\UserSettingTranslations.Designer.cs">
+      <CustomToolNamespace>gs.interfaces</CustomToolNamespace>
+      <DependentUpon>UserSettingTranslations.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="engines\translations\UserSettingTranslations.resx">
+      <LastGenOutput>UserSettingTranslations.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <CustomToolNamespace>gs.interfaces</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

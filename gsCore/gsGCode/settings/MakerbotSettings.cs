@@ -120,7 +120,7 @@ namespace gs.info
         {
             Machine.ManufacturerName = "Makerbot";
             Machine.ManufacturerUUID = Makerbot.UUID;
-            Machine.ModelIdentifier = "(Unknown)";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = Makerbot.UUID_Unknown;
             Machine.Class = MachineClass.PlasticFFFPrinter;
 

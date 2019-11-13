@@ -102,7 +102,7 @@ namespace gs.info
         {
             Machine.ManufacturerName = "Prusa";
             Machine.ManufacturerUUID = Prusa.UUID;
-            Machine.ModelIdentifier = "(Unknown)";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = Prusa.UUID_Unknown;
             Machine.Class = MachineClass.PlasticFFFPrinter;
             Machine.BedSizeXMM = 100;
