@@ -43,6 +43,18 @@ namespace gsCore.UnitTests
         public SubSettingsBad SubSettings = new SubSettingsBad();
     }
 
+    internal enum EnumNumbers { Zero = 0, One = 1, Two = 2};
+    internal class SettingsF : SettingsA
+    {
+        public EnumNumbers Enum;
+    }
+
+    internal enum EnumColors { Blue = 0, Green = 1, Red = 2};
+    internal class SettingsG : SettingsA
+    {
+        public EnumColors Enum;
+    }
+
     [TestClass]
     public class SettingsTests
     {
@@ -164,6 +176,34 @@ namespace gsCore.UnitTests
             {
                 var copy = orig.CloneAs<SettingsE>();
             });
+        }
+
+        [TestMethod]
+        public void Clone_FieldsWithDifferentEnums()
+        {
+            var orig = new SettingsF();
+            orig.Enum = EnumNumbers.One;
+
+            var copy = new SettingsG();
+            copy.Enum = EnumColors.Red;
+
+            copy.CopyValuesFrom(orig);
+
+            Assert.AreEqual(EnumColors.Red, copy.Enum);
+        }
+
+        [TestMethod]
+        public void Clone_FieldsWithSameEnums()
+        {
+            var orig = new SettingsF();
+            orig.Enum = EnumNumbers.One;
+
+            var copy = new SettingsF();
+            copy.Enum = EnumNumbers.Two;
+
+            copy.CopyValuesFrom(orig);
+
+            Assert.AreEqual(EnumNumbers.One, copy.Enum);
         }
     }
 }

@@ -34,7 +34,17 @@ namespace gs
                     PropertyInfo prop_other = other.GetType().GetProperty(prop_this.Name);
                     if (prop_other != null)
                     {
-                        prop_this.SetValue(this, CopyValue(prop_other.GetValue(other)));
+                        if (prop_this.PropertyType.IsEnum)
+                        {
+                            if (prop_this.PropertyType == prop_other.PropertyType)
+                            {
+                                prop_this.SetValue(this, prop_other.GetValue(other));
+                            }
+                        }
+                        else
+                        {
+                            prop_this.SetValue(this, CopyValue(prop_other.GetValue(other)));
+                        }
                     }
                 }
             }
@@ -42,9 +52,20 @@ namespace gs
             foreach (FieldInfo field_this in GetType().GetFields())
             {
                 FieldInfo field_other = other.GetType().GetField(field_this.Name);
+
                 if (field_other != null)
                 {
-                    field_this.SetValue(this, CopyValue(field_other.GetValue(other)));
+                    if (field_this.FieldType.IsEnum)
+                    {
+                        if (field_this.FieldType == field_other.FieldType)
+                        {
+                            field_this.SetValue(this, field_other.GetValue(other));
+                        }
+                    }
+                    else
+                    {
+                        field_this.SetValue(this, CopyValue(field_other.GetValue(other)));
+                    }
                 }
             }
         }
