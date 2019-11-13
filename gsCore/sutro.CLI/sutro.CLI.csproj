@@ -62,10 +62,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\smPro\smPro\smPro.Lib\smPro.Lib.csproj">
-      <Project>{41ec8c02-6d4f-42b3-a231-42cc346747be}</Project>
-      <Name>smPro.Lib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\geometry3Sharp\geometry3Sharp.csproj">
       <Project>{7046cf61-d5d8-4c11-9e4b-959102ae131c}</Project>
       <Name>geometry3Sharp</Name>
