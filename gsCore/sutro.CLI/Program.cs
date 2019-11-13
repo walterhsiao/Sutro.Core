@@ -48,17 +48,11 @@ namespace sutro.CLI
 
         protected virtual void AddCatalogs(AggregateCatalog catalog)
         {
-            // Add all the "parts" found in the same assembly as the Program class
-            catalog.Catalogs.Add(new ApplicationCatalog());
-
-            // Add all the "parts" found in the same assembly as the Program class
-            catalog.Catalogs.Add(new AssemblyCatalog(typeof(Program).Assembly));
-
-            //// Add all the "parts" found in dlls in the given directory.
-            //string dir = Path.Combine(
-            //    Directory.GetParent(Environment.CurrentDirectory).Parent.FullName,
-            //    "Extensions");
-            //catalog.Catalogs.Add(new DirectoryCatalog(dir));
+            // This iteration is required because of the bundling done by Fody.Costura
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                catalog.Catalogs.Add(new AssemblyCatalog(asm));
+            }
         }
 
         public class Options
