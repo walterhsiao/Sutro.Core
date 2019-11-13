@@ -136,7 +136,6 @@ namespace sutro.CLI
                 return;
             }
             var engine = engineEntry.Value;
-            var settings = engine.SettingsManager.FactorySettingByManufacturerAndModel(o.MachineManufacturer, o.MachineModel);
 
             ConsoleWriteSeparator();
             Version cliVersion = Assembly.GetEntryAssembly().GetName().Version;
@@ -170,9 +169,23 @@ namespace sutro.CLI
             ConsoleWriteSeparator();
             Console.WriteLine($"SETTINGS");
             Console.WriteLine();
-            string manufacturerName = ((PlanarAdditiveSettings)settings).BaseMachine.ManufacturerName;
-            string modelName = ((PlanarAdditiveSettings)settings).BaseMachine.ModelIdentifier;
-            Console.WriteLine($"Starting with factory profile {manufacturerName} {modelName}");
+            object settings;
+            try
+            {
+                settings = engine.SettingsManager.FactorySettingByManufacturerAndModel(o.MachineManufacturer, o.MachineModel);
+                string manufacturerName = ((PlanarAdditiveSettings)settings).BaseMachine.ManufacturerName;
+                string modelName = ((PlanarAdditiveSettings)settings).BaseMachine.ModelIdentifier;
+                Console.WriteLine($"Starting with factory profile {manufacturerName} {modelName}");
+            }
+            catch (KeyNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+
+                settings = engine.SettingsManager.FactorySettings[0];
+                string manufacturerName = ((PlanarAdditiveSettings)settings).BaseMachine.ManufacturerName;
+                string modelName = ((PlanarAdditiveSettings)settings).BaseMachine.ModelIdentifier;
+                Console.WriteLine($"Falling back to first factory profile: {manufacturerName} {modelName}");
+            }
             
             // Load settings from files
             foreach (string s in o.SettingsFiles)
@@ -264,9 +277,8 @@ namespace sutro.CLI
             Console.WriteLine($"GENERATION");
             Console.WriteLine();
 
-            Console.WriteLine("Generating gcode...");
             var gcode = engine.Generator.GenerateGCode(parts, settings, out var generationReport, 
-                null, null, (s) => Console.WriteLine("\t" + s));
+                null, null, (s) => Console.WriteLine(s));
 
             Console.WriteLine($"Writing gcode to {fGCodeFilePath}");
             engine.Generator.SaveGCode(fGCodeFilePath, gcode);

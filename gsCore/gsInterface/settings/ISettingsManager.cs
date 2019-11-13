@@ -91,7 +91,7 @@ namespace gs.interfaces
                             select profile).ToArray();
 
             if (profiles.Length == 0)
-                throw new Exception($"Matching profile not found for {manufacturer} - {model}");
+                throw new KeyNotFoundException($"Matching profile not found for: {manufacturer} {model}");
 
             return profiles[0];
         }
