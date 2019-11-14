@@ -15,4 +15,15 @@ namespace gs.interfaces
         {
         }
     }
+
+    public static class UserSettingEnumValidations<T> where T : IComparable<T> {
+        public static Func<T, ValidationResult> ValidateContains(T[] array, ValidationResult.Level level) {
+            return (val) =>
+            {
+                if (!Array.Exists(array, (elem) => val.Equals(elem)))
+                    return new ValidationResult(level, string.Format("Must be one of ", string.Join(", ", array)));
+                return new ValidationResult();
+            };
+        }
+    }
 }
