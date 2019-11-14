@@ -83,6 +83,10 @@ namespace gs
                 {
                     return v;
                 }
+                else if (type.IsArray)
+                {
+                    return ((Array)v).Clone();
+                }
                 else if (v is Settings v_typed)
                 {
                     var instance = Activator.CreateInstance(type);

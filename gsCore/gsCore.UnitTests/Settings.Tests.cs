@@ -33,26 +33,31 @@ namespace gsCore.UnitTests
         public int IntegerFieldC = 0;
     }
 
-    internal class SettingsD : SettingsA
+    internal class SettingsD : Settings
     {
         public SubSettingsGood SubSettings = new SubSettingsGood();
     }
 
-    internal class SettingsE : SettingsA
+    internal class SettingsE : Settings
     {
         public SubSettingsBad SubSettings = new SubSettingsBad();
     }
 
     internal enum EnumNumbers { Zero = 0, One = 1, Two = 2};
-    internal class SettingsF : SettingsA
+    internal class SettingsF : Settings
     {
         public EnumNumbers Enum;
     }
 
     internal enum EnumColors { Blue = 0, Green = 1, Red = 2};
-    internal class SettingsG : SettingsA
+    internal class SettingsG : Settings
     {
         public EnumColors Enum;
+    }
+
+    internal class SettingsH : Settings
+    {
+        public float[,] FloatArray = new float[2,3] { { 0, 1, 2 }, { 3, 4, 5 } };
     }
 
     [TestClass]
@@ -204,6 +209,18 @@ namespace gsCore.UnitTests
             copy.CopyValuesFrom(orig);
 
             Assert.AreEqual(EnumNumbers.One, copy.Enum);
+        }
+
+        [TestMethod]
+        public void Clone_FloatArray()
+        {
+            var orig = new SettingsH();
+            orig.FloatArray[0, 0] = 10;
+
+            var copy = orig.CloneAs<SettingsH>();
+            orig.FloatArray[0, 0] = 99;
+
+            Assert.AreEqual(10, copy.FloatArray[0,0]);
         }
     }
 }
