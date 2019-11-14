@@ -14,6 +14,11 @@ namespace gs
         public bool AcceptsParts { get; } = true;
         public bool AcceptsPartSettings { get; } = false;
 
+        public SinglePartGenerator(bool acceptsParts = true)
+        {
+            AcceptsParts = acceptsParts;
+        }
+
         public Version Version { get {
                 var assembly = Assembly.GetAssembly(typeof(TPrintGenerator));
                 return assembly.GetName().Version;
