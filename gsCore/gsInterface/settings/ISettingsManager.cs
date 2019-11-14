@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using gs;
 
 namespace gs.interfaces
 {
@@ -65,11 +66,7 @@ namespace gs.interfaces
         public virtual void ApplyKeyValuePair(TSettings settings, string keyValue)
         {
             // TODO: Make this more strict to avoid converting values unintentionally
-            string[] keyValueSplit = keyValue.Split(':');
-            if (keyValueSplit.Length != 2)
-                throw new Exception("Need setting in \"KeyName:Value\" format; got " + keyValue);
-            string sFormatted = "{\"" + keyValueSplit[0] + "\":" + keyValueSplit[1] + "}";
-
+            var sFormatted = StringUtil.FormatSettingOverride(keyValue);
             JsonConvert.PopulateObject(sFormatted, settings, jsonSerializerSettings);
         }
 

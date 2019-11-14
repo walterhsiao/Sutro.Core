@@ -212,10 +212,11 @@ namespace sutro.CLI
                 {
                     engine.SettingsManager.ApplyKeyValuePair(settings, s);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     Console.WriteLine("Error processing settings override from command line argument: ");
                     Console.WriteLine(s);
+                    Console.WriteLine(e.Message);
                     return;
                 }
             }
@@ -250,28 +251,32 @@ namespace sutro.CLI
                 }
             }
 
-            string fMeshFilePath = Path.GetFullPath(o.MeshFilePath);
+            var parts = new List<Tuple<DMesh3, object>>();
+
+            if (engine.Generator.AcceptsParts)
+            {
+                string fMeshFilePath = Path.GetFullPath(o.MeshFilePath);
+                ConsoleWriteSeparator();
+                Console.WriteLine($"PARTS");
+                Console.WriteLine();
+
+                Console.Write("Loading mesh " + fMeshFilePath + "...");
+                DMesh3 mesh = StandardMeshReader.ReadMesh(fMeshFilePath);
+                Console.WriteLine(" done.");
+
+                // Center mesh above origin.
+                AxisAlignedBox3d bounds = mesh.CachedBounds;
+                if (o.CenterXY)
+                    MeshTransforms.Translate(mesh, new Vector3d(-bounds.Center.x, -bounds.Center.y, 0));
+
+                // Drop mesh to bed.
+                if (o.DropZ)
+                    MeshTransforms.Translate(mesh, new Vector3d(0, 0, bounds.Extents.z - bounds.Center.z));
+
+                var part = new Tuple<DMesh3, object>(mesh, null);
+                parts.Add(part);
+            };
             string fGCodeFilePath = Path.GetFullPath(o.GCodeFilePath);
-
-            ConsoleWriteSeparator();
-            Console.WriteLine($"PARTS");
-            Console.WriteLine();
-
-            Console.Write("Loading mesh " + fMeshFilePath + "...");
-            DMesh3 mesh = StandardMeshReader.ReadMesh(fMeshFilePath);
-            Console.WriteLine(" done.");
-
-            // Center mesh above origin.
-            AxisAlignedBox3d bounds = mesh.CachedBounds;
-            if (o.CenterXY)
-                MeshTransforms.Translate(mesh, new Vector3d(-bounds.Center.x, -bounds.Center.y, 0));
-
-            // Drop mesh to bed.
-            if (o.DropZ)
-                MeshTransforms.Translate(mesh, new Vector3d(0, 0, bounds.Extents.z - bounds.Center.z));
-
-            var part = new Tuple<DMesh3, object>(mesh, null);
-            var parts = new List<Tuple<DMesh3, object>>() { part };
 
             ConsoleWriteSeparator();
             Console.WriteLine($"GENERATION");
