@@ -8,8 +8,8 @@ using System.Reflection;
 namespace gs
 {
     public class SinglePartGenerator<TPrintGenerator, TPrintSettings> : IGenerator<TPrintSettings>
-            where TPrintGenerator : ThreeAxisPrintGenerator, IPrintGeneratorInitialize, new()
-            where TPrintSettings : SingleMaterialFFFSettings
+            where TPrintGenerator : IPrintGenerator<TPrintSettings>, new()
+            where TPrintSettings : IPlanarAdditiveSettings
     {
         public bool AcceptsParts { get; } = true;
         public bool AcceptsPartSettings { get; } = false;
@@ -79,20 +79,13 @@ namespace gs
 
             if (printGenerator.Generate())
             {
-                generationReport = CreateGenerationReport(printGenerator.TotalPrintTimeStatistics);
+                generationReport = printGenerator.GenerationReport;
                 return printGenerator.Result;
             }
             else
             {
                 throw new Exception("PrintGenerator failed to generate gcode!");
             }
-        }
-
-        public virtual List<string> CreateGenerationReport(PrintTimeStatistics printTimeStatistics)
-        {
-            var report = new List<string>();
-            report.AddRange(printTimeStatistics.ToStringList());
-            return report;
         }
 
         public GCodeFile GenerateGCode(IList<Tuple<DMesh3, object>> parts,

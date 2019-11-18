@@ -3,7 +3,7 @@
 namespace gs
 {
 
-    public class SingleMaterialFFFPrintGenerator : ThreeAxisPrintGenerator, IPrintGeneratorInitialize
+    public class SingleMaterialFFFPrintGenerator : ThreeAxisPrintGenerator
     {
         GCodeFileAccumulator file_accumulator;
         GCodeBuilder builder;
@@ -19,15 +19,14 @@ namespace gs
             Initialize(meshes, slices, settings, overrideAssemblerF);
         }
 
-        public void Initialize(PrintMeshAssembly meshes,
+        public override void Initialize(PrintMeshAssembly meshes,
                                PlanarSliceStack slices,
                                SingleMaterialFFFSettings settings,
                                AssemblerFactoryF overrideAssemblerF = null)
         {
             file_accumulator = new GCodeFileAccumulator();
             builder = new GCodeBuilder(file_accumulator);
-            AssemblerFactoryF useAssembler = (overrideAssemblerF != null) ?
-                overrideAssemblerF : settings.AssemblerType();
+            AssemblerFactoryF useAssembler = overrideAssemblerF ?? settings.AssemblerType();
             compiler = new SingleMaterialFFFCompiler(builder, settings, useAssembler);
             Initialize(meshes, slices, settings, compiler);
         }

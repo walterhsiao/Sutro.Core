@@ -49,13 +49,19 @@ namespace gs
     }
 
 
-    public interface IPrintGeneratorInitialize
+    public interface IPrintGenerator<TPrintSettings>
     {
         void Initialize(
             PrintMeshAssembly meshes,
             PlanarSliceStack slices,
-            SingleMaterialFFFSettings settings,
+            TPrintSettings settings,
             AssemblerFactoryF overrideAssemblerF);
+
+        bool Generate();
+
+        GCodeFile Result { get; }
+
+        IEnumerable<string> GenerationReport { get; }
     }
 
 
@@ -63,7 +69,7 @@ namespace gs
     /// This is the top-level class that generates a GCodeFile for a stack of slices.
     /// Currently must subclass to provide resulting GCodeFile.
     /// </summary>
-    public abstract class ThreeAxisPrintGenerator
+    public abstract class ThreeAxisPrintGenerator : IPrintGenerator<SingleMaterialFFFSettings>
     {
         // Data structures that must be provided by client
         public PrintMeshAssembly PrintMeshes { get; protected set; }
@@ -74,7 +80,7 @@ namespace gs
                                                         // to implement per-layer settings
 
         // available after calling Generate()
-        public GCodeFile Result;
+        public GCodeFile Result { get; private set; }
 
         // Generally we discard the paths at each layer as we generate them. If you 
         // would like to analyze, set this to true, and then AccumulatedPaths will
@@ -85,7 +91,16 @@ namespace gs
 
         public PrintTimeStatistics TotalPrintTimeStatistics { get; private set; } = new PrintTimeStatistics();
 
-		/*
+        public IEnumerable<string> GenerationReport
+        {
+            get
+            {
+                foreach (var s in TotalPrintTimeStatistics.ToStringList())
+                    yield return s;
+            }
+        }
+
+        /*
 		 * Customizable functions you can use to configure/modify slicer behavior
 		 */
 
@@ -1641,10 +1656,6 @@ namespace gs
             return false;
         }
 
-
+        public abstract void Initialize(PrintMeshAssembly meshes, PlanarSliceStack slices, SingleMaterialFFFSettings settings, AssemblerFactoryF overrideAssemblerF);
     }
-
-
-
-
 }

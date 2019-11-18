@@ -93,16 +93,25 @@ namespace gs
     }
 
 
-    public abstract class PlanarAdditiveSettings : Settings
+    public interface IPlanarAdditiveSettings 
+    {
+        double LayerHeightMM { get; }
+        AssemblerFactoryF AssemblerType();
+    }
+
+
+    public abstract class PlanarAdditiveSettings : Settings, IPlanarAdditiveSettings
 	{
         /// <summary>
         /// This is the "name" of this settings (eg user identifier)
         /// </summary>
         public string Identifier = "Defaults";
 
-		public double LayerHeightMM = 0.2;
+		public double LayerHeightMM { get; set; } = 0.2;
 
         public abstract MachineInfo BaseMachine { get; set; }
+
+        public abstract AssemblerFactoryF AssemblerType();
     }
 
 
@@ -111,7 +120,7 @@ namespace gs
 	{
         // This is a bit of an odd place for this, but settings are where we actually
         // know what assembler we should be using...
-        public virtual AssemblerFactoryF AssemblerType()
+        public override AssemblerFactoryF AssemblerType()
         {
             throw new NotImplementedException($"{GetType()}.AssemblerType() not provided");
         }
