@@ -1,14 +1,14 @@
 ﻿using System.Globalization;
 
 namespace gs.interfaces {
-    public class UserSettingsFFF : UserSettingCollection<SingleMaterialFFFSettings> {
+    public class UserSettingsFFF<TSettings> : UserSettingCollection<TSettings> where TSettings : SingleMaterialFFFSettings {
 
         #region Advanced
 
         public static readonly UserSettingGroup GroupAdvanced =
             new UserSettingGroup(() => UserSettingTranslations.GroupAdvanced);
 
-        public UserSettingBool<SingleMaterialFFFSettings> EnableAutoBedLeveling = new UserSettingBool<SingleMaterialFFFSettings>(
+        public UserSettingBool<TSettings> EnableAutoBedLeveling = new UserSettingBool<TSettings>(
             () => UserSettingTranslations.EnableAutoBedLeveling_Name,
             () => UserSettingTranslations.EnableAutoBedLeveling_Description,
             GroupAdvanced,
@@ -21,14 +21,14 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupBasic =
             new UserSettingGroup(() => UserSettingTranslations.GroupBasic);
 
-        public UserSettingBool<SingleMaterialFFFSettings> EnableBridging = new UserSettingBool<SingleMaterialFFFSettings>(
+        public UserSettingBool<TSettings> EnableBridging = new UserSettingBool<TSettings>(
             () => UserSettingTranslations.EnableBridging_Name,
             () => UserSettingTranslations.EnableBridging_Description,
             GroupBasic,
             (settings) => settings.EnableBridging,
             (settings, val) => settings.EnableBridging = val);
 
-        public UserSettingInt<SingleMaterialFFFSettings> ExtruderTempC = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> ExtruderTempC = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.ExtruderTempC_Name,
             () => UserSettingTranslations.ExtruderTempC_Description,
             GroupBasic,
@@ -36,7 +36,7 @@ namespace gs.interfaces {
             (settings, val) => settings.ExtruderTempC = val,
             UserSettingNumericValidations<int>.ValidateMin(-273, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> FilamentDiamMM = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> FilamentDiamMM = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.FilamentDiamMM_Name,
             () => UserSettingTranslations.FilamentDiamMM_Description,
             GroupBasic,
@@ -44,7 +44,7 @@ namespace gs.interfaces {
             (settings, val) => settings.Machine.FilamentDiamMM = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingInt<SingleMaterialFFFSettings> FloorLayers = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> FloorLayers = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.FloorLayers_Name,
             () => UserSettingTranslations.FloorLayers_Description,
             GroupBasic,
@@ -52,14 +52,14 @@ namespace gs.interfaces {
             (settings, val) => settings.FloorLayers = val,
             UserSettingNumericValidations<int>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingBool<SingleMaterialFFFSettings> GenerateSupport = new UserSettingBool<SingleMaterialFFFSettings>(
+        public UserSettingBool<TSettings> GenerateSupport = new UserSettingBool<TSettings>(
             () => UserSettingTranslations.GenerateSupport_Name,
             () => UserSettingTranslations.GenerateSupport_Description,
             GroupBasic,
             (settings) => settings.GenerateSupport,
             (settings, val) => settings.GenerateSupport = val);
 
-        public UserSettingInt<SingleMaterialFFFSettings> HeatedBedTempC = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> HeatedBedTempC = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.HeatedBedTempC_Name,
             () => UserSettingTranslations.HeatedBedTempC_Description,
             GroupBasic,
@@ -67,7 +67,7 @@ namespace gs.interfaces {
             (settings, val) => settings.HeatedBedTempC = val,
             UserSettingNumericValidations<int>.ValidateMin(-273, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> LayerHeightMM = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> LayerHeightMM = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.LayerHeightMM_Name,
             () => UserSettingTranslations.LayerHeightMM_Description,
             GroupBasic,
@@ -75,7 +75,7 @@ namespace gs.interfaces {
             (settings, val) => settings.LayerHeightMM = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> MinExtrudeSpeed = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> MinExtrudeSpeed = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.MinExtrudeSpeed_Name,
             () => UserSettingTranslations.MinExtrudeSpeed_Description,
             GroupBasic,
@@ -83,7 +83,7 @@ namespace gs.interfaces {
             (settings, val) => settings.MinExtrudeSpeed = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingInt<SingleMaterialFFFSettings> RoofLayers = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> RoofLayers = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.RoofLayers_Name,
             () => UserSettingTranslations.RoofLayers_Description,
             GroupBasic,
@@ -91,7 +91,7 @@ namespace gs.interfaces {
             (settings, val) => settings.RoofLayers = val,
             UserSettingNumericValidations<int>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingInt<SingleMaterialFFFSettings> Shells = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> Shells = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.Shells_Name,
             () => UserSettingTranslations.Shells_Description,
             GroupBasic,
@@ -105,7 +105,7 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupBridging =
             new UserSettingGroup(() => UserSettingTranslations.GroupBridging);
 
-        public UserSettingDouble<SingleMaterialFFFSettings> BridgeExtrudeSpeedX = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> BridgeExtrudeSpeedX = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.BridgeExtrudeSpeedX_Name,
             () => UserSettingTranslations.BridgeExtrudeSpeedX_Description,
             GroupBridging,
@@ -113,7 +113,7 @@ namespace gs.interfaces {
             (settings, val) => settings.BridgeExtrudeSpeedX = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> BridgeFillNozzleDiamStepX = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> BridgeFillNozzleDiamStepX = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.BridgeFillNozzleDiamStepX_Name,
             () => UserSettingTranslations.BridgeFillNozzleDiamStepX_Description,
             GroupBridging,
@@ -121,7 +121,7 @@ namespace gs.interfaces {
             (settings, val) => settings.BridgeFillNozzleDiamStepX = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> BridgeVolumeScale = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> BridgeVolumeScale = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.BridgeVolumeScale_Name,
             () => UserSettingTranslations.BridgeVolumeScale_Description,
             GroupBridging,
@@ -129,7 +129,7 @@ namespace gs.interfaces {
             (settings, val) => settings.BridgeVolumeScale = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> MaxBridgeWidthMM = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> MaxBridgeWidthMM = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.MaxBridgeWidthMM_Name,
             () => UserSettingTranslations.MaxBridgeWidthMM_Description,
             GroupBridging,
@@ -143,21 +143,21 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupCapabilities =
             new UserSettingGroup(() => UserSettingTranslations.GroupCapabilities);
 
-        public UserSettingBool<SingleMaterialFFFSettings> HasAutoBedLeveling = new UserSettingBool<SingleMaterialFFFSettings>(
+        public UserSettingBool<TSettings> HasAutoBedLeveling = new UserSettingBool<TSettings>(
             () => UserSettingTranslations.HasAutoBedLeveling_Name,
             () => UserSettingTranslations.HasAutoBedLeveling_Description,
             GroupCapabilities,
             (settings) => settings.Machine.HasAutoBedLeveling,
             (settings, val) => settings.Machine.HasAutoBedLeveling = val);
 
-        public UserSettingBool<SingleMaterialFFFSettings> HasHeatedBed = new UserSettingBool<SingleMaterialFFFSettings>(
+        public UserSettingBool<TSettings> HasHeatedBed = new UserSettingBool<TSettings>(
             () => UserSettingTranslations.HasHeatedBed_Name,
             () => UserSettingTranslations.HasHeatedBed_Description,
             GroupCapabilities,
             (settings) => settings.Machine.HasHeatedBed,
             (settings, val) => settings.Machine.HasHeatedBed = val);
 
-        public UserSettingDouble<SingleMaterialFFFSettings> MaxLayerHeightMM = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> MaxLayerHeightMM = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.MaxLayerHeightMM_Name,
             () => UserSettingTranslations.MaxLayerHeightMM_Description,
             GroupCapabilities,
@@ -165,7 +165,7 @@ namespace gs.interfaces {
             (settings, val) => settings.Machine.MaxLayerHeightMM = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> MinLayerHeightMM = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> MinLayerHeightMM = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.MinLayerHeightMM_Name,
             () => UserSettingTranslations.MinLayerHeightMM_Description,
             GroupCapabilities,
@@ -179,7 +179,7 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupExtruder =
             new UserSettingGroup(() => UserSettingTranslations.GroupExtruder);
 
-        public UserSettingInt<SingleMaterialFFFSettings> MaxExtruderTempC = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> MaxExtruderTempC = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.MaxExtruderTempC_Name,
             () => UserSettingTranslations.MaxExtruderTempC_Description,
             GroupExtruder,
@@ -187,7 +187,7 @@ namespace gs.interfaces {
             (settings, val) => settings.Machine.MaxExtruderTempC = val,
             UserSettingNumericValidations<int>.ValidateMin(-273, ValidationResult.Level.Error));
 
-        public UserSettingInt<SingleMaterialFFFSettings> MinExtruderTempC = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> MinExtruderTempC = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.MinExtruderTempC_Name,
             () => UserSettingTranslations.MinExtruderTempC_Description,
             GroupExtruder,
@@ -195,7 +195,7 @@ namespace gs.interfaces {
             (settings, val) => settings.Machine.MinExtruderTempC = val,
             UserSettingNumericValidations<int>.ValidateMin(-273, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> NozzleDiamMM = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> NozzleDiamMM = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.NozzleDiamMM_Name,
             () => UserSettingTranslations.NozzleDiamMM_Description,
             GroupExtruder,
@@ -209,7 +209,7 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupFirstLayer =
             new UserSettingGroup(() => UserSettingTranslations.GroupFirstLayer);
 
-        public UserSettingDouble<SingleMaterialFFFSettings> CarefulExtrudeSpeed = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> CarefulExtrudeSpeed = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.CarefulExtrudeSpeed_Name,
             () => UserSettingTranslations.CarefulExtrudeSpeed_Description,
             GroupFirstLayer,
@@ -217,7 +217,7 @@ namespace gs.interfaces {
             (settings, val) => settings.CarefulExtrudeSpeed = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> StartLayerHeightMM = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> StartLayerHeightMM = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.StartLayerHeightMM_Name,
             () => UserSettingTranslations.StartLayerHeightMM_Description,
             GroupFirstLayer,
@@ -225,7 +225,7 @@ namespace gs.interfaces {
             (settings, val) => settings.StartLayerHeightMM = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingInt<SingleMaterialFFFSettings> StartLayers = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> StartLayers = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.StartLayers_Name,
             () => UserSettingTranslations.StartLayers_Description,
             GroupFirstLayer,
@@ -239,7 +239,7 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupHeatedBed =
             new UserSettingGroup(() => UserSettingTranslations.GroupHeatedBed);
 
-        public UserSettingInt<SingleMaterialFFFSettings> MaxBedTempC = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> MaxBedTempC = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.MaxBedTempC_Name,
             () => UserSettingTranslations.MaxBedTempC_Description,
             GroupHeatedBed,
@@ -247,7 +247,7 @@ namespace gs.interfaces {
             (settings, val) => settings.Machine.MaxBedTempC = val,
             UserSettingNumericValidations<int>.ValidateMin(-273, ValidationResult.Level.Error));
 
-        public UserSettingInt<SingleMaterialFFFSettings> MinBedTempC = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> MinBedTempC = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.MinBedTempC_Name,
             () => UserSettingTranslations.MinBedTempC_Description,
             GroupHeatedBed,
@@ -261,35 +261,35 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupHidden =
             new UserSettingGroup(() => UserSettingTranslations.GroupHidden);
 
-        public UserSettingString<SingleMaterialFFFSettings> ManufacturerName = new UserSettingString<SingleMaterialFFFSettings>(
+        public UserSettingString<TSettings> ManufacturerName = new UserSettingString<TSettings>(
             () => UserSettingTranslations.ManufacturerName_Name,
             () => UserSettingTranslations.ManufacturerName_Description,
             GroupHidden,
             (settings) => settings.Machine.ManufacturerName,
             (settings, val) => settings.Machine.ManufacturerName = val);
 
-        public UserSettingString<SingleMaterialFFFSettings> ManufacturerUUID = new UserSettingString<SingleMaterialFFFSettings>(
+        public UserSettingString<TSettings> ManufacturerUUID = new UserSettingString<TSettings>(
             () => UserSettingTranslations.ManufacturerUUID_Name,
             () => UserSettingTranslations.ManufacturerUUID_Description,
             GroupHidden,
             (settings) => settings.Machine.ManufacturerUUID,
             (settings, val) => settings.Machine.ManufacturerUUID = val);
 
-        public UserSettingString<SingleMaterialFFFSettings> ModelIdentifier = new UserSettingString<SingleMaterialFFFSettings>(
+        public UserSettingString<TSettings> ModelIdentifier = new UserSettingString<TSettings>(
             () => UserSettingTranslations.ModelIdentifier_Name,
             () => UserSettingTranslations.ModelIdentifier_Description,
             GroupHidden,
             (settings) => settings.Machine.ModelIdentifier,
             (settings, val) => settings.Machine.ModelIdentifier = val);
 
-        public UserSettingString<SingleMaterialFFFSettings> ModelUUID = new UserSettingString<SingleMaterialFFFSettings>(
+        public UserSettingString<TSettings> ModelUUID = new UserSettingString<TSettings>(
             () => UserSettingTranslations.ModelUUID_Name,
             () => UserSettingTranslations.ModelUUID_Description,
             GroupHidden,
             (settings) => settings.Machine.ModelUUID,
             (settings, val) => settings.Machine.ModelUUID = val);
 
-        public UserSettingString<SingleMaterialFFFSettings> Class = new UserSettingString<SingleMaterialFFFSettings>(
+        public UserSettingString<TSettings> Class = new UserSettingString<TSettings>(
             () => UserSettingTranslations.Class_Name,
             () => UserSettingTranslations.Class_Description,
             GroupHidden,
@@ -297,21 +297,21 @@ namespace gs.interfaces {
             (settings, val) => settings.Machine.Class = (MachineClass)System.Enum.Parse(typeof(MachineClass), val),
             UserSettingEnumValidations<string>.ValidateContains(System.Enum.GetNames(typeof(MachineClass)), ValidationResult.Level.Error));
 
-        public UserSettingString<SingleMaterialFFFSettings> ClassTypeName = new UserSettingString<SingleMaterialFFFSettings>(
+        public UserSettingString<TSettings> ClassTypeName = new UserSettingString<TSettings>(
             () => UserSettingTranslations.ClassTypeName_Name,
             () => UserSettingTranslations.ClassTypeName_Description,
             GroupHidden,
             (settings) => settings.ClassTypeName,
             (settings, val) => throw new System.Exception("ClassTypeName is read-only!"));
 
-        public UserSettingString<SingleMaterialFFFSettings> Identifier = new UserSettingString<SingleMaterialFFFSettings>(
+        public UserSettingString<TSettings> Identifier = new UserSettingString<TSettings>(
             () => UserSettingTranslations.Identifier_Name,
             () => UserSettingTranslations.Identifier_Description,
             GroupHidden,
             (settings) => settings.Identifier,
             (settings, val) => settings.Identifier = val);
 
-        public UserSettingDouble<SingleMaterialFFFSettings> MinPointSpacingMM = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> MinPointSpacingMM = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.MinPointSpacingMM_Name,
             () => UserSettingTranslations.MinPointSpacingMM_Description,
             GroupHidden,
@@ -325,7 +325,7 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupMiscellaneous =
             new UserSettingGroup(() => UserSettingTranslations.GroupMiscellaneous);
 
-        public UserSettingDouble<SingleMaterialFFFSettings> MinLayerTime = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> MinLayerTime = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.MinLayerTime_Name,
             () => UserSettingTranslations.MinLayerTime_Description,
             GroupMiscellaneous,
@@ -339,14 +339,14 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupPerimeters =
             new UserSettingGroup(() => UserSettingTranslations.GroupPerimeters);
 
-        public UserSettingBool<SingleMaterialFFFSettings> ClipSelfOverlaps = new UserSettingBool<SingleMaterialFFFSettings>(
+        public UserSettingBool<TSettings> ClipSelfOverlaps = new UserSettingBool<TSettings>(
             () => UserSettingTranslations.ClipSelfOverlaps_Name,
             () => UserSettingTranslations.ClipSelfOverlaps_Description,
             GroupPerimeters,
             (settings) => settings.ClipSelfOverlaps,
             (settings, val) => settings.ClipSelfOverlaps = val);
 
-        public UserSettingInt<SingleMaterialFFFSettings> InteriorSolidRegionShells = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> InteriorSolidRegionShells = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.InteriorSolidRegionShells_Name,
             () => UserSettingTranslations.InteriorSolidRegionShells_Description,
             GroupPerimeters,
@@ -354,14 +354,14 @@ namespace gs.interfaces {
             (settings, val) => settings.InteriorSolidRegionShells = val,
             UserSettingNumericValidations<int>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingBool<SingleMaterialFFFSettings> OuterShellLast = new UserSettingBool<SingleMaterialFFFSettings>(
+        public UserSettingBool<TSettings> OuterShellLast = new UserSettingBool<TSettings>(
             () => UserSettingTranslations.OuterShellLast_Name,
             () => UserSettingTranslations.OuterShellLast_Description,
             GroupPerimeters,
             (settings) => settings.OuterShellLast,
             (settings, val) => settings.OuterShellLast = val);
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SelfOverlapToleranceX = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SelfOverlapToleranceX = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.SelfOverlapToleranceX_Name,
             () => UserSettingTranslations.SelfOverlapToleranceX_Description,
             GroupPerimeters,
@@ -369,7 +369,7 @@ namespace gs.interfaces {
             (settings, val) => settings.SelfOverlapToleranceX = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> ShellsFillNozzleDiamStepX = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> ShellsFillNozzleDiamStepX = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.ShellsFillNozzleDiamStepX_Name,
             () => UserSettingTranslations.ShellsFillNozzleDiamStepX_Description,
             GroupPerimeters,
@@ -383,7 +383,7 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupPrintVolume =
            new UserSettingGroup(() => UserSettingTranslations.GroupPrintVolume);
 
-        public UserSettingDouble<SingleMaterialFFFSettings> BedSizeXMM = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> BedSizeXMM = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.BedSizeXMM_Name,
             () => UserSettingTranslations.BedSizeXMM_Description,
             GroupPrintVolume,
@@ -391,7 +391,7 @@ namespace gs.interfaces {
             (settings, val) => settings.Machine.BedSizeXMM = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> BedSizeYMM = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> BedSizeYMM = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.BedSizeYMM_Name,
             () => UserSettingTranslations.BedSizeYMM_Description,
             GroupPrintVolume,
@@ -399,7 +399,7 @@ namespace gs.interfaces {
             (settings, val) => settings.Machine.BedSizeYMM = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> MaxHeightMM = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> MaxHeightMM = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.MaxHeightMM_Name,
             () => UserSettingTranslations.MaxHeightMM_Description,
             GroupPrintVolume,
@@ -413,7 +413,7 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupRetraction =
             new UserSettingGroup(() => UserSettingTranslations.GroupRetraction);
 
-        public UserSettingDouble<SingleMaterialFFFSettings> MinRetractTravelLength = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> MinRetractTravelLength = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.MinRetractTravelLength_Name,
             () => UserSettingTranslations.MinRetractTravelLength_Description,
             GroupRetraction,
@@ -421,7 +421,7 @@ namespace gs.interfaces {
             (settings, val) => settings.MinRetractTravelLength = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> RetractDistanceMM = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> RetractDistanceMM = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.RetractDistanceMM_Name,
             () => UserSettingTranslations.RetractDistanceMM_Description,
             GroupRetraction,
@@ -429,7 +429,7 @@ namespace gs.interfaces {
             (settings, val) => settings.RetractDistanceMM = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> RetractSpeed = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> RetractSpeed = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.RetractSpeed_Name,
             () => UserSettingTranslations.RetractSpeed_Description,
             GroupRetraction,
@@ -443,7 +443,7 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupSolidFill =
             new UserSettingGroup(() => UserSettingTranslations.GroupSolidFill);
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SolidFillBorderOverlapX = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SolidFillBorderOverlapX = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.SolidFillBorderOverlapX_Name,
             () => UserSettingTranslations.SolidFillBorderOverlapX_Description,
             GroupSolidFill,
@@ -451,7 +451,7 @@ namespace gs.interfaces {
             (settings, val) => settings.SolidFillBorderOverlapX = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SolidFillNozzleDiamStepX = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SolidFillNozzleDiamStepX = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.SolidFillNozzleDiamStepX_Name,
             () => UserSettingTranslations.SolidFillNozzleDiamStepX_Description,
             GroupSolidFill,
@@ -465,7 +465,7 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupSparseFill =
             new UserSettingGroup(() => UserSettingTranslations.GroupSparseFill);
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SparseFillBorderOverlapX = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SparseFillBorderOverlapX = new UserSettingDouble<TSettings>(
            () => UserSettingTranslations.SparseFillBorderOverlapX_Name,
            () => UserSettingTranslations.SparseFillBorderOverlapX_Description,
            GroupSparseFill,
@@ -473,7 +473,7 @@ namespace gs.interfaces {
            (settings, val) => settings.SparseFillBorderOverlapX = val,
            UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SparseLinearInfillStepX = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SparseLinearInfillStepX = new UserSettingDouble<TSettings>(
            () => UserSettingTranslations.SparseLinearInfillStepX_Name,
            () => UserSettingTranslations.SparseLinearInfillStepX_Description,
            GroupSparseFill,
@@ -487,7 +487,7 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupSpeeds =
             new UserSettingGroup(() => UserSettingTranslations.GroupSpeeds);
 
-        public UserSettingInt<SingleMaterialFFFSettings> MaxExtrudeSpeedMMM = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> MaxExtrudeSpeedMMM = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.MaxExtrudeSpeedMMM_Name,
             () => UserSettingTranslations.MaxExtrudeSpeedMMM_Description,
             GroupSpeeds,
@@ -495,7 +495,7 @@ namespace gs.interfaces {
             (settings, val) => settings.Machine.MaxExtrudeSpeedMMM = val,
             UserSettingNumericValidations<int>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingInt<SingleMaterialFFFSettings> MaxRetractSpeedMMM = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> MaxRetractSpeedMMM = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.MaxRetractSpeedMMM_Name,
             () => UserSettingTranslations.MaxRetractSpeedMMM_Description,
             GroupSpeeds,
@@ -503,7 +503,7 @@ namespace gs.interfaces {
             (settings, val) => settings.Machine.MaxRetractSpeedMMM = val,
             UserSettingNumericValidations<int>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingInt<SingleMaterialFFFSettings> MaxTravelSpeedMMM = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> MaxTravelSpeedMMM = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.MaxTravelSpeedMMM_Name,
             () => UserSettingTranslations.MaxTravelSpeedMMM_Description,
             GroupSpeeds,
@@ -511,7 +511,7 @@ namespace gs.interfaces {
             (settings, val) => settings.Machine.MaxTravelSpeedMMM = val,
             UserSettingNumericValidations<int>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingInt<SingleMaterialFFFSettings> MaxZTravelSpeedMMM = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> MaxZTravelSpeedMMM = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.MaxZTravelSpeedMMM_Name,
             () => UserSettingTranslations.MaxZTravelSpeedMMM_Description,
             GroupSpeeds,
@@ -519,7 +519,7 @@ namespace gs.interfaces {
             (settings, val) => settings.Machine.MaxZTravelSpeedMMM = val,
             UserSettingNumericValidations<int>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> OuterPerimeterSpeedX = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> OuterPerimeterSpeedX = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.OuterPerimeterSpeedX_Name,
             () => UserSettingTranslations.OuterPerimeterSpeedX_Description,
             GroupSpeeds,
@@ -527,7 +527,7 @@ namespace gs.interfaces {
             (settings, val) => settings.OuterPerimeterSpeedX = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> RapidExtrudeSpeed = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> RapidExtrudeSpeed = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.RapidExtrudeSpeed_Name,
             () => UserSettingTranslations.RapidExtrudeSpeed_Description,
             GroupSpeeds,
@@ -535,7 +535,7 @@ namespace gs.interfaces {
             (settings, val) => settings.RapidExtrudeSpeed = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> RapidTravelSpeed = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> RapidTravelSpeed = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.RapidTravelSpeed_Name,
             () => UserSettingTranslations.RapidTravelSpeed_Description,
             GroupSpeeds,
@@ -543,7 +543,7 @@ namespace gs.interfaces {
             (settings, val) => settings.RapidTravelSpeed = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> ZTravelSpeed = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> ZTravelSpeed = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.ZTravelSpeed_Name,
             () => UserSettingTranslations.ZTravelSpeed_Description,
             GroupSpeeds,
@@ -557,21 +557,21 @@ namespace gs.interfaces {
         public static readonly UserSettingGroup GroupSupport =
             new UserSettingGroup(() => UserSettingTranslations.GroupSupport);
 
-        public UserSettingBool<SingleMaterialFFFSettings> EnableSupportReleaseOpt = new UserSettingBool<SingleMaterialFFFSettings>(
+        public UserSettingBool<TSettings> EnableSupportReleaseOpt = new UserSettingBool<TSettings>(
             () => UserSettingTranslations.EnableSupportReleaseOpt_Name,
             () => UserSettingTranslations.EnableSupportReleaseOpt_Description,
             GroupSupport,
             (settings) => settings.EnableSupportReleaseOpt,
             (settings, val) => settings.EnableSupportReleaseOpt = val);
 
-        public UserSettingBool<SingleMaterialFFFSettings> EnableSupportShell = new UserSettingBool<SingleMaterialFFFSettings>(
+        public UserSettingBool<TSettings> EnableSupportShell = new UserSettingBool<TSettings>(
             () => UserSettingTranslations.EnableSupportShell_Name,
             () => UserSettingTranslations.EnableSupportShell_Description,
             GroupSupport,
             (settings) => settings.EnableSupportShell,
             (settings, val) => settings.EnableSupportShell = val);
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SupportAreaOffsetX = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SupportAreaOffsetX = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.SupportAreaOffsetX_Name,
             () => UserSettingTranslations.SupportAreaOffsetX_Description,
             GroupSupport,
@@ -579,14 +579,14 @@ namespace gs.interfaces {
             (settings, val) => settings.SupportAreaOffsetX = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingBool<SingleMaterialFFFSettings> SupportMinZTips = new UserSettingBool<SingleMaterialFFFSettings>(
+        public UserSettingBool<TSettings> SupportMinZTips = new UserSettingBool<TSettings>(
             () => UserSettingTranslations.SupportMinZTips_Name,
             () => UserSettingTranslations.SupportMinZTips_Description,
             GroupSupport,
             (settings) => settings.SupportMinZTips,
             (settings, val) => settings.SupportMinZTips = val);
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SupportOverhangAngleDeg = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SupportOverhangAngleDeg = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.SupportOverhangAngleDeg_Name,
             () => UserSettingTranslations.SupportOverhangAngleDeg_Description,
             GroupSupport,
@@ -594,7 +594,7 @@ namespace gs.interfaces {
             (settings, val) => settings.SupportOverhangAngleDeg = val,
             UserSettingNumericValidations<double>.ValidateMinMax(0, 90, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SupportPointDiam = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SupportPointDiam = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.SupportPointDiam_Name,
             () => UserSettingTranslations.SupportPointDiam_Description,
             GroupSupport,
@@ -602,7 +602,7 @@ namespace gs.interfaces {
             (settings, val) => settings.SupportPointDiam = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingInt<SingleMaterialFFFSettings> SupportPointSides = new UserSettingInt<SingleMaterialFFFSettings>(
+        public UserSettingInt<TSettings> SupportPointSides = new UserSettingInt<TSettings>(
             () => UserSettingTranslations.SupportPointSides_Name,
             () => UserSettingTranslations.SupportPointSides_Description,
             GroupSupport,
@@ -610,7 +610,7 @@ namespace gs.interfaces {
             (settings, val) => settings.SupportPointSides = val,
             UserSettingNumericValidations<int>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SupportRegionJoinTolX = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SupportRegionJoinTolX = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.SupportRegionJoinTolX_Name,
             () => UserSettingTranslations.SupportRegionJoinTolX_Description,
             GroupSupport,
@@ -618,7 +618,7 @@ namespace gs.interfaces {
             (settings, val) => settings.SupportRegionJoinTolX = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SupportReleaseGap = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SupportReleaseGap = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.SupportReleaseGap_Name,
             () => UserSettingTranslations.SupportReleaseGap_Description,
             GroupSupport,
@@ -626,7 +626,7 @@ namespace gs.interfaces {
             (settings, val) => settings.SupportReleaseGap = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SupportSolidSpace = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SupportSolidSpace = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.SupportSolidSpace_Name,
             () => UserSettingTranslations.SupportSolidSpace_Description,
             GroupSupport,
@@ -634,7 +634,7 @@ namespace gs.interfaces {
             (settings, val) => settings.SupportSolidSpace = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SupportSpacingStepX = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SupportSpacingStepX = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.SupportSpacingStepX_Name,
             () => UserSettingTranslations.SupportSpacingStepX_Description,
             GroupSupport,
@@ -642,7 +642,7 @@ namespace gs.interfaces {
             (settings, val) => settings.SupportSpacingStepX = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        public UserSettingDouble<SingleMaterialFFFSettings> SupportVolumeScale = new UserSettingDouble<SingleMaterialFFFSettings>(
+        public UserSettingDouble<TSettings> SupportVolumeScale = new UserSettingDouble<TSettings>(
             () => UserSettingTranslations.SupportVolumeScale_Name,
             () => UserSettingTranslations.SupportVolumeScale_Description,
             GroupSupport,
