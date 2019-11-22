@@ -294,8 +294,7 @@ namespace gs.interfaces {
             () => UserSettingTranslations.Class_Description,
             GroupHidden,
             (settings) => settings.Machine.Class.ToString(),
-            (settings, val) => settings.Machine.Class = (MachineClass)System.Enum.Parse(typeof(MachineClass), val),
-            UserSettingEnumValidations<string>.ValidateContains(System.Enum.GetNames(typeof(MachineClass)), ValidationResult.Level.Error));
+            (settings, val) => settings.Machine.Class = (MachineClass)System.Enum.Parse(typeof(MachineClass), val));
 
         public UserSettingString<TSettings> ClassTypeName = new UserSettingString<TSettings>(
             () => UserSettingTranslations.ClassTypeName_Name,
