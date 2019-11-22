@@ -576,8 +576,7 @@ namespace gs.interfaces {
             () => UserSettingTranslations.SupportAreaOffsetX_Description,
             GroupSupport,
             (settings) => settings.SupportAreaOffsetX,
-            (settings, val) => settings.SupportAreaOffsetX = val,
-            UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
+            (settings, val) => settings.SupportAreaOffsetX = val);
 
         public UserSettingBool<TSettings> SupportMinZTips = new UserSettingBool<TSettings>(
             () => UserSettingTranslations.SupportMinZTips_Name,
