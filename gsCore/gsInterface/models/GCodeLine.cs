@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using g3;
-
-namespace gs
+﻿namespace gs
 {
-
-
-
-	public struct GCodeParam
+    public struct GCodeParam
 	{
 		public enum PType
 		{
@@ -33,8 +24,6 @@ namespace gs
 	}
 
 
-
-
 	// ugh..class...dangerous!!
 	public class GCodeLine
 	{
@@ -53,8 +42,6 @@ namespace gs
 			Else,
 			UnknownControl
 		}
-
-
 
 		public int lineNumber;
 
@@ -88,7 +75,6 @@ namespace gs
 			}
 		}
 
-
 		public virtual GCodeLine Clone() {
 			GCodeLine clone = new GCodeLine(this.lineNumber, this.type);
 			clone.orig_string = this.orig_string;
@@ -102,8 +88,5 @@ namespace gs
 			clone.comment = this.comment;
 			return clone;
 		}
-			
 	}
-
-
 }

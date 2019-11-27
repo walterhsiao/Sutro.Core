@@ -1,35 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace gs
 {
-
-
     public class GCodeFile
     {
-
         List<GCodeLine> lines;
-
-
 
         public GCodeFile()
         {
             lines = new List<GCodeLine>();
         }
 
-
         public void AppendLine(GCodeLine l)
         {
             lines.Add(l);
         }
-
         
         public int LineCount {
             get { return lines.Count; }
         }
-
 
         public IEnumerable<GCodeLine> AllLines()
         {
@@ -39,7 +28,6 @@ namespace gs
             }
         }
 
-
         public IEnumerable<GCodeLine> AllLinesOfType(GCodeLine.LType eType)
         {
             int N = lines.Count;
@@ -48,8 +36,5 @@ namespace gs
                     yield return lines[i];
             }
         }
-
-
-
     }
 }
