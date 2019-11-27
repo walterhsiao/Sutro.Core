@@ -1,9 +1,10 @@
 ﻿using g3;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using gs.interfaces;
 
-namespace gs.interfaces
+
+namespace gs
 {
     public class VolumetricBeadVisualizer : IVisualizer
     {        
@@ -320,7 +321,7 @@ namespace gs.interfaces
         {
             Vector3d offset = miterNormal * (dimensions.x * crossSectionVertex.x * secant) + new Vector3d(0, 0, dimensions.y * crossSectionVertex.y);
             Vector3d vertex = point - new Vector3d(positionShift.x, positionShift.y, 0) + offset;
-            vertices.Add(new ToolpathPreviewVertex(vertex, fillType, dimensions, feedrate, layerIndex, pointCount, brightness));
+            vertices.Add(new ToolpathPreviewVertex(vertex, (int)fillType, dimensions, feedrate, layerIndex, pointCount, brightness));
             return vertices.Count - 1;
         }
 

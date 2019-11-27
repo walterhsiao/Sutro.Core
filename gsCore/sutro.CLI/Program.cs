@@ -10,6 +10,7 @@ using System.Reflection;
 using g3;
 using gs;
 using gs.interfaces;
+using gs.engines;
 
 namespace sutro.CLI
 {
@@ -46,8 +47,21 @@ namespace sutro.CLI
             }
         }
 
+        /// <remarks>
+        /// Need to explicitly reference any class from each assembly with engines in it;
+        /// this is due to the fact that Fody.Costura will discard unreferenced assemblies
+        /// which breaks MEF discovery. This is a bit of a hack; hopefully able to come
+        /// up with something more elegant in the future.
+        /// </remarks>
+        protected virtual void ReferenceEngines()
+        {
+            _ = new EngineFFF();
+        }
+
         protected virtual void AddCatalogs(AggregateCatalog catalog)
         {
+            ReferenceEngines();
+
             // This iteration is required because of the bundling done by Fody.Costura
             foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -283,7 +297,7 @@ namespace sutro.CLI
             Console.WriteLine();
 
             var gcode = engine.Generator.GenerateGCode(parts, settings, out var generationReport, 
-                null, null, (s) => Console.WriteLine(s));
+                null, (s) => Console.WriteLine(s));
 
             Console.WriteLine($"Writing gcode to {fGCodeFilePath}");
             engine.Generator.SaveGCode(fGCodeFilePath, gcode);

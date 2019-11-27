@@ -18,7 +18,6 @@ namespace gs
                                 object globalSettings,
                                 out IEnumerable<string> generationReport,
                                 Action<GCodeLine> gcodeLineReadyF = null,
-                                Action<PrintLayerData> layerReadyF = null,
                                 Action<string> progressMessageF = null);
 
         void SaveGCode(string path, GCodeFile file);
@@ -45,7 +44,6 @@ namespace gs
                                 TSettings globalSettings,
                                 out IEnumerable<string> generationReport,
                                 Action<GCodeLine> gcodeLineReadyF = null,
-                                Action<PrintLayerData> layerReadyF = null,
                                 Action<string> progressMessageF = null);
     }
 }

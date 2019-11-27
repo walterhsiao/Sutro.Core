@@ -44,7 +44,6 @@ namespace gs
                                        TPrintSettings globalSettings,
                                        out IEnumerable<string> generationReport,
                                        Action<GCodeLine> gcodeLineReadyF = null,
-                                       Action<PrintLayerData> layerReadyF = null,
                                        Action<string> progressMessageF = null)
         {
             if (AcceptsParts == false && parts != null && parts.Count > 0)
@@ -92,7 +91,6 @@ namespace gs
                                        object globalSettings,
                                        out IEnumerable<string> generationReport,
                                        Action<GCodeLine> gcodeLineReadyF = null,
-                                       Action<PrintLayerData> layerReadyF = null,
                                        Action<string> progressMessageF = null)
         {
             var partsTypedSettings = new List<Tuple<DMesh3, TPrintSettings>>();
@@ -102,7 +100,7 @@ namespace gs
             }
 
             return GenerateGCode(partsTypedSettings, (TPrintSettings)globalSettings, out generationReport,
-                                 gcodeLineReadyF, layerReadyF, progressMessageF);
+                                 gcodeLineReadyF, progressMessageF);
         }
     }
 }

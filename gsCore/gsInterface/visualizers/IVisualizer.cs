@@ -2,15 +2,13 @@
 using System;
 using System.Collections.Generic;
 
-namespace gs
+namespace gs.interfaces
 {
     public interface IVisualizer
     {
         void BeginGCodeLineStream();
         void ProcessGCodeLine(GCodeLine line);
         void EndGCodeLineStream();
-
-        void PrintLayerCompleted(PrintLayerData printLayerData);
 
         event Action<ToolpathPreviewVertex[], int[], int> OnMeshGenerated;
         event Action<List<Vector3d>, int> OnLineGenerated;
@@ -21,14 +19,14 @@ namespace gs
     public struct ToolpathPreviewVertex
     {
         public Vector3d point;
-        public FillTypeFlags fillType;
+        public int fillType;
         public Vector2d dimensions;
         public double feedrate;
         public int layerIndex;
         public int pointCount;
         public double brightness;
 
-        public ToolpathPreviewVertex(Vector3d point, FillTypeFlags fillType, Vector2d dimensions, double feedrate, int layerIndex, int pointCount, double brightness)
+        public ToolpathPreviewVertex(Vector3d point, int fillType, Vector2d dimensions, double feedrate, int layerIndex, int pointCount, double brightness)
         {
             this.point = point;
             this.fillType = fillType;

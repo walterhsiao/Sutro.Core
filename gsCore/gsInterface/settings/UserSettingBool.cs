@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace gs.interfaces {
-    public class UserSettingBool<TSettings> : UserSetting<TSettings, bool> where TSettings : PlanarAdditiveSettings {
+namespace gs.interfaces
+{
+    public class UserSettingBool<TSettings> : UserSetting<TSettings, bool>
+    {
         public UserSettingBool(
             Func<string> nameF,
             Func<string> descriptionF,

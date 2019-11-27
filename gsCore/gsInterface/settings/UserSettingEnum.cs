@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace gs.interfaces {
-    public class UserSettingEnum<TSettings> : UserSetting<TSettings, string> where TSettings : PlanarAdditiveSettings {
-
+    public class UserSettingEnum<TSettings> : UserSetting<TSettings, string>
+    {
         private readonly Func<IList<Tuple<int, string, string>>> tupleF;
         public IList<Tuple<int, string, string>> Tuples => tupleF();
 

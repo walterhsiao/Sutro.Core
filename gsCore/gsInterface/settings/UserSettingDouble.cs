@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace gs.interfaces {
-    public class UserSettingDouble<TSettings> : UserSetting<TSettings, double> where TSettings : PlanarAdditiveSettings {
+namespace gs.interfaces
+{
+    public class UserSettingDouble<TSettings> : UserSetting<TSettings, double>
+    {
         public UserSettingDouble(
             Func<string> nameF,
             Func<string> descriptionF,

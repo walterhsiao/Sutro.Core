@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace gs.interfaces
 {
-    public class UserSettingInt<TSettings> : UserSetting<TSettings, int> where TSettings : PlanarAdditiveSettings
+    public class UserSettingInt<TSettings> : UserSetting<TSettings, int>
     {
         public UserSettingInt(
             Func<string> nameF,

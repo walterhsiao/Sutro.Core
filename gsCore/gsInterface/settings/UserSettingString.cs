@@ -2,9 +2,8 @@
 
 namespace gs.interfaces
 {
-    public class UserSettingString<TSettings> : UserSetting<TSettings, string> where TSettings : PlanarAdditiveSettings
+    public class UserSettingString<TSettings> : UserSetting<TSettings, string>
     {
-
         public UserSettingString(
             Func<string> nameF,
             Func<string> descriptionF,
