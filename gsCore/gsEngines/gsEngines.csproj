@@ -1,14 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\gsCore\geometry3Sharp\geometry3Sharp.csproj" />
-    <ProjectReference Include="..\gsCore\gsGCode\gsGCode.csproj" />
-    <ProjectReference Include="..\gsCore\gsInterface\gsInterface.csproj" />
-    <ProjectReference Include="..\gsCore\gsSlicer\gsSlicer.csproj" />
+    <ProjectReference Include="..\geometry3Sharp\geometry3Sharp.csproj" />
+    <ProjectReference Include="..\gsGCode\gsGCode.csproj" />
+    <ProjectReference Include="..\gsInterface\gsInterface.csproj" />
+    <ProjectReference Include="..\gsSlicer\gsSlicer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
