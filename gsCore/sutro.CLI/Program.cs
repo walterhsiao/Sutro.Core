@@ -8,7 +8,6 @@ using System.IO;
 using System.Reflection;
 
 using g3;
-using gs;
 using gs.interfaces;
 using gs.engines;
 
@@ -41,6 +40,14 @@ namespace sutro.CLI
             {
                 _container.ComposeParts(this);
             }
+            catch (ReflectionTypeLoadException e)
+            {
+                Console.WriteLine(e.ToString());
+                foreach (var a in e.LoaderExceptions)
+                {
+                    Console.WriteLine(a.ToString());
+                }
+            }
             catch (CompositionException e)
             {
                 Console.WriteLine(e.ToString());
@@ -67,6 +74,9 @@ namespace sutro.CLI
             {
                 catalog.Catalogs.Add(new AssemblyCatalog(asm));
             }
+            var pluginDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "plugins");
+            if (Directory.Exists(pluginDirectory))
+                catalog.Catalogs.Add(new DirectoryCatalog(pluginDirectory));
         }
 
         public class Options
@@ -183,22 +193,18 @@ namespace sutro.CLI
             ConsoleWriteSeparator();
             Console.WriteLine($"SETTINGS");
             Console.WriteLine();
-            object settings;
+            IProfile settings;
             try
             {
                 settings = engine.SettingsManager.FactorySettingByManufacturerAndModel(o.MachineManufacturer, o.MachineModel);
-                string manufacturerName = ((PlanarAdditiveSettings)settings).BaseMachine.ManufacturerName;
-                string modelName = ((PlanarAdditiveSettings)settings).BaseMachine.ModelIdentifier;
-                Console.WriteLine($"Starting with factory profile {manufacturerName} {modelName}");
+                Console.WriteLine($"Starting with factory profile {settings.ManufacturerName} {settings.ModelIdentifier}");
             }
             catch (KeyNotFoundException e)
             {
                 Console.WriteLine(e.Message);
 
                 settings = engine.SettingsManager.FactorySettings[0];
-                string manufacturerName = ((PlanarAdditiveSettings)settings).BaseMachine.ManufacturerName;
-                string modelName = ((PlanarAdditiveSettings)settings).BaseMachine.ModelIdentifier;
-                Console.WriteLine($"Falling back to first factory profile: {manufacturerName} {modelName}");
+                Console.WriteLine($"Falling back to first factory profile: {settings.ManufacturerName} {settings.ModelIdentifier}");
             }
             
             // Load settings from files

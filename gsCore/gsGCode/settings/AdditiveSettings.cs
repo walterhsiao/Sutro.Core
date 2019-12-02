@@ -1,5 +1,6 @@
 ﻿﻿using System;
 using g3;
+using gs.interfaces;
 
 namespace gs
 {
@@ -116,7 +117,7 @@ namespace gs
 
 
 
-    public class SingleMaterialFFFSettings : PlanarAdditiveSettings
+    public class SingleMaterialFFFSettings : PlanarAdditiveSettings, IProfile
 	{
         // This is a bit of an odd place for this, but settings are where we actually
         // know what assembler we should be using...
@@ -183,6 +184,11 @@ namespace gs
         public bool TravelLiftEnabled { get; set; } = true;
         public double TravelLiftHeight { get; set; } = 0.2;
         public double TravelLiftDistanceThreshold { get; set; } = 5d;
+
+        // Wrap some properties to satisfy the IProfile interface 
+        public string ManufacturerName => BaseMachine.ManufacturerName;
+        public string ModelIdentifier => BaseMachine.ModelIdentifier;
+        public string ProfileName => Identifier;
 
         /*
          * Shells

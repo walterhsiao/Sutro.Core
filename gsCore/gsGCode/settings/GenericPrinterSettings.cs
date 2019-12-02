@@ -7,7 +7,6 @@
             return RepRapAssembler.Factory;
         }
 
-        public string ManufacturerName;
         public string ManufacturerUUID;
         public string DefaultMachineUUID;
 
@@ -17,7 +16,7 @@
         }
 
         public GenericPrinterSettings(string mfgName, string mfgUUID, string defaultMachineUUID) {
-            ManufacturerName = mfgName;
+            BaseMachine.ManufacturerName = mfgName;
             ManufacturerUUID = mfgUUID;
             DefaultMachineUUID = defaultMachineUUID;
 

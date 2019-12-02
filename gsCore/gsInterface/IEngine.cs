@@ -15,13 +15,13 @@ namespace gs.interfaces
         List<IVisualizer> Visualizers { get; }
     }
 
-    public interface IEngine<TSettings> : IEngine
+    public interface IEngine<TSettings> : IEngine where TSettings : IProfile
     {
         new IGenerator<TSettings> Generator { get; }
         new ISettingsManager<TSettings> SettingsManager { get; }
     }
 
-    public abstract class Engine<TSettings> : IEngine<TSettings>
+    public abstract class Engine<TSettings> : IEngine<TSettings> where TSettings : IProfile
     {
         public abstract IGenerator<TSettings> Generator { get; }
         public abstract ISettingsManager<TSettings> SettingsManager { get; }

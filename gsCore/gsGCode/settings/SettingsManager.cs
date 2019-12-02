@@ -7,15 +7,16 @@ using g3;
 
 namespace gs
 {
-    public abstract class SettingsManager<TSettings> : ISettingsManager<TSettings> where TSettings : PlanarAdditiveSettings
+    public abstract class SettingsManager<TSettings> : ISettingsManager<TSettings> 
+        where TSettings : PlanarAdditiveSettings, IProfile
     {
         public abstract List<TSettings> FactorySettings { get; }
         public abstract IUserSettingCollection<TSettings> UserSettings { get; }
 
-        List<object> ISettingsManager.FactorySettings
+        List<IProfile> ISettingsManager.FactorySettings
         {
             get {
-                var settings = new List<object>();
+                var settings = new List<IProfile>();
                 foreach (TSettings setting in FactorySettings)
                     settings.Add(setting);
                 return settings;
@@ -34,7 +35,7 @@ namespace gs
             JsonConvert.PopulateObject(json, settings, jsonSerializerSettings);
         }
 
-        public void ApplyJSON(object settings, string json)
+        public void ApplyJSON(IProfile settings, string json)
         {
             ApplyJSON((TSettings)settings, json);
         }
@@ -46,7 +47,7 @@ namespace gs
             JsonConvert.PopulateObject(sFormatted, settings, jsonSerializerSettings);
         }
 
-        public void ApplyKeyValuePair(object settings, string keyValue)
+        public void ApplyKeyValuePair(IProfile settings, string keyValue)
         {
             ApplyKeyValuePair((TSettings)settings, keyValue);
         }
@@ -69,7 +70,7 @@ namespace gs
             return profiles[0];
         }
 
-        object ISettingsManager.FactorySettingByManufacturerAndModel(string manufacturer, string model)
+        IProfile ISettingsManager.FactorySettingByManufacturerAndModel(string manufacturer, string model)
         {
             return FactorySettingByManufacturerAndModel(manufacturer, model);
         }

@@ -71,17 +71,9 @@
       <Project>{289ec3b7-6a37-4c6a-bbf8-dc080c377c1f}</Project>
       <Name>gsEngines</Name>
     </ProjectReference>
-    <ProjectReference Include="..\gsGCode\gsGCode.csproj">
-      <Project>{25de77c9-14a4-4562-9a24-0bf1e612d9a9}</Project>
-      <Name>gsGCode</Name>
-    </ProjectReference>
     <ProjectReference Include="..\gsInterface\gsInterface.csproj">
       <Project>{5ac09bd3-0ec4-47be-9342-4dd471031229}</Project>
       <Name>gsInterface</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\gsSlicer\gsSlicer.csproj">
-      <Project>{6c2e415e-37d9-4c5a-8fd5-60b0133872cf}</Project>
-      <Name>gsSlicer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

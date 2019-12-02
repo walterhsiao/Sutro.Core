@@ -4,18 +4,18 @@ namespace gs.interfaces
 {
     public interface ISettingsManager
     {
-        List<object> FactorySettings { get; }
+        List<IProfile> FactorySettings { get; }
 
-        object FactorySettingByManufacturerAndModel(string manufacturer, string model);
+        IProfile FactorySettingByManufacturerAndModel(string manufacturer, string model);
 
-        void ApplyJSON(object settings, string json);
-        void ApplyKeyValuePair(object settings, string keyValue);
+        void ApplyJSON(IProfile settings, string json);
+        void ApplyKeyValuePair(IProfile settings, string keyValue);
 
         IUserSettingCollection UserSettings { get; }
     }
 
 
-    public interface ISettingsManager<TSettings> : ISettingsManager
+    public interface ISettingsManager<TSettings> : ISettingsManager where TSettings : IProfile
     {
         new List<TSettings> FactorySettings { get; }
 
