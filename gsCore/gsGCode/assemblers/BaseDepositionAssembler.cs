@@ -403,7 +403,7 @@ namespace gs
 
         protected virtual void AppendMoveToE(double x, double y, double z, double f, double e, string comment = null) 
 		{
-            queue_extrude(new Vector3d(x, y, z), f, e, 'E', comment, false);
+            queue_extrude(new Vector3d(x, y, z), f, e, 'E', comment, InRetract);
 		}
         protected virtual void AppendMoveToE(Vector3d pos, double f, double e, string comment = null)
         {

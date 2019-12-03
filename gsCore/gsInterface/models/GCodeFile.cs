@@ -6,6 +6,14 @@ namespace gs
     {
         List<GCodeLine> lines;
 
+        public GCodeLine this[int i]
+        {
+            get
+            {
+                return lines[i];
+            }
+        }
+
         public GCodeFile()
         {
             lines = new List<GCodeLine>();
