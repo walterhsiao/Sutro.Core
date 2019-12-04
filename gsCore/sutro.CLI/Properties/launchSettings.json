@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "smSlicerCLI": {
-      "commandName": "Project",
-      "commandLineArgs": "\"Sample Input/bunny.stl\" \"Sample Output/bunny.gcode\" -s \"Sample Input/machineSettings.json\" \"Sample Input/materialSettings.json\" \"Sample Input/printSettings.json\" -o LayerHeightMM:0.4",
-      "workingDirectory": "E:\\Source\\Sutro\\smSlicerCore"
-    }
-  }
-}
