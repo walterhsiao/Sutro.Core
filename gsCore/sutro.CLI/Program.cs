@@ -42,7 +42,7 @@ namespace sutro.CLI
             }
             catch (ReflectionTypeLoadException e)
             {
-                Console.WriteLine(e.ToString());
+                Console.WriteLine("Composition loader exceptions:");
                 foreach (var a in e.LoaderExceptions)
                 {
                     Console.WriteLine(a.ToString());
@@ -120,6 +120,10 @@ namespace sutro.CLI
             var p = new Program();
 
             EngineDictionary = new Dictionary<string, Lazy<IEngine, IEngineData>>();
+
+            if (p.Engines == null)
+                return;
+
             foreach (var e in p.Engines)
             {
                 if (!EngineDictionary.ContainsKey(e.Metadata.Name))

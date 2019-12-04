@@ -246,14 +246,14 @@ namespace gs
  
 
         // tags on slice polygons get transferred to shells
-        IntTagSet<IFillPolygon> ShellTags = new IntTagSet<IFillPolygon>();
+        protected IntTagSet<IFillPolygon> ShellTags = new IntTagSet<IFillPolygon>();
 
         // basic progress monitoring
-        int TotalProgress = 1;
-        int CurProgress = 0;
+        protected int TotalProgress = 1;
+        protected int CurProgress = 0;
 
         // [TODO] these should be moved to settings, or something?
-        double OverhangAllowanceMM;
+        protected double OverhangAllowanceMM;
         protected virtual double LayerFillAngleF(int layer_i)
         {
 			//return 90;
