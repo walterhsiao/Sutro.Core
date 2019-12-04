@@ -1,6 +1,35 @@
-.vs/
-packages/
-*.user
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
 
-*/bin/*
-*/obj/*
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+gsGCode/bin
+gsGCode/obj
+gsGCode.csproj.user
+bin
+obj
+*.meta
