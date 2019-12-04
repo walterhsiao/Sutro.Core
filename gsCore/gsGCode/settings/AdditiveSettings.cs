@@ -189,6 +189,13 @@ namespace gs
         public string ManufacturerName => BaseMachine.ManufacturerName;
         public string ModelIdentifier => BaseMachine.ModelIdentifier;
         public string ProfileName => Identifier;
+        public double MachineBedSizeXMM => Machine.BedSizeXMM;
+        public double MachineBedSizeYMM => Machine.BedSizeYMM;
+        public double MachineBedSizeZM01M => Machine.MaxHeightMM;
+        public IProfile Clone()
+        {
+            return CloneAs<SingleMaterialFFFSettings>();
+        }
 
         /*
          * Shells
