@@ -9,19 +9,27 @@ namespace gs
         GCodeBuilder builder;
         SingleMaterialFFFCompiler compiler;
 
-        public SingleMaterialFFFPrintGenerator(PrintMeshAssembly meshes, 
-                                      PlanarSliceStack slices,
-                                      SingleMaterialFFFSettings settings,
-                                      AssemblerFactoryF overrideAssemblerF = null )
+        public SingleMaterialFFFPrintGenerator() { }
+
+        public SingleMaterialFFFPrintGenerator(PrintMeshAssembly meshes,
+                                               PlanarSliceStack slices,
+                                               SingleMaterialFFFSettings settings,
+                                               AssemblerFactoryF overrideAssemblerF = null)
+        {
+            Initialize(meshes, slices, settings, overrideAssemblerF);
+        }
+
+        public override void Initialize(PrintMeshAssembly meshes,
+                               PlanarSliceStack slices,
+                               SingleMaterialFFFSettings settings,
+                               AssemblerFactoryF overrideAssemblerF = null)
         {
             file_accumulator = new GCodeFileAccumulator();
             builder = new GCodeBuilder(file_accumulator);
-            AssemblerFactoryF useAssembler = (overrideAssemblerF != null) ?
-                overrideAssemblerF : settings.AssemblerType();
+            AssemblerFactoryF useAssembler = overrideAssemblerF ?? settings.AssemblerType();
             compiler = new SingleMaterialFFFCompiler(builder, settings, useAssembler);
-            base.Initialize(meshes, slices, settings, compiler);
+            Initialize(meshes, slices, settings, compiler);
         }
-
 
         protected override GCodeFile extract_result()
         {
