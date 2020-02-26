@@ -1,41 +1,40 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using g3;
+﻿using gs.interfaces;
 
 namespace gs.info
 {
-	public class GenericPrinterSettings : GenericRepRapSettings
+    public class GenericPrinterSettings : GenericRepRapSettings
     {
-        public override AssemblerFactoryF AssemblerType() {
+        public override IProfile Clone()
+        {
+            return CloneAs<GenericPrinterSettings>();
+        }
+
+        public override AssemblerFactoryF AssemblerType()
+        {
             return RepRapAssembler.Factory;
         }
 
-        public string ManufacturerName;
         public string ManufacturerUUID;
         public string DefaultMachineUUID;
 
-		public GenericPrinterSettings(string mfgName, string mfgUUID, string defaultMachineUUID) {
-            ManufacturerName = mfgName;
+        public GenericPrinterSettings()
+        {
+            configure_unknown();
+        }
+
+        public GenericPrinterSettings(string mfgName, string mfgUUID, string defaultMachineUUID) {
+            BaseMachine.ManufacturerName = mfgName;
             ManufacturerUUID = mfgUUID;
             DefaultMachineUUID = defaultMachineUUID;
 
             configure_unknown();
         }
 
-
-        public override T CloneAs<T>() {
-            GenericPrinterSettings copy = new GenericPrinterSettings(ManufacturerName, ManufacturerUUID, DefaultMachineUUID);
-            this.CopyFieldsTo(copy);
-            return copy as T;
-        }
-
-
         void configure_unknown()
         {
             Machine.ManufacturerName = ManufacturerName;
             Machine.ManufacturerUUID = ManufacturerUUID;
-            Machine.ModelIdentifier = "Unknown";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = DefaultMachineUUID;
             Machine.Class = MachineClass.PlasticFFFPrinter;
             Machine.BedSizeXMM = 80;

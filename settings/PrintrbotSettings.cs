@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using g3;
+using gs.interfaces;
 
 namespace gs.info
 {
@@ -23,24 +24,30 @@ namespace gs.info
     {
 		public Printrbot.Models ModelEnum;
 
-        public override AssemblerFactoryF AssemblerType() {
+        public override IProfile Clone()
+        {
+            return CloneAs<PrintrbotSettings>();
+        }
+
+        public override AssemblerFactoryF AssemblerType()
+        {
 			return MakePrintrbotAssembler;
         }
 
+        public PrintrbotSettings()
+        {
+            ModelEnum = Printrbot.Models.Unknown;
+            configure_unknown();
+        }
 
-		public PrintrbotSettings(Printrbot.Models model) {
+        public PrintrbotSettings(Printrbot.Models model)
+        {
 			ModelEnum = model;
 
 			if (model == Printrbot.Models.Plus)
                 configure_Plus();
             else
                 configure_unknown();
-        }
-
-        public override T CloneAs<T>() {
-			PrintrbotSettings copy = new PrintrbotSettings(this.ModelEnum);
-            this.CopyFieldsTo(copy);
-            return copy as T;
         }
 
 
@@ -104,7 +111,7 @@ namespace gs.info
         {
             Machine.ManufacturerName = "Printrbot";
             Machine.ManufacturerUUID = Printrbot.UUID;
-            Machine.ModelIdentifier = "(Unknown)";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = Printrbot.UUID_Unknown;
             Machine.Class = MachineClass.PlasticFFFPrinter;
             Machine.BedSizeXMM = 100;

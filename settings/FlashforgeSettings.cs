@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using g3;
+using gs.interfaces;
 
 namespace gs.info
 {
-	public static class Flashforge
+    public static class Flashforge
 	{
         public const string UUID = "5974064e-8751-4048-a700-73a023add74f";
 
@@ -23,11 +21,24 @@ namespace gs.info
     {
         public Flashforge.Models ModelEnum;
 
-        public override AssemblerFactoryF AssemblerType() {
+        public override IProfile Clone()
+        {
+            return CloneAs<FlashforgeSettings>();
+        }
+
+        public override AssemblerFactoryF AssemblerType()
+        {
             return MakerbotAssembler.Factory;
         }
 
-        public FlashforgeSettings(Flashforge.Models model = Flashforge.Models.CreatorPro) {
+        public FlashforgeSettings()
+        {
+            ModelEnum = Flashforge.Models.Unknown;
+            configure_unknown();
+        }
+        
+        public FlashforgeSettings(Flashforge.Models model)
+        {
 			ModelEnum = model;
 
             if (model == Flashforge.Models.CreatorPro)
@@ -35,13 +46,6 @@ namespace gs.info
             else
                 configure_unknown();
 
-        }
-
-
-        public override T CloneAs<T>() {
-            FlashforgeSettings copy = new FlashforgeSettings(this.ModelEnum);
-            this.CopyFieldsTo(copy);
-            return copy as T;
         }
 
 
@@ -107,7 +111,7 @@ namespace gs.info
         {
             Machine.ManufacturerName = "Flashforge";
             Machine.ManufacturerUUID = Flashforge.UUID;
-            Machine.ModelIdentifier = "(Unknown)";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = Flashforge.UUID_Unknown;
             Machine.Class = MachineClass.PlasticFFFPrinter;
 

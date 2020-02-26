@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using g3;
+using gs.interfaces;
 
 namespace gs.info
 {
-	public static class Makerbot
+    public static class Makerbot
 	{
         public const string UUID = "77b7ed08-dcc8-4c2e-a189-18aa549bf94b";
 
@@ -19,24 +17,34 @@ namespace gs.info
     }
 
 
-
-
     public interface ISailfishSettings
     {
         string GPXModelFlag { get; }
     }
 
 
-
 	public class MakerbotSettings : SingleMaterialFFFSettings, ISailfishSettings
     {
         public Makerbot.Models ModelEnum;
 
-        public override AssemblerFactoryF AssemblerType() {
+        public override IProfile Clone()
+        {
+            return CloneAs<MakerbotSettings>();
+        }
+
+        public override AssemblerFactoryF AssemblerType()
+        {
             return MakerbotAssembler.Factory;
         }
 
-        public MakerbotSettings(Makerbot.Models model = Makerbot.Models.Replicator2) {
+        public MakerbotSettings()
+        {
+            ModelEnum = Makerbot.Models.Unknown;
+            configure_unknown();
+        }
+
+        public MakerbotSettings(Makerbot.Models model)
+        {
 			ModelEnum = model;
 
             if (model == Makerbot.Models.Replicator2)
@@ -46,21 +54,11 @@ namespace gs.info
 
         }
 
-
-        public override T CloneAs<T>() {
-            MakerbotSettings copy = new MakerbotSettings(this.ModelEnum);
-            this.CopyFieldsTo(copy);
-            return copy as T;
-        }
-
-
         public static IEnumerable<SingleMaterialFFFSettings> EnumerateDefaults()
         {
             yield return new MakerbotSettings(Makerbot.Models.Replicator2);
             yield return new MakerbotSettings(Makerbot.Models.Unknown);
         }
-
-
 
         public string GPXModelFlag {
             get {
@@ -70,8 +68,6 @@ namespace gs.info
                     return "";
             }
         }
-
-
 
         void configure_Replicator_2()
         {
@@ -114,12 +110,11 @@ namespace gs.info
             OuterPerimeterSpeedX = 0.5;
         }
 
-
         void configure_unknown()
         {
             Machine.ManufacturerName = "Makerbot";
             Machine.ManufacturerUUID = Makerbot.UUID;
-            Machine.ModelIdentifier = "(Unknown)";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = Makerbot.UUID_Unknown;
             Machine.Class = MachineClass.PlasticFFFPrinter;
 

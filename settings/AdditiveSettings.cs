@@ -1,5 +1,7 @@
 ﻿﻿using System;
 using g3;
+using gs.interfaces;
+using Newtonsoft.Json;
 
 namespace gs
 {
@@ -11,7 +13,7 @@ namespace gs
     }
 
 
-    public abstract class MachineInfo
+    public abstract class MachineInfo : Settings
     {
         protected static string UnknownUUID = "00000000-0000-0000-0000-000000000000";
 
@@ -39,21 +41,7 @@ namespace gs
 
         public double BedOriginFactorX = 0;
         public double BedOriginFactorY = 0;
-
-        public abstract T CloneAs<T>() where T : class;
-        protected virtual void CopyFieldsTo(MachineInfo to)
-        {
-            to.ManufacturerName = this.ManufacturerName;
-            to.ManufacturerUUID = this.ManufacturerUUID;
-            to.ModelIdentifier = this.ModelIdentifier;
-            to.ModelUUID = this.ModelUUID;
-            to.Class = this.Class;
-            to.BedSizeXMM = this.BedSizeXMM;
-            to.BedSizeYMM = this.BedSizeYMM;
-            to.MaxHeightMM = this.MaxHeightMM;
-        }
     }
-
 
 
     public class FFFMachineInfo : MachineInfo
@@ -104,84 +92,40 @@ namespace gs
                                                         // configured using CalibrationModelGenerator.MakePrintStepSizeTest() with
                                                         // all other cleanup steps disabled.
                                                         // [TODO] this is actually speed-dependent...
-
-        public override T CloneAs<T>()
-        {
-            FFFMachineInfo fi = new FFFMachineInfo();
-            this.CopyFieldsTo(fi);
-            return fi as T;
-        }
-        protected virtual void CopyFieldsTo(FFFMachineInfo to)
-        {
-            base.CopyFieldsTo(to);
-
-            to.NozzleDiamMM = this.NozzleDiamMM;
-            to.FilamentDiamMM = this.FilamentDiamMM;
-            to.MinLayerHeightMM = this.MinLayerHeightMM;
-            to.MaxHeightMM = this.MaxHeightMM;
-            to.MinExtruderTempC = this.MaxExtruderTempC;
-            to.HasHeatedBed = this.HasHeatedBed;
-            to.MinBedTempC = this.MinBedTempC;
-            to.MaxBedTempC = this.MaxBedTempC;
-            to.MaxExtrudeSpeedMMM = this.MaxExtrudeSpeedMMM;
-            to.MaxTravelSpeedMMM = this.MaxTravelSpeedMMM;
-            to.MaxZTravelSpeedMMM = this.MaxZTravelSpeedMMM;
-            to.MaxRetractSpeedMMM = this.MaxRetractSpeedMMM;
-            to.MinPointSpacingMM = this.MinPointSpacingMM;
-
-            to.EnableAutoBedLeveling = this.EnableAutoBedLeveling;
-            to.HasAutoBedLeveling = this.HasAutoBedLeveling;
-
-            to.ManufacturerName = this.ManufacturerName;
-            to.ManufacturerUUID = this.ManufacturerUUID;
-            to.ModelIdentifier = this.ModelIdentifier;
-            to.ModelUUID = this.ModelUUID;
-            to.Class = this.Class;
-            to.BedSizeXMM = this.BedSizeXMM;
-            to.BedSizeYMM = this.BedSizeYMM;
-            to.MaxHeightMM = this.MaxHeightMM;
-            to.BedOriginFactorX = this.BedOriginFactorX;
-            to.BedOriginFactorY = this.BedOriginFactorY;
-        }
     }
 
 
+    public interface IPlanarAdditiveSettings 
+    {
+        double LayerHeightMM { get; }
+        AssemblerFactoryF AssemblerType();
+    }
 
-    public abstract class PlanarAdditiveSettings
+
+    public abstract class PlanarAdditiveSettings : Settings, IPlanarAdditiveSettings
 	{
         /// <summary>
         /// This is the "name" of this settings (eg user identifier)
         /// </summary>
         public string Identifier = "Defaults";
 
-		public double LayerHeightMM = 0.2;
-
-
-        public string ClassTypeName {
-            get { return GetType().ToString(); }
-        }
-
+		public double LayerHeightMM { get; set; } = 0.2;
 
         public abstract MachineInfo BaseMachine { get; set; }
 
-        public abstract T CloneAs<T>() where T : class;
-        protected virtual void CopyFieldsTo(PlanarAdditiveSettings to)
-        {
-            to.Identifier = this.Identifier;
-            to.LayerHeightMM = this.LayerHeightMM;
-        }
+        public abstract AssemblerFactoryF AssemblerType();
     }
 
 
 
-    public class SingleMaterialFFFSettings : PlanarAdditiveSettings
+    public class SingleMaterialFFFSettings : PlanarAdditiveSettings, IProfile
 	{
         // This is a bit of an odd place for this, but settings are where we actually
         // know what assembler we should be using...
-        public virtual AssemblerFactoryF AssemblerType() {
-            throw new NotImplementedException("Settings.AssemblerType() not provided");
+        public override AssemblerFactoryF AssemblerType()
+        {
+            throw new NotImplementedException($"{GetType()}.AssemblerType() not provided");
         }
-
 
         protected FFFMachineInfo machineInfo;
         public FFFMachineInfo Machine {
@@ -198,6 +142,14 @@ namespace gs
                     throw new Exception("SingleMaterialFFFSettings.Machine.set: type is not FFFMachineInfo!");
             }
         }
+
+        #region Material
+        public string MaterialSource { get; set; } = "Generic";
+        public string MaterialType { get; set; } = "PLA";
+        public string MaterialColor { get; set; } = "Blue";
+
+        public string MaterialName => $"{MaterialSource} {MaterialType} - {MaterialColor}";
+        #endregion
 
         /*
          * Temperatures
@@ -242,18 +194,32 @@ namespace gs
         public double TravelLiftHeight { get; set; } = 0.2;
         public double TravelLiftDistanceThreshold { get; set; } = 5d;
 
+        // Wrap some properties to satisfy the IProfile interface 
+        public string ManufacturerName { get => Machine.ManufacturerName; set => Machine.ManufacturerName = value; }
+        public string ModelIdentifier { get => Machine.ModelIdentifier; set => Machine.ModelIdentifier = value; }
+        public string ProfileName { get => Identifier; set => Identifier = value; }
+        public double MachineBedSizeXMM => Machine.BedSizeXMM;
+        public double MachineBedSizeYMM => Machine.BedSizeYMM;
+        public double MachineBedSizeZMM => Machine.MaxHeightMM;
+        public double MachineBedOriginFactorX => Machine.BedOriginFactorX;
+        public double MachineBedOriginFactorY => Machine.BedOriginFactorY;
+        public virtual IProfile Clone()
+        {
+            return CloneAs<SingleMaterialFFFSettings>();
+        }
+
         /*
          * Shells
          */
-        public int Shells = 2;
+        public int Shells { get; set; } = 2;
         public int InteriorSolidRegionShells = 0;       // how many shells to add around interior solid regions (eg roof/floor)
 		public bool OuterShellLast = false;				// do outer shell last (better quality but worse precision)
 
 		/*
 		 * Roof/Floors
 		 */
-		public int RoofLayers = 2;
-		public int FloorLayers = 2;
+		public int RoofLayers { get; set; } = 2;
+		public int FloorLayers { get; set; } = 2;
 
         /*
          *  Solid fill settings
@@ -320,10 +286,12 @@ namespace gs
          * Debug/Utility options
          */
 
+        [JsonIgnore]
         public Interval1i LayerRangeFilter = new Interval1i(0, 999999999);   // only compute slices in this range
 
-
-
+        [JsonProperty]
+        private int LayerRangeFilterMin { get { return LayerRangeFilter.a; } set { LayerRangeFilter.a = value; } }
+        private int LayerRangeFilterMax { get { return LayerRangeFilter.b; } set { LayerRangeFilter.b = value; } }
 
         /*
          * functions that calculate derived values
@@ -338,83 +306,6 @@ namespace gs
         public double BridgeFillPathSpacingMM() {
 			return Machine.NozzleDiamMM * BridgeFillNozzleDiamStepX;
         }
-
-
-        public override T CloneAs<T>()
-        {
-            SingleMaterialFFFSettings copy = new SingleMaterialFFFSettings();
-            this.CopyFieldsTo(copy);
-            return copy as T;
-        }
-        protected virtual void CopyFieldsTo(SingleMaterialFFFSettings to)
-        {
-            base.CopyFieldsTo(to);
-            to.machineInfo = this.machineInfo.CloneAs<FFFMachineInfo>();
-
-            to.ExtruderTempC = this.ExtruderTempC;
-            to.HeatedBedTempC = this.HeatedBedTempC;
-            to.EnableRetraction = this.EnableRetraction;
-            to.RetractDistanceMM = this.RetractDistanceMM;
-            to.MinRetractTravelLength = this.MinRetractTravelLength;
-
-            to.RetractSpeed = this.RetractSpeed;
-            to.ZTravelSpeed = this.ZTravelSpeed;
-            to.RapidTravelSpeed = this.RapidTravelSpeed;
-            to.CarefulExtrudeSpeed = this.CarefulExtrudeSpeed;
-            to.RapidExtrudeSpeed = this.RapidExtrudeSpeed;
-            to.MinExtrudeSpeed = this.MinExtrudeSpeed;
-            to.OuterPerimeterSpeedX = this.OuterPerimeterSpeedX;
-            to.FanSpeedX = this.FanSpeedX;
-
-            to.TravelLiftEnabled = this.TravelLiftEnabled;
-            to.TravelLiftHeight = this.TravelLiftHeight;
-            to.TravelLiftDistanceThreshold = this.TravelLiftDistanceThreshold;
-
-            to.Shells = this.Shells;
-            to.InteriorSolidRegionShells = this.InteriorSolidRegionShells;
-			to.OuterShellLast = this.OuterShellLast;
-            to.RoofLayers = this.RoofLayers;
-            to.FloorLayers = this.FloorLayers;
-
-            to.ShellsFillNozzleDiamStepX = this.ShellsFillNozzleDiamStepX;
-            to.SolidFillNozzleDiamStepX = this.SolidFillNozzleDiamStepX;
-			to.SolidFillBorderOverlapX = this.SolidFillBorderOverlapX;
-
-            to.SparseLinearInfillStepX = this.SparseLinearInfillStepX;
-            to.SparseFillBorderOverlapX = this.SparseFillBorderOverlapX;
-
-            to.StartLayers = this.StartLayers;
-            to.StartLayerHeightMM = this.StartLayerHeightMM;
-
-            to.GenerateSupport = this.GenerateSupport;
-			to.SupportOverhangAngleDeg = this.SupportOverhangAngleDeg;
-            to.SupportSpacingStepX = this.SupportSpacingStepX;
-            to.SupportVolumeScale = this.SupportVolumeScale;
-			to.EnableSupportShell = this.EnableSupportShell;
-			to.SupportAreaOffsetX = this.SupportAreaOffsetX;
-			to.SupportSolidSpace = this.SupportSolidSpace;
-			to.SupportRegionJoinTolX = this.SupportRegionJoinTolX;
-            to.EnableSupportReleaseOpt = this.EnableSupportReleaseOpt;
-            to.SupportReleaseGap = this.SupportReleaseGap;
-            to.SupportMinDimension = this.SupportMinDimension;
-            to.SupportMinZTips = this.SupportMinZTips;
-            to.SupportPointDiam = this.SupportPointDiam;
-			to.SupportPointSides = this.SupportPointSides;
-
-			to.EnableBridging = this.EnableBridging;
-			to.MaxBridgeWidthMM = this.MaxBridgeWidthMM;
-			to.BridgeFillNozzleDiamStepX = this.BridgeFillNozzleDiamStepX;
-			to.BridgeVolumeScale = this.BridgeVolumeScale;
-			to.BridgeExtrudeSpeedX = this.BridgeExtrudeSpeedX;
-
-
-            to.MinLayerTime = this.MinLayerTime;
-            to.ClipSelfOverlaps = this.ClipSelfOverlaps;
-            to.SelfOverlapToleranceX = this.SelfOverlapToleranceX;
-
-            to.LayerRangeFilter = this.LayerRangeFilter;
-        }
-
     }
 
 
@@ -426,16 +317,6 @@ namespace gs
         public override AssemblerFactoryF AssemblerType() {
             return RepRapAssembler.Factory;
         }
-
-
-        public override T CloneAs<T>()
-        {
-            GenericRepRapSettings copy = new GenericRepRapSettings();
-            this.CopyFieldsTo(copy);
-            return copy as T;
-        }
-        
-
     }
 
 }

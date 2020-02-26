@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using g3;
+using gs.interfaces;
 
 namespace gs.info
 {
-	public static class Monoprice
+    public static class Monoprice
 	{
         public const string UUID = "860432eb-dec6-4b20-8f97-3643a50daf1d";
 
@@ -22,13 +20,25 @@ namespace gs.info
 	public class MonopriceSettings : GenericRepRapSettings
     {
 		public Monoprice.Models ModelEnum;
+		
+        public override IProfile Clone()
+        {
+            return CloneAs<MonopriceSettings>();
+        }
 
-        public override AssemblerFactoryF AssemblerType() {
+        public override AssemblerFactoryF AssemblerType()
+        {
             return RepRapAssembler.Factory;
         }
 
+        public MonopriceSettings()
+        {
+            ModelEnum = Monoprice.Models.Unknown;
+            configure_unknown();
+        }
 
-		public MonopriceSettings(Monoprice.Models model) {
+        public MonopriceSettings(Monoprice.Models model)
+        {
 			ModelEnum = model;
 
             if (model == Monoprice.Models.MP_Select_Mini_V2)
@@ -37,19 +47,11 @@ namespace gs.info
                 configure_unknown();
         }
 
-        public override T CloneAs<T>() {
-            MonopriceSettings copy = new MonopriceSettings(this.ModelEnum);
-            this.CopyFieldsTo(copy);
-            return copy as T;
-        }
-
         public static IEnumerable<SingleMaterialFFFSettings> EnumerateDefaults()
         {
             yield return new MonopriceSettings(Monoprice.Models.MP_Select_Mini_V2);
             yield return new MonopriceSettings(Monoprice.Models.Unknown);
         }
-
-
 
         void configure_MP_Select_Mini_V2()
         {
@@ -92,14 +94,11 @@ namespace gs.info
             OuterPerimeterSpeedX = 0.5;
         }
 
-
-
-
         void configure_unknown()
         {
             Machine.ManufacturerName = "Monoprice";
             Machine.ManufacturerUUID = Monoprice.UUID;
-            Machine.ModelIdentifier = "(Unknown)";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = Monoprice.UUID_Unknown;
             Machine.Class = MachineClass.PlasticFFFPrinter;
             Machine.BedSizeXMM = 100;
@@ -137,8 +136,5 @@ namespace gs.info
             RapidExtrudeSpeed = Machine.MaxExtrudeSpeedMMM;
             OuterPerimeterSpeedX = 0.5;
         }
-
-
     }
-
 }

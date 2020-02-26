@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using g3;
+using gs.interfaces;
 
 namespace gs.info
 {
@@ -21,23 +22,30 @@ namespace gs.info
     {
 		public RepRap.Models ModelEnum;
 
-        public override AssemblerFactoryF AssemblerType() {
+        public override IProfile Clone()
+        {
+            return CloneAs<RepRapSettings>();
+        }
+
+        public override AssemblerFactoryF AssemblerType()
+        {
             return RepRapAssembler.Factory;
         }
 
+        public RepRapSettings()
+        {
+            ModelEnum = RepRap.Models.Unknown;
+            configure_unknown();
+        }
 
-		public RepRapSettings(RepRap.Models model) {
+		public RepRapSettings(RepRap.Models model)
+        {
 			ModelEnum = model;
 
             if (model == RepRap.Models.Unknown)
                 configure_unknown();
         }
 
-        public override T CloneAs<T>() {
-            RepRapSettings copy = new RepRapSettings(this.ModelEnum);
-            this.CopyFieldsTo(copy);
-            return copy as T;
-        }
 
         public static IEnumerable<SingleMaterialFFFSettings> EnumerateDefaults()
         {
@@ -49,7 +57,7 @@ namespace gs.info
         {
             Machine.ManufacturerName = "RepRap";
             Machine.ManufacturerUUID = RepRap.UUID;
-            Machine.ModelIdentifier = "Unknown";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = RepRap.UUID_Unknown;
             Machine.Class = MachineClass.PlasticFFFPrinter;
             Machine.BedSizeXMM = 80;

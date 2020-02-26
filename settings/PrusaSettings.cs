@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using g3;
+using gs.interfaces;
 
 namespace gs.info
 {
@@ -23,24 +24,31 @@ namespace gs.info
     {
 		public Prusa.Models ModelEnum;
 
-        public override AssemblerFactoryF AssemblerType() {
+        public override IProfile Clone()
+        {
+            return CloneAs<PrusaSettings>();
+        }
+
+        public override AssemblerFactoryF AssemblerType()
+        {
 			return MakePrusaAssembler;
         }
 
+        public PrusaSettings()
+        {
+            ModelEnum = Prusa.Models.Unknown;
+            configure_unknown();
+        }
 
-		public PrusaSettings(Prusa.Models model) {
+
+        public PrusaSettings(Prusa.Models model)
+        {
 			ModelEnum = model;
 
             if (model == Prusa.Models.i3_MK3)
                 configure_i3_MK3();
             else
                 configure_unknown();
-        }
-
-        public override T CloneAs<T>() {
-			PrusaSettings copy = new PrusaSettings(this.ModelEnum);
-            this.CopyFieldsTo(copy);
-            return copy as T;
         }
 
 
@@ -101,7 +109,7 @@ namespace gs.info
         {
             Machine.ManufacturerName = "Prusa";
             Machine.ManufacturerUUID = Prusa.UUID;
-            Machine.ModelIdentifier = "(Unknown)";
+            Machine.ModelIdentifier = "Generic";
             Machine.ModelUUID = Prusa.UUID_Unknown;
             Machine.Class = MachineClass.PlasticFFFPrinter;
             Machine.BedSizeXMM = 100;
