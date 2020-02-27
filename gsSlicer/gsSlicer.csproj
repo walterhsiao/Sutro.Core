@@ -29,24 +29,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="thirdparty\**" />
-    <EmbeddedResource Remove="thirdparty\**" />
-    <None Remove="thirdparty\**" />
-    <None Include="..\LICENSE.txt">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Sutro.Clipper" Version="1.0.0" />
     <PackageReference Include="Sutro.gsGCode" Version="1.0.0" />
     <PackageReference Include="Sutro.PathWorks.Plugins.API" Version="1.0.1" />
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\clipper_library\clipper_library.csproj" />
   </ItemGroup>
 
 </Project>

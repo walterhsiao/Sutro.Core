@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gsSlicer", "gsSlicer\gsSlicer.csproj", "{1F862827-28FF-46E2-B003-5F2BE2F92FF5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "clipper_library", "clipper_library\clipper_library.csproj", "{4A6219A0-AA88-4FE2-AE05-A96EBA7BDCF1}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gsSlicer.UnitTests", "gsSlicer.UnitTests\gsSlicer.UnitTests.csproj", "{2ECFBCD0-0DA8-427E-BAE6-2E9EEB48B767}"
 EndProject
 Global
@@ -19,10 +17,6 @@ Global
 		{1F862827-28FF-46E2-B003-5F2BE2F92FF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F862827-28FF-46E2-B003-5F2BE2F92FF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F862827-28FF-46E2-B003-5F2BE2F92FF5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4A6219A0-AA88-4FE2-AE05-A96EBA7BDCF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4A6219A0-AA88-4FE2-AE05-A96EBA7BDCF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4A6219A0-AA88-4FE2-AE05-A96EBA7BDCF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4A6219A0-AA88-4FE2-AE05-A96EBA7BDCF1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2ECFBCD0-0DA8-427E-BAE6-2E9EEB48B767}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2ECFBCD0-0DA8-427E-BAE6-2E9EEB48B767}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2ECFBCD0-0DA8-427E-BAE6-2E9EEB48B767}.Release|Any CPU.ActiveCfg = Release|Any CPU
