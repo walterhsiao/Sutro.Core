@@ -12,7 +12,6 @@ jobs:
       - name: Test creating package
         run: dotnet pack gsSlicer/gsSlicer.csproj 
                -c Release
-               -IncludeReferencedProjects
                --include-source
                --include-symbols
                
