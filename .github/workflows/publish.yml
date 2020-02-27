@@ -13,6 +13,7 @@ jobs:
       - name: Create package
         run: dotnet pack gsSlicer/gsSlicer.csproj 
                -c Release
+               -IncludeReferencedProjects
                --include-source
                --include-symbols
       - name: Push package

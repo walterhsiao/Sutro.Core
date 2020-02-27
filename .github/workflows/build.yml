@@ -10,4 +10,9 @@ jobs:
       - name: Build & test project
         run: dotnet test -c Release
       - name: Test creating package
-        run: dotnet pack gsSlicer/gsSlicer.csproj -c Release --include-source --include-symbols
+        run: dotnet pack gsSlicer/gsSlicer.csproj 
+               -c Release
+               -IncludeReferencedProjects
+               --include-source
+               --include-symbols
+               
