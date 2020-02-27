@@ -1,9 +1,9 @@
 ﻿using g3;
-using gs.interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using gs.utility;
+using Sutro.PathWorks.Plugins.API;
 
 namespace gs
 {

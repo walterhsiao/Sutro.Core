@@ -1,5 +1,5 @@
-﻿using System;
-using gs.interfaces;
+﻿using Sutro.PathWorks.Plugins.API;
+using System;
 
 
 namespace gs

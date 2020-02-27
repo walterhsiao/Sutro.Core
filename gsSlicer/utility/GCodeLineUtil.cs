@@ -1,4 +1,6 @@
-﻿namespace gs.utility
+﻿using Sutro.PathWorks.Plugins.API;
+
+namespace gs.utility
 {
     public static class GCodeLineUtil
     {
