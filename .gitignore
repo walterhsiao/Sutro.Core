@@ -27,9 +27,10 @@
 *.exe
 *.out
 *.app
-gsGCode/bin
-gsGCode/obj
-gsGCode.csproj.user
-bin
-obj
+
+#Folders
+*.csproj.user
+*/bin
+*/obj
 *.meta
+.vs/

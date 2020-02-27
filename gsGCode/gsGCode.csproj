@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Sutro.gsGCode</PackageId>
+    <Version>1.0.0</Version>
+    <PackageDescription>GCode parsing, manipulation and generation library.</PackageDescription>
+    <RepositoryUrl>https://github.com/SutroMachine/gsGCode</RepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>
+      $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
+    </AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>gs</RootNamespace>
+    <Authors>Ryan Schmidt</Authors>
+    <Company>gradientspace</Company>
+    <Copyright>Copyright © Ryan Schmidt/gradientspace 2017</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <Description>GCode parsing, manipulation and generation library.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Sutro.geometry3Sharp" Version="1.0.10" />
+    <PackageReference Include="Sutro.PathWorks.Plugins.API" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="engine\translations\UserSettingTranslations.Designer.cs">
+      <CustomToolNamespace>Sutro.PathWorks.Plugins.Core</CustomToolNamespace>
+      <DependentUpon>UserSettingTranslations.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="engine\translations\UserSettingTranslations.resx">
+      <CustomToolNamespace>Sutro.PathWorks.Plugins.Core</CustomToolNamespace>
+      <LastGenOutput>UserSettingTranslations.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+</Project>
