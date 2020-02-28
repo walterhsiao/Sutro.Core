@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Sutro.gsGCode</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <PackageDescription>GCode parsing, manipulation and generation library.</PackageDescription>
     <RepositoryUrl>https://github.com/SutroMachine/gsGCode</RepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
@@ -31,7 +31,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Sutro.geometry3Sharp" Version="1.0.10" />
-    <PackageReference Include="Sutro.PathWorks.Plugins.API" Version="1.0.1" />
+    <PackageReference Include="Sutro.PathWorks.Plugins.API" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>

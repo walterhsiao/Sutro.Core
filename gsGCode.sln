@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gsGCode", "gsGCode\gsGCode.csproj", "{C0C739AF-9062-4638-8A1E-B8176E01EE7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gsGCode.Tests", "gsGCode.Tests\gsGCode.Tests.csproj", "{6DF0D830-6010-4F0E-8C20-8883CE278C0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gsGCode.Tests", "gsGCode.Tests\gsGCode.Tests.csproj", "{6DF0D830-6010-4F0E-8C20-8883CE278C0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

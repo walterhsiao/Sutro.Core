@@ -3,7 +3,6 @@ using Sutro.PathWorks.Plugins.API;
 
 namespace gs.engines
 {
-
     public class MachineUserSettingsFFF<TSettings> : UserSettingCollection<TSettings> where TSettings : SingleMaterialFFFSettings
     {
         #region Identifiers
@@ -12,6 +11,7 @@ namespace gs.engines
             new UserSettingGroup(() => UserSettingTranslations.GroupIdentifiers);
 
         public UserSettingString<TSettings> ManufacturerName = new UserSettingString<TSettings>(
+            "MachineUserSettingsFFF.ManufacturerName",
             () => UserSettingTranslations.ManufacturerName_Name,
             () => UserSettingTranslations.ManufacturerName_Description,
             GroupIdentifiers,
@@ -19,13 +19,14 @@ namespace gs.engines
             (settings, val) => settings.Machine.ManufacturerName = val);
 
         public UserSettingString<TSettings> ModelIdentifier = new UserSettingString<TSettings>(
+            "MachineUserSettingsFFF.ModelIdentifier",
             () => UserSettingTranslations.ModelIdentifier_Name,
             () => UserSettingTranslations.ModelIdentifier_Description,
             GroupIdentifiers,
             (settings) => settings.Machine.ModelIdentifier,
             (settings, val) => settings.Machine.ModelIdentifier = val);
-        
-        #endregion
+
+        #endregion Identifiers
 
         #region Extruder
 
@@ -33,6 +34,7 @@ namespace gs.engines
             new UserSettingGroup(() => UserSettingTranslations.GroupExtruder);
 
         public UserSettingInt<TSettings> MaxExtruderTempC = new UserSettingInt<TSettings>(
+            "MachineUserSettingsFFF.MaxExtruderTempC",
             () => UserSettingTranslations.MaxExtruderTempC_Name,
             () => UserSettingTranslations.MaxExtruderTempC_Description,
             GroupExtruder,
@@ -41,6 +43,7 @@ namespace gs.engines
             UserSettingNumericValidations<int>.ValidateMin(-273, ValidationResult.Level.Error));
 
         public UserSettingInt<TSettings> MinExtruderTempC = new UserSettingInt<TSettings>(
+            "MachineUserSettingsFFF.MinExtruderTempC",
             () => UserSettingTranslations.MinExtruderTempC_Name,
             () => UserSettingTranslations.MinExtruderTempC_Description,
             GroupExtruder,
@@ -49,6 +52,7 @@ namespace gs.engines
             UserSettingNumericValidations<int>.ValidateMin(-273, ValidationResult.Level.Error));
 
         public UserSettingDouble<TSettings> NozzleDiamMM = new UserSettingDouble<TSettings>(
+            "MachineUserSettingsFFF.NozzleDiamMM",
             () => UserSettingTranslations.NozzleDiamMM_Name,
             () => UserSettingTranslations.NozzleDiamMM_Description,
             GroupExtruder,
@@ -56,7 +60,7 @@ namespace gs.engines
             (settings, val) => settings.Machine.NozzleDiamMM = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        #endregion
+        #endregion Extruder
 
         #region PrintVolume
 
@@ -64,6 +68,7 @@ namespace gs.engines
             new UserSettingGroup(() => UserSettingTranslations.GroupPrintVolume);
 
         public UserSettingDouble<TSettings> BedSizeXMM = new UserSettingDouble<TSettings>(
+            "MachineUserSettingsFFF.BedSizeXMM",
             () => UserSettingTranslations.BedSizeXMM_Name,
             () => UserSettingTranslations.BedSizeXMM_Description,
             GroupPrintVolume,
@@ -72,6 +77,7 @@ namespace gs.engines
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
         public UserSettingDouble<TSettings> BedSizeYMM = new UserSettingDouble<TSettings>(
+            "MachineUserSettingsFFF.BedSizeYMM",
             () => UserSettingTranslations.BedSizeYMM_Name,
             () => UserSettingTranslations.BedSizeYMM_Description,
             GroupPrintVolume,
@@ -80,6 +86,7 @@ namespace gs.engines
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
         public UserSettingDouble<TSettings> MaxHeightMM = new UserSettingDouble<TSettings>(
+            "MachineUserSettingsFFF.MaxHeightMM",
             () => UserSettingTranslations.MaxHeightMM_Name,
             () => UserSettingTranslations.MaxHeightMM_Description,
             GroupPrintVolume,
@@ -87,14 +94,15 @@ namespace gs.engines
             (settings, val) => settings.Machine.MaxHeightMM = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        #endregion
-        
+        #endregion PrintVolume
+
         #region Speeds
 
         public static readonly UserSettingGroup GroupSpeeds =
             new UserSettingGroup(() => UserSettingTranslations.GroupSpeeds);
 
         public UserSettingInt<TSettings> MaxExtrudeSpeedMMM = new UserSettingInt<TSettings>(
+            "MachineUserSettingsFFF.MaxExtrudeSpeedMMM",
             () => UserSettingTranslations.MaxExtrudeSpeedMMM_Name,
             () => UserSettingTranslations.MaxExtrudeSpeedMMM_Description,
             GroupSpeeds,
@@ -103,6 +111,7 @@ namespace gs.engines
             UserSettingNumericValidations<int>.ValidateMin(0, ValidationResult.Level.Error));
 
         public UserSettingInt<TSettings> MaxRetractSpeedMMM = new UserSettingInt<TSettings>(
+            "MachineUserSettingsFFF.MaxRetractSpeedMMM",
             () => UserSettingTranslations.MaxRetractSpeedMMM_Name,
             () => UserSettingTranslations.MaxRetractSpeedMMM_Description,
             GroupSpeeds,
@@ -111,6 +120,7 @@ namespace gs.engines
             UserSettingNumericValidations<int>.ValidateMin(0, ValidationResult.Level.Error));
 
         public UserSettingInt<TSettings> MaxTravelSpeedMMM = new UserSettingInt<TSettings>(
+            "MachineUserSettingsFFF.MaxTravelSpeedMMM",
             () => UserSettingTranslations.MaxTravelSpeedMMM_Name,
             () => UserSettingTranslations.MaxTravelSpeedMMM_Description,
             GroupSpeeds,
@@ -119,6 +129,7 @@ namespace gs.engines
             UserSettingNumericValidations<int>.ValidateMin(0, ValidationResult.Level.Error));
 
         public UserSettingInt<TSettings> MaxZTravelSpeedMMM = new UserSettingInt<TSettings>(
+            "MachineUserSettingsFFF.MaxZTravelSpeedMMM",
             () => UserSettingTranslations.MaxZTravelSpeedMMM_Name,
             () => UserSettingTranslations.MaxZTravelSpeedMMM_Description,
             GroupSpeeds,
@@ -126,14 +137,15 @@ namespace gs.engines
             (settings, val) => settings.Machine.MaxZTravelSpeedMMM = val,
             UserSettingNumericValidations<int>.ValidateMin(0, ValidationResult.Level.Error));
 
-        #endregion
-        
+        #endregion Speeds
+
         #region Capabilities
 
         public static readonly UserSettingGroup GroupCapabilities =
             new UserSettingGroup(() => UserSettingTranslations.GroupCapabilities);
 
         public UserSettingBool<TSettings> HasAutoBedLeveling = new UserSettingBool<TSettings>(
+            "MachineUserSettingsFFF.HasAutoBedLeveling",
             () => UserSettingTranslations.HasAutoBedLeveling_Name,
             () => UserSettingTranslations.HasAutoBedLeveling_Description,
             GroupCapabilities,
@@ -141,6 +153,7 @@ namespace gs.engines
             (settings, val) => settings.Machine.HasAutoBedLeveling = val);
 
         public UserSettingBool<TSettings> HasHeatedBed = new UserSettingBool<TSettings>(
+            "MachineUserSettingsFFF.HasHeatedBed",
             () => UserSettingTranslations.HasHeatedBed_Name,
             () => UserSettingTranslations.HasHeatedBed_Description,
             GroupCapabilities,
@@ -148,6 +161,7 @@ namespace gs.engines
             (settings, val) => settings.Machine.HasHeatedBed = val);
 
         public UserSettingDouble<TSettings> MaxLayerHeightMM = new UserSettingDouble<TSettings>(
+            "MachineUserSettingsFFF.MaxLayerHeightMM",
             () => UserSettingTranslations.MaxLayerHeightMM_Name,
             () => UserSettingTranslations.MaxLayerHeightMM_Description,
             GroupCapabilities,
@@ -156,6 +170,7 @@ namespace gs.engines
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
         public UserSettingDouble<TSettings> MinLayerHeightMM = new UserSettingDouble<TSettings>(
+            "MachineUserSettingsFFF.MinLayerHeightMM",
             () => UserSettingTranslations.MinLayerHeightMM_Name,
             () => UserSettingTranslations.MinLayerHeightMM_Description,
             GroupCapabilities,
@@ -163,7 +178,7 @@ namespace gs.engines
             (settings, val) => settings.Machine.MinLayerHeightMM = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
 
-        #endregion
+        #endregion Capabilities
 
         #region HeatedBed
 
@@ -171,6 +186,7 @@ namespace gs.engines
             new UserSettingGroup(() => UserSettingTranslations.GroupHeatedBed);
 
         public UserSettingInt<TSettings> MaxBedTempC = new UserSettingInt<TSettings>(
+            "MachineUserSettingsFFF.MaxBedTempC",
             () => UserSettingTranslations.MaxBedTempC_Name,
             () => UserSettingTranslations.MaxBedTempC_Description,
             GroupHeatedBed,
@@ -179,6 +195,7 @@ namespace gs.engines
             UserSettingNumericValidations<int>.ValidateMin(-273, ValidationResult.Level.Error));
 
         public UserSettingInt<TSettings> MinBedTempC = new UserSettingInt<TSettings>(
+            "MachineUserSettingsFFF.MinBedTempC",
             () => UserSettingTranslations.MinBedTempC_Name,
             () => UserSettingTranslations.MinBedTempC_Description,
             GroupHeatedBed,
@@ -186,17 +203,18 @@ namespace gs.engines
             (settings, val) => settings.Machine.MinBedTempC = val,
             UserSettingNumericValidations<int>.ValidateMin(-273, ValidationResult.Level.Error));
 
-        #endregion
+        #endregion HeatedBed
 
         /// <summary>
         /// Sets the culture for name & description strings.
         /// </summary>
         /// <remarks>
-        /// Any translation resources used in derived classes should override to set the culture 
+        /// Any translation resources used in derived classes should override to set the culture
         /// on the resource manager, while still calling the base method.
         /// </remarks>
         /// <param name="cultureInfo"></param>
-        public override void SetCulture(CultureInfo cultureInfo) {
+        public override void SetCulture(CultureInfo cultureInfo)
+        {
             UserSettingTranslations.Culture = cultureInfo;
         }
     }
