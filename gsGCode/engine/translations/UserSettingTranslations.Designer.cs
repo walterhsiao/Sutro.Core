@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace gs.engines {
+namespace Sutro.PathWorks.Plugins.Core {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace gs.engines {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("gsGCode.engine.translations.UserSettingTranslations", typeof(UserSettingTranslations).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("gs.engine.translations.UserSettingTranslations", typeof(UserSettingTranslations).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
