@@ -19,10 +19,11 @@ namespace gs
     /// </summary>
     public class SupportLinesFillPolygon : ParallelLinesFillPolygon
     {
-        public SupportLinesFillPolygon(GeneralPolygon2d poly) : base(poly)
+        public SupportLinesFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings) : base(poly)
         {
             SimplifyAmount = SimplificationLevel.Aggressive;
-            TypeFlags = FillTypeFlags.SupportMaterial;
+            FillType = new SupportFillType(settings);
+            TypeFlags = FillTypeFlags.Invalid;
         }
     }
 

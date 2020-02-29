@@ -103,6 +103,8 @@ namespace gs
         // remaining interior polygons (to fill w/ other strategy, etc)
         public List<GeneralPolygon2d> InnerPolygons { get; set; }
 
+        public SupportFillType FillType { get; internal set; }
+
         public List<GeneralPolygon2d> GetInnerPolygons()
         {
             return InnerPolygons;

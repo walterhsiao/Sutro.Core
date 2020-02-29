@@ -20,7 +20,6 @@ namespace gs
         SolidInfill = 1 << 8,
         SparseInfill = 1 << 9,
 
-        SupportMaterial = 1 << 10,
         Skirt = 1 << 12,
         Priming = 1 << 13,
 

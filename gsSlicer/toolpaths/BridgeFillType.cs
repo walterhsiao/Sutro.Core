@@ -23,7 +23,7 @@
             return volume * settings.BridgeVolumeScale;
         }
 
-        public override double ModifySpeed(double speed)
+        public override double ModifySpeed(double speed, SchedulerSpeedHint speedHint = SchedulerSpeedHint.Default)
         {
             return settings.CarefulExtrudeSpeed * settings.BridgeExtrudeSpeedX;
         }

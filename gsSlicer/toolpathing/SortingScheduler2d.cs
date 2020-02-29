@@ -85,6 +85,7 @@ namespace gs
                             o.AppendVertex(loop.curve[(i + iStart) % N]);
                         }
                         o.TypeFlags = loop.curve.TypeFlags;
+                        o.FillType = loop.curve.FillType;
                         paths.Append(o);
                         OutPoint = o.Vertices[0];
                     }

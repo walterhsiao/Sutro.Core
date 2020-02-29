@@ -72,6 +72,15 @@ namespace gs
                 curve.TypeFlags = flags;
         }
 
+        public void SetFillType(IFillType fillType)
+        {
+            foreach (var loop in Loops)
+                loop.FillType = fillType;
+
+            foreach (var curve in Curves)
+                curve.FillType = fillType;
+        }
+
         public void AddFlags(FillTypeFlags flags)
         {
             foreach (var loop in Loops)

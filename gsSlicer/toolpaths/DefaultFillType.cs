@@ -15,7 +15,7 @@
             return Label;
         }
 
-        public virtual double ModifySpeed(double speed)
+        public virtual double ModifySpeed(double speed, SchedulerSpeedHint speedHint = SchedulerSpeedHint.Default)
         {
             return speed;
         }

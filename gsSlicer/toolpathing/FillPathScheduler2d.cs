@@ -170,14 +170,13 @@ namespace gs
         //       (bit of a hack, currently means on first layer we do support extra slow)
         private double select_speed(FillCurve2d pathCurve)
         {
-            bool bIsSupport = pathCurve.HasTypeFlag(FillTypeFlags.SupportMaterial);
             bool bIsOuterPerimeter = pathCurve.HasTypeFlag(FillTypeFlags.OuterPerimeter);
             bool bCareful = (SpeedHint == SchedulerSpeedHint.Careful);
             double useSpeed = bCareful ? Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;
-            if (bIsOuterPerimeter || (bCareful && bIsSupport))
+            if (bIsOuterPerimeter)
                 useSpeed *= Settings.OuterPerimeterSpeedX;
 
-            useSpeed = pathCurve.FillType.ModifySpeed(useSpeed);
+            useSpeed = pathCurve.FillType.ModifySpeed(useSpeed, SpeedHint);
 
             return useSpeed;
         }

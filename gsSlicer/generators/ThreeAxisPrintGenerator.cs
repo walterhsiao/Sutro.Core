@@ -568,8 +568,14 @@ namespace gs
                 shells_gen.DiscardTinyPerimterLengthMM = 0.0;
                 shells_gen.Compute();
                 List<FillCurveSet2d> shell_fill_curves = shells_gen.GetFillCurves();
+
+                // Note: this will wipe out fill types for inner and outer perimeters;
+                // may need to create sub-fill types for support shells
                 foreach (var fillpath in shell_fill_curves)
-                    fillpath.AddFlags(FillTypeFlags.SupportMaterial);
+                {
+                    fillpath.SetFillType(new SupportFillType(Settings));
+                    fillpath.SetFlags(FillTypeFlags.Invalid);
+                }
                 scheduler.AppendCurveSets(shell_fill_curves);
 
                 // expand inner polygon so that infill overlaps shell
@@ -583,7 +589,7 @@ namespace gs
 
             foreach (var poly in infill_polys)
             {
-                SupportLinesFillPolygon infill_gen = new SupportLinesFillPolygon(poly)
+                SupportLinesFillPolygon infill_gen = new SupportLinesFillPolygon(poly, Settings)
                 {
                     InsetFromInputPolygon = (Settings.EnableSupportShell == false),
                     PathSpacing = support_spacing,
