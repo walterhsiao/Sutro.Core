@@ -71,7 +71,8 @@ namespace gs
         public bool PreserveOuterShells = true;         // if true, we do not try to filter self-overlaps for shell 0
         public double SelfOverlapTolerance = 0.3;
 
-        public bool OuterShellLast = false;				// if true, outer shell is scheduled last
+        public bool OuterShellLast = false;             // if true, outer shell is scheduled last
+        private readonly SingleMaterialFFFSettings settings;
 
         // Outputs
 
@@ -107,10 +108,11 @@ namespace gs
             return InnerPolygons;
         }
 
-        public ShellsFillPolygon(GeneralPolygon2d poly)
+        public ShellsFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings)
         {
             Polygon = poly;
             Shells = new List<FillCurveSet2d>();
+            this.settings = settings;
         }
 
         public bool Compute()
@@ -293,17 +295,22 @@ namespace gs
             FillCurveSet2d paths = new FillCurveSet2d();
 
             FillTypeFlags flags = FillTypeFlags.PerimeterShell;
+            IFillType fillType = new DefaultFillType();
+
             if (nShell == 0 && ShellType == ShellTypes.ExternalPerimeters)
                 flags = FillTypeFlags.OutermostShell;
             else if (ShellType == ShellTypes.InternalShell)
                 flags = FillTypeFlags.InteriorShell;
             else if (ShellType == ShellTypes.BridgeShell)
-                flags = FillTypeFlags.BridgeSupport;
+            {
+                fillType = new BridgeFillType(settings);
+                flags = FillTypeFlags.Invalid;
+            }
 
             if (FilterSelfOverlaps == false)
             {
                 foreach (GeneralPolygon2d shell in shell_polys)
-                    paths.Append(shell, flags);
+                    paths.Append(shell, flags, fillType);
                 return paths;
             }
 
@@ -327,7 +334,7 @@ namespace gs
 
                 foreach (var polygon in c.Loops)
                 {
-                    paths.Append(polygon, flags);
+                    paths.Append(polygon, flags, fillType);
                 }
                 foreach (var polyline in c.Paths)
                 {

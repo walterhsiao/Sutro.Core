@@ -105,8 +105,7 @@ namespace gs
                 double vol_scale = 1.0;
                 if ((path.TypeModifiers & FillTypeFlags.SupportMaterial) != 0)
                     vol_scale *= SupportExtrudeScale;
-                else if ((path.TypeModifiers & FillTypeFlags.BridgeSupport) != 0)
-                    vol_scale *= Settings.BridgeVolumeScale;
+                vol_scale = path.FillType.AdjustVolume(vol_scale);
 
                 for (int i = 0; i < path.VertexCount; ++i)
                 {

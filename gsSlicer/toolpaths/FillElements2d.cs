@@ -21,9 +21,10 @@ namespace gs
         SparseInfill = 1 << 9,
 
         SupportMaterial = 1 << 10,
-        BridgeSupport = 1 << 11,
         Skirt = 1 << 12,
-        Priming = 1 << 13
+        Priming = 1 << 13,
+
+        Invalid = 1 << 14, // temporary for refactoring; check use new IFillType instead
 
         // Warning: default enum max size is 32 bits; cannot add flags past 1 << 31
         // If more are needed, may need to change defintion to the following:
@@ -38,6 +39,8 @@ namespace gs
         bool HasTypeFlag(FillTypeFlags f);
 
         double CustomThickness { get; }
+
+        IFillType FillType { get; }
     }
 
     /// <summary>
@@ -46,6 +49,8 @@ namespace gs
     public class FillPolygon2d : Polygon2d, FillCurve2d
     {
         public FillTypeFlags TypeFlags = FillTypeFlags.Unknown;
+
+        public IFillType FillType { get; set; } = new DefaultFillType();
 
         public bool HasTypeFlag(FillTypeFlags f)
         {
@@ -76,6 +81,7 @@ namespace gs
     public class FillPolyline2d : PolyLine2d, FillCurve2d
     {
         public FillTypeFlags TypeFlags = FillTypeFlags.Unknown;
+        public IFillType FillType { get; set; } = new DefaultFillType();
 
         public bool HasTypeFlag(FillTypeFlags f)
         {

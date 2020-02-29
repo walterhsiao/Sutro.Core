@@ -12,7 +12,7 @@ namespace gs
         protected double feedrate;
         protected double extrusion;
         protected Vector2d dimensions = new Vector2d(0.4, 0.2);
-        protected FillTypeFlags fillType;
+        protected string fillType;
         protected int layerIndex;
         protected int pointCount;
 
@@ -29,14 +29,14 @@ namespace gs
 
         public Dictionary<int, FillType> FillTypes { get; protected set; } = new Dictionary<int, FillType>()
         {
-            {(int)FillTypeFlags.Unknown, new FillType("Unknown", new Vector3f(0.5, 0.5, 0.5))},
+            {DefaultFillType.Flag, new FillType("Unknown", new Vector3f(0.5, 0.5, 0.5))},
             {(int)FillTypeFlags.PerimeterShell, new FillType("Inner Perimeter", new Vector3f(1, 0, 0))},
             {(int)FillTypeFlags.OutermostShell, new FillType("Outer Perimeter", new Vector3f(1, 1, 0))},
             {(int)FillTypeFlags.OpenShellCurve, new FillType("Open Mesh Curve", new Vector3f(0, 1, 1))},
             {(int)FillTypeFlags.SolidInfill, new FillType("Solid Fill", new Vector3f(0, 0.5f, 1))},
             {(int)FillTypeFlags.SparseInfill, new FillType("Sparse Fill", new Vector3f(0.5f, 0, 1))},
             {(int)FillTypeFlags.SupportMaterial, new FillType("Support", new Vector3f(1, 0, 1))},
-            {(int)FillTypeFlags.BridgeSupport, new FillType("Bridge", new Vector3f(0, 0, 1))},
+            {BridgeFillType.Flag, new FillType("Bridge", new Vector3f(0, 0, 1))},
         };
 
         private readonly FixedRangeCustomDataDetails customDataBeadWidth =

@@ -85,7 +85,7 @@ namespace gs
 
             double useSpeed = select_speed(poly);
 
-            Builder.AppendExtrude(loopV, useSpeed, poly.TypeFlags, null);
+            Builder.AppendExtrude(loopV, useSpeed, poly.FillType, poly.TypeFlags, null);
         }
 
         private void AppendTravel(Vector2d startPt, Vector2d endPt)
@@ -96,7 +96,8 @@ namespace gs
             if (ExtrudeOnShortTravels &&
                 travelDistance < ShortTravelDistance)
             {
-                Builder.AppendExtrude(endPt, Settings.RapidTravelSpeed);
+                // TODO: Add strategy for extrude move?
+                Builder.AppendExtrude(endPt, Settings.RapidTravelSpeed, new DefaultFillType());
             }
             else if (Settings.TravelLiftEnabled &&
                 travelDistance > Settings.TravelLiftDistanceThreshold)
@@ -159,7 +160,7 @@ namespace gs
             if (curve.CustomThickness > 0)
                 dimensions.x = curve.CustomThickness;
 
-            Builder.AppendExtrude(loopV, useSpeed, dimensions, curve.TypeFlags, flags);
+            Builder.AppendExtrude(loopV, useSpeed, dimensions, curve.FillType, curve.TypeFlags, flags);
         }
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
@@ -176,9 +177,7 @@ namespace gs
             if (bIsOuterPerimeter || (bCareful && bIsSupport))
                 useSpeed *= Settings.OuterPerimeterSpeedX;
 
-            bool bIsBridgeSupport = pathCurve.HasTypeFlag(FillTypeFlags.BridgeSupport);
-            if (bIsBridgeSupport)
-                useSpeed = Settings.CarefulExtrudeSpeed * Settings.BridgeExtrudeSpeedX;
+            useSpeed = pathCurve.FillType.ModifySpeed(useSpeed);
 
             return useSpeed;
         }

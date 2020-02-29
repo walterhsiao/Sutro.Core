@@ -555,7 +555,7 @@ namespace gs
 
             if (nShells > 0)
             {
-                ShellsFillPolygon shells_gen = new ShellsFillPolygon(support_poly);
+                ShellsFillPolygon shells_gen = new ShellsFillPolygon(support_poly, Settings);
                 shells_gen.PathSpacing = shell_spacing;
                 shells_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
                 shells_gen.Layers = nShells;
@@ -669,7 +669,7 @@ namespace gs
             //   came from where. Would need to do loop above per-polygon
             if (bIsInfillAdjacent && Settings.InteriorSolidRegionShells > 0)
             {
-                ShellsFillPolygon interior_shells = new ShellsFillPolygon(solid_poly);
+                ShellsFillPolygon interior_shells = new ShellsFillPolygon(solid_poly, Settings);
                 interior_shells.PathSpacing = Settings.ShellsFillPathSpacingMM();
                 interior_shells.ToolWidth = Settings.Machine.NozzleDiamMM;
                 interior_shells.Layers = Settings.InteriorSolidRegionShells;
@@ -726,7 +726,7 @@ namespace gs
             //	fillPolys = ClipperUtil.MiterOffset(fillPolys, offset);
             //}
 
-            BridgeLinesFillPolygon fill_gen = new BridgeLinesFillPolygon(poly)
+            BridgeLinesFillPolygon fill_gen = new BridgeLinesFillPolygon(poly, Settings)
             {
                 InsetFromInputPolygon = false,
                 PathSpacing = spacing,
@@ -756,7 +756,7 @@ namespace gs
 
                 GeneralPolygon2d gp = new GeneralPolygon2d(polypart);
 
-                ShellsFillPolygon shells_fill = new ShellsFillPolygon(gp);
+                ShellsFillPolygon shells_fill = new ShellsFillPolygon(gp, Settings);
                 shells_fill.PathSpacing = Settings.SolidFillPathSpacingMM();
                 shells_fill.ToolWidth = Settings.Machine.NozzleDiamMM;
                 shells_fill.Layers = 1;
@@ -772,7 +772,7 @@ namespace gs
 
                 foreach (var fp in fillPolys)
                 {
-                    BridgeLinesFillPolygon fill_gen = new BridgeLinesFillPolygon(fp)
+                    BridgeLinesFillPolygon fill_gen = new BridgeLinesFillPolygon(fp, Settings)
                     {
                         InsetFromInputPolygon = false,
                         PathSpacing = spacing,
@@ -992,7 +992,7 @@ namespace gs
         /// </summary>
         protected virtual IShellsFillPolygon compute_shells_for_shape(GeneralPolygon2d shape)
         {
-            ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape);
+            ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape, Settings);
             shells_gen.PathSpacing = Settings.ShellsFillPathSpacingMM();
             shells_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
             shells_gen.Layers = Settings.Shells;

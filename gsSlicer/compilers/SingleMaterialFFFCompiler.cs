@@ -154,7 +154,10 @@ namespace gs
                 var currentDimensions = p[1].Dimensions;
                 if (p.Type == ToolpathTypes.Deposition)
                 {
-                    AddFeatureTypeLabel(p.TypeModifiers);
+                    if (p.TypeModifiers == FillTypeFlags.Invalid)
+                        AddFeatureTypeLabel(p.FillType.GetLabel());
+                    else
+                        AddFeatureTypeLabel(p.TypeModifiers);
                     AppendDimensions(currentDimensions);
                 }
 
@@ -187,7 +190,11 @@ namespace gs
         private void AddFeatureTypeLabel(FillTypeFlags typeModifier)
         {
             var featureLabel = featureTypeLabeler.FeatureLabelFromFillTypeFlag(typeModifier);
+            AddFeatureTypeLabel(featureLabel);
+        }
 
+        private void AddFeatureTypeLabel(string featureLabel)
+        {
             Builder.AddExplicitLine("");
             Builder.AddCommentLine(" feature " + featureLabel);
         }

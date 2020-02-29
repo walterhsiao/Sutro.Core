@@ -49,6 +49,8 @@ namespace gs
         // this flag is set on all Paths
         public FillTypeFlags TypeFlags = FillTypeFlags.SolidInfill;
 
+        public IFillType FillType { get; set; } = new DefaultFillType();
+
         // fill paths
         public List<FillCurveSet2d> FillCurves { get; set; }
 
@@ -143,7 +145,7 @@ namespace gs
                 int vid = start_vid;
                 int eid = pathGraph.GetVtxEdges(vid)[0];
 
-                FillPolyline2d path = new FillPolyline2d() { TypeFlags = this.TypeFlags };
+                FillPolyline2d path = new FillPolyline2d() { TypeFlags = this.TypeFlags, FillType = this.FillType };
 
                 path.AppendVertex(pathGraph.GetVertex(vid));
                 while (true)
@@ -190,7 +192,7 @@ namespace gs
                             simp.SimplifyDeviationThreshold = ToolWidth / 2; break;
                     }
                     simp.Simplify();
-                    path = new FillPolyline2d(simp.Result.ToArray()) { TypeFlags = this.TypeFlags };
+                    path = new FillPolyline2d(simp.Result.ToArray()) { TypeFlags = this.TypeFlags, FillType = this.FillType };
                 }
 
                 paths.Append(path);

@@ -12,7 +12,7 @@ namespace gsCore.FunctionalTests.Utility
 
         private FeatureInfo currentFeatureInfo;
 
-        public FeatureInfo SwitchFeature(FillTypeFlags featureType)
+        public FeatureInfo SwitchFeature(string featureType)
         {
             var result = currentFeatureInfo;
             currentFeatureInfo = new FeatureInfo(featureType);

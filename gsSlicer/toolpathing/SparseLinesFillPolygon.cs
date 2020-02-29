@@ -31,10 +31,11 @@ namespace gs
     /// </summary>
     public class BridgeLinesFillPolygon : ParallelLinesFillPolygon
     {
-        public BridgeLinesFillPolygon(GeneralPolygon2d poly) : base(poly)
+        public BridgeLinesFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings) : base(poly)
         {
             SimplifyAmount = SimplificationLevel.Minor;
-            TypeFlags = FillTypeFlags.BridgeSupport;
+            FillType = new BridgeFillType(settings);
+            TypeFlags = FillTypeFlags.Invalid;
         }
     }
 }

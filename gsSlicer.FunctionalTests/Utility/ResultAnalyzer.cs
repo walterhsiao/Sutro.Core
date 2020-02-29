@@ -58,7 +58,7 @@ namespace gsCore.FunctionalTests.Utility
             var layers = new List<LayerInfo<TFeatureInfo>>();
 
             LayerInfo<TFeatureInfo> currentLayer = null;
-            FillTypeFlags fillType = FillTypeFlags.Unknown;
+            string fillType = DefaultFillType.Label;
 
             foreach (var line in gcode.AllLines())
             {
@@ -86,7 +86,7 @@ namespace gsCore.FunctionalTests.Utility
             return layers;
         }
 
-        private bool LineIsNewFeatureType(GCodeLine line, FillTypeFlags fillType, out FillTypeFlags newFillType)
+        private bool LineIsNewFeatureType(GCodeLine line, string fillType, out string newFillType)
         {
             newFillType = fillType;
             if (GCodeLineUtil.ExtractFillType(line, ref newFillType))

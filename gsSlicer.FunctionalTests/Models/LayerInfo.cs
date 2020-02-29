@@ -5,8 +5,8 @@ namespace gsCore.FunctionalTests.Models
 {
     public class LayerInfo<TFeatureInfo> where TFeatureInfo : IFeatureInfo
     {
-        private readonly Dictionary<FillTypeFlags, TFeatureInfo> perFeatureInfo =
-            new Dictionary<FillTypeFlags, TFeatureInfo>();
+        private readonly Dictionary<string, TFeatureInfo> perFeatureInfo =
+            new Dictionary<string, TFeatureInfo>();
 
         public void AssertEqualsExpected(LayerInfo<TFeatureInfo> expected)
         {
@@ -24,7 +24,7 @@ namespace gsCore.FunctionalTests.Models
             }
         }
 
-        public bool GetFeatureInfo(FillTypeFlags fillType, out TFeatureInfo featureInfo)
+        public bool GetFeatureInfo(string fillType, out TFeatureInfo featureInfo)
         {
             return perFeatureInfo.TryGetValue(fillType, out featureInfo);
         }

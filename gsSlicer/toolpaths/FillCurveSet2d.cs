@@ -18,28 +18,28 @@ namespace gs
         {
         }
 
-        public void Append(GeneralPolygon2d poly, FillTypeFlags typeFlags)
+        public void Append(GeneralPolygon2d poly, FillTypeFlags typeFlags, IFillType fillType)
         {
-            Loops.Add(new FillPolygon2d(poly.Outer) { TypeFlags = typeFlags });
+            Loops.Add(new FillPolygon2d(poly.Outer) { TypeFlags = typeFlags, FillType = fillType });
             foreach (var h in poly.Holes)
-                Loops.Add(new FillPolygon2d(h) { TypeFlags = typeFlags });
+                Loops.Add(new FillPolygon2d(h) { TypeFlags = typeFlags, FillType = fillType });
         }
 
-        public void Append(List<GeneralPolygon2d> polys, FillTypeFlags typeFlags)
+        public void Append(List<GeneralPolygon2d> polys, FillTypeFlags typeFlags, IFillType fillType)
         {
             foreach (var p in polys)
-                Append(p, typeFlags);
+                Append(p, typeFlags, fillType);
         }
 
-        public void Append(Polygon2d poly, FillTypeFlags typeFlags)
+        public void Append(Polygon2d poly, FillTypeFlags typeFlags, IFillType fillType)
         {
-            Loops.Add(new FillPolygon2d(poly) { TypeFlags = typeFlags });
+            Loops.Add(new FillPolygon2d(poly) { TypeFlags = typeFlags, FillType = fillType });
         }
 
-        public void Append(List<Polygon2d> polys, FillTypeFlags typeFlags)
+        public void Append(List<Polygon2d> polys, FillTypeFlags typeFlags, IFillType fillType)
         {
             foreach (var p in polys)
-                Append(p, typeFlags);
+                Append(p, typeFlags, fillType);
         }
 
         public void Append(FillPolygon2d loop)

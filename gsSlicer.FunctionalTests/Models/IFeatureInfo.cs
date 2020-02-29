@@ -4,7 +4,7 @@ namespace gsCore.FunctionalTests.Models
 {
     public interface IFeatureInfo
     {
-        FillTypeFlags FillType { get; set; }
+        string FillType { get; set; }
 
         void Add(IFeatureInfo other);
 
