@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
-using gs;
+﻿using gs;
 using gs.utility;
 using gsCore.FunctionalTests.Models;
 using Sutro.PathWorks.Plugins.API;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace gsCore.FunctionalTests.Utility
 {

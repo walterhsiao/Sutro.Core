@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using gs;
+﻿using gs;
+using System.Collections.Generic;
 
 namespace gsCore.FunctionalTests.Models
 {

@@ -17,6 +17,7 @@ namespace gs
                 Tuple.Create(FillTypeFlags.OpenShellCurve, "external single extrusion"),
                 Tuple.Create(FillTypeFlags.InteriorShell, "interior shell")
             });
-        public static FeatureTypeLabeler Value {get => singleton;}
+
+        public static FeatureTypeLabeler Value { get => singleton; }
     }
 }

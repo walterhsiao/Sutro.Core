@@ -9,14 +9,12 @@ namespace gsCore.FunctionalTests.Models
         }
     }
 
-
     public class FeatureCumulativeDistanceMismatch : Exception
     {
         public FeatureCumulativeDistanceMismatch(string s) : base(s)
         {
         }
     }
-
 
     public class FeatureCumulativeDurationMismatch : Exception
     {
@@ -25,14 +23,12 @@ namespace gsCore.FunctionalTests.Models
         }
     }
 
-
     public class FeatureCenterOfMassMismatch : Exception
     {
         public FeatureCenterOfMassMismatch(string s) : base(s)
         {
         }
     }
-
 
     public class FeatureBoundingBoxMismatch : Exception
     {
@@ -41,7 +37,6 @@ namespace gsCore.FunctionalTests.Models
         }
     }
 
-
     public class MissingFeature : Exception
     {
         public MissingFeature(string s) : base(s)
@@ -49,12 +44,10 @@ namespace gsCore.FunctionalTests.Models
         }
     }
 
-
-    public class LayerCountMismatch: Exception
+    public class LayerCountMismatch : Exception
     {
         public LayerCountMismatch(string s) : base(s)
         {
         }
     }
-
 }

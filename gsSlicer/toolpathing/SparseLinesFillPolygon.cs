@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using g3;
+﻿using g3;
 
 namespace gs
 {
@@ -18,8 +14,6 @@ namespace gs
         }
     }
 
-
-
     /// <summary>
     /// configure dense-fill for support fill
     /// </summary>
@@ -32,20 +26,15 @@ namespace gs
         }
     }
 
-
-
-
-	/// <summary>
-	/// configure dense-fill for bridge fill
-	/// </summary>
-	public class BridgeLinesFillPolygon : ParallelLinesFillPolygon
-	{
-		public BridgeLinesFillPolygon(GeneralPolygon2d poly) : base(poly)
-		{
-			SimplifyAmount = SimplificationLevel.Minor;
-			TypeFlags = FillTypeFlags.BridgeSupport;
-		}
-	}
-
-
+    /// <summary>
+    /// configure dense-fill for bridge fill
+    /// </summary>
+    public class BridgeLinesFillPolygon : ParallelLinesFillPolygon
+    {
+        public BridgeLinesFillPolygon(GeneralPolygon2d poly) : base(poly)
+        {
+            SimplifyAmount = SimplificationLevel.Minor;
+            TypeFlags = FillTypeFlags.BridgeSupport;
+        }
+    }
 }

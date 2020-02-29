@@ -1,9 +1,6 @@
 ﻿using gs;
 using gsCore.FunctionalTests.Models;
 using gsCore.FunctionalTests.Utility;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace gsSlicer.FunctionalTests.Utility
 {

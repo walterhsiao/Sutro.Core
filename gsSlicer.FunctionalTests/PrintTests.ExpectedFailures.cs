@@ -1,13 +1,9 @@
-﻿using g3;
-using gs;
-using gs.engines;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.IO;
-using System.Reflection.PortableExecutable;
+﻿using gs;
 using gsCore.FunctionalTests.Models;
 using gsCore.FunctionalTests.Utility;
 using gsSlicer.FunctionalTests.Utility;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace gsCore.FunctionalTests
 {

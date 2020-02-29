@@ -1,8 +1,8 @@
-﻿using System;
-using System.IO;
-using g3;
+﻿using g3;
 using gs;
 using Sutro.PathWorks.Plugins.API;
+using System;
+using System.IO;
 
 namespace gsCore.FunctionalTests.Utility
 {

@@ -27,7 +27,7 @@ namespace gsCore.FunctionalTests.Utility
         public void GenerateFile()
         {
             resultGenerator.GenerateResultFile(
-                TestDataPaths.GetMeshFilePath(directory), 
+                TestDataPaths.GetMeshFilePath(directory),
                 TestDataPaths.GetResultFilePath(directory));
         }
     }

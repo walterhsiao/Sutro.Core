@@ -1,8 +1,6 @@
-﻿using System;
-using g3;
+﻿using g3;
 using gs;
 using gsCore.FunctionalTests.Models;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Sutro.PathWorks.Plugins.API;
 
 namespace gsCore.FunctionalTests.Utility

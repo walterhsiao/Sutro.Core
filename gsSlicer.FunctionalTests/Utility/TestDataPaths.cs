@@ -39,6 +39,5 @@ namespace gsCore.FunctionalTests.Utility
         {
             return Path.Combine(directory.FullName, directory.Name + ".Expected.gcode");
         }
-
     }
 }
