@@ -297,20 +297,23 @@ namespace gs
         {
             FillCurveSet2d paths = new FillCurveSet2d();
 
-            FillTypeFlags flags = FillTypeFlags.PerimeterShell;
+            FillTypeFlags flags = FillTypeFlags.Invalid;
             IFillType fillType = new DefaultFillType();
 
-            if (nShell == 0 && ShellType == ShellTypes.ExternalPerimeters)
-                flags = FillTypeFlags.OutermostShell;
+            if (ShellType == ShellTypes.ExternalPerimeters)
+            {
+                if (nShell == 0)
+                    fillType = new OuterPerimeterFillType(settings);
+                else
+                    fillType = new InnerPerimeterFillType();
+            }
             else if (ShellType == ShellTypes.InternalShell)
             {
                 fillType = new InteriorShellFillType();
-                flags = FillTypeFlags.Invalid;
             }
             else if (ShellType == ShellTypes.BridgeShell)
             {
                 fillType = new BridgeFillType(settings);
-                flags = FillTypeFlags.Invalid;
             }
 
             if (FilterSelfOverlaps == false)

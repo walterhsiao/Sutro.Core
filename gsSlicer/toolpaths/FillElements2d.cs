@@ -9,11 +9,6 @@ namespace gs
     public enum FillTypeFlags
     {
         Unknown = 0,
-
-        PerimeterShell = 1,
-        OutermostShell = 1 << 1,
-        OuterPerimeter = PerimeterShell | OutermostShell,
-
         Invalid = 1 << 14, // temporary for refactoring; check use new IFillType instead
 
         // Warning: default enum max size is 32 bits; cannot add flags past 1 << 31

@@ -166,20 +166,12 @@ namespace gs
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
         //       (currently this is only set on first layer)
-        // 2) if this is an outer perimeter, scale by outer perimeter speed multiplier
-        // 3) if we are being "careful" and this is support, also use that multiplier
-        //       (bit of a hack, currently means on first layer we do support extra slow)
         private double select_speed(FillCurve2d pathCurve)
         {
-            bool bIsOuterPerimeter = pathCurve.HasTypeFlag(FillTypeFlags.OuterPerimeter);
-            bool bCareful = (SpeedHint == SchedulerSpeedHint.Careful);
-            double useSpeed = bCareful ? Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;
-            if (bIsOuterPerimeter)
-                useSpeed *= Settings.OuterPerimeterSpeedX;
+            double speed = SpeedHint == SchedulerSpeedHint.Careful ?
+                Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;
 
-            useSpeed = pathCurve.FillType.ModifySpeed(useSpeed, SpeedHint);
-
-            return useSpeed;
+            return pathCurve.FillType.ModifySpeed(speed, SpeedHint);
         }
     }
 }

@@ -31,8 +31,8 @@ namespace gs
         public Dictionary<int, FillType> FillTypes { get; protected set; } = new Dictionary<int, FillType>()
         {
             {DefaultFillType.Flag, new FillType("Unknown", new Vector3f(0.5, 0.5, 0.5))},
-            {(int)FillTypeFlags.PerimeterShell, new FillType("Inner Perimeter", new Vector3f(1, 0, 0))},
-            {(int)FillTypeFlags.OutermostShell, new FillType("Outer Perimeter", new Vector3f(1, 1, 0))},
+            {InnerPerimeterFillType.Flag, new FillType("Inner Perimeter", new Vector3f(1, 0, 0))},
+            {OuterPerimeterFillType.Flag, new FillType("Outer Perimeter", new Vector3f(1, 1, 0))},
             {OpenShellCurveFillType.Flag, new FillType("Open Mesh Curve", new Vector3f(0, 1, 1))},
             {SolidFillType.Flag, new FillType("Solid Fill", new Vector3f(0, 0.5f, 1))},
             {SparseFillType.Flag, new FillType("Sparse Fill", new Vector3f(0.5f, 0, 1))},
