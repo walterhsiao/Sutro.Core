@@ -8,11 +8,9 @@ namespace gs
     /// </summary>
     public class SparseLinesFillPolygon : ParallelLinesFillPolygon
     {
-        public SparseLinesFillPolygon(GeneralPolygon2d poly) : base(poly)
+        public SparseLinesFillPolygon(GeneralPolygon2d poly) : base(poly, new SparseFillType())
         {
             SimplifyAmount = SimplificationLevel.Moderate;
-            TypeFlags = FillTypeFlags.Invalid;
-            FillType = new SparseFillType();
         }
     }
 
@@ -21,11 +19,9 @@ namespace gs
     /// </summary>
     public class SupportLinesFillPolygon : ParallelLinesFillPolygon
     {
-        public SupportLinesFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings) : base(poly)
+        public SupportLinesFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings) : base(poly, new SupportFillType(settings))
         {
             SimplifyAmount = SimplificationLevel.Aggressive;
-            FillType = new SupportFillType(settings);
-            TypeFlags = FillTypeFlags.Invalid;
         }
     }
 
@@ -34,11 +30,9 @@ namespace gs
     /// </summary>
     public class BridgeLinesFillPolygon : ParallelLinesFillPolygon
     {
-        public BridgeLinesFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings) : base(poly)
+        public BridgeLinesFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings) : base(poly, new BridgeFillType(settings))
         {
             SimplifyAmount = SimplificationLevel.Minor;
-            FillType = new BridgeFillType(settings);
-            TypeFlags = FillTypeFlags.Invalid;
         }
     }
 }

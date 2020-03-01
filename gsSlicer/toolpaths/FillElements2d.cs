@@ -5,23 +5,11 @@ using System.Collections.Generic;
 
 namespace gs
 {
-    [Flags]
-    public enum FillTypeFlags
-    {
-        Invalid = 1 << 14, // temporary for refactoring; check use new IFillType instead
-
-        // Warning: default enum max size is 32 bits; cannot add flags past 1 << 31
-        // If more are needed, may need to change defintion to the following:
-        //    enum FillTypeFlags : Int64
-    }
-
     /// <summary>
     /// things that are common to FillPolyline2d and FillPolygon2d
     /// </summary>
     public interface FillCurve2d
     {
-        bool HasTypeFlag(FillTypeFlags f);
-
         double CustomThickness { get; }
 
         IFillType FillType { get; }
@@ -32,14 +20,7 @@ namespace gs
     /// </summary>
     public class FillPolygon2d : Polygon2d, FillCurve2d
     {
-        public FillTypeFlags TypeFlags = FillTypeFlags.Invalid;
-
         public IFillType FillType { get; set; } = new DefaultFillType();
-
-        public bool HasTypeFlag(FillTypeFlags f)
-        {
-            return (TypeFlags & f) != 0;
-        }
 
         public double CustomThickness { get; set; }
 
@@ -64,13 +45,7 @@ namespace gs
     /// </summary>
     public class FillPolyline2d : PolyLine2d, FillCurve2d
     {
-        public FillTypeFlags TypeFlags = FillTypeFlags.Invalid;
         public IFillType FillType { get; set; } = new DefaultFillType();
-
-        public bool HasTypeFlag(FillTypeFlags f)
-        {
-            return (TypeFlags & f) == f;
-        }
 
         // [TODO] maybe remove? see below.
         private List<TPVertexFlags> flags;

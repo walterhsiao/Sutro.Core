@@ -297,7 +297,6 @@ namespace gs
         {
             FillCurveSet2d paths = new FillCurveSet2d();
 
-            FillTypeFlags flags = FillTypeFlags.Invalid;
             IFillType fillType = new DefaultFillType();
 
             if (ShellType == ShellTypes.ExternalPerimeters)
@@ -319,7 +318,7 @@ namespace gs
             if (FilterSelfOverlaps == false)
             {
                 foreach (GeneralPolygon2d shell in shell_polys)
-                    paths.Append(shell, flags, fillType);
+                    paths.Append(shell, fillType);
                 return paths;
             }
 
@@ -343,7 +342,7 @@ namespace gs
 
                 foreach (var polygon in c.Loops)
                 {
-                    paths.Append(polygon, flags, fillType);
+                    paths.Append(polygon, fillType);
                 }
                 foreach (var polyline in c.Paths)
                 {
@@ -351,7 +350,7 @@ namespace gs
                         continue;
                     if (polyline.Bounds.MaxDim < DiscardTinyPerimterLengthMM)
                         continue;
-                    paths.Append(new FillPolyline2d(polyline) { TypeFlags = flags });
+                    paths.Append(new FillPolyline2d(polyline));
                 }
             }
             return paths;

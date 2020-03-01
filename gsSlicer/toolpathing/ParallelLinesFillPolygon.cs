@@ -47,10 +47,7 @@ namespace gs
 
         public SimplificationLevel SimplifyAmount = SimplificationLevel.Minor;
 
-        // this flag is set on all Paths
-        public FillTypeFlags TypeFlags = FillTypeFlags.Invalid;
-
-        public IFillType FillType { get; set; } = new DefaultFillType();
+        public IFillType FillType { get; }
 
         // fill paths
         public List<FillCurveSet2d> FillCurves { get; set; }
@@ -64,10 +61,11 @@ namespace gs
         // [TODO] replace with GeneralPolygon2dBoxTree (currently does not have intersection test!)
         //SegmentSet2d BoundaryPolygonCache;
 
-        public ParallelLinesFillPolygon(GeneralPolygon2d poly)
+        public ParallelLinesFillPolygon(GeneralPolygon2d poly, IFillType fillType)
         {
             Polygon = poly;
             FillCurves = new List<FillCurveSet2d>();
+            FillType = fillType;
         }
 
         public bool Compute()
@@ -146,7 +144,7 @@ namespace gs
                 int vid = start_vid;
                 int eid = pathGraph.GetVtxEdges(vid)[0];
 
-                FillPolyline2d path = new FillPolyline2d() { TypeFlags = this.TypeFlags, FillType = this.FillType };
+                FillPolyline2d path = new FillPolyline2d() { FillType = this.FillType };
 
                 path.AppendVertex(pathGraph.GetVertex(vid));
                 while (true)
@@ -193,7 +191,7 @@ namespace gs
                             simp.SimplifyDeviationThreshold = ToolWidth / 2; break;
                     }
                     simp.Simplify();
-                    path = new FillPolyline2d(simp.Result.ToArray()) { TypeFlags = this.TypeFlags, FillType = this.FillType };
+                    path = new FillPolyline2d(simp.Result.ToArray()) { FillType = this.FillType };
                 }
 
                 paths.Append(path);

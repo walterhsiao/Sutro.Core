@@ -575,7 +575,6 @@ namespace gs
                 foreach (var fillpath in shell_fill_curves)
                 {
                     fillpath.SetFillType(new SupportFillType(Settings));
-                    fillpath.SetFlags(FillTypeFlags.Invalid);
                 }
                 scheduler.AppendCurveSets(shell_fill_curves);
 
@@ -698,15 +697,13 @@ namespace gs
             // now actually fill solid regions
             foreach (GeneralPolygon2d fillPoly in fillPolys)
             {
-                ICurvesFillPolygon solid_gen = new ParallelLinesFillPolygon(fillPoly)
+                ICurvesFillPolygon solid_gen = new ParallelLinesFillPolygon(fillPoly, new SolidFillType())
                 {
                     InsetFromInputPolygon = false,
                     PathSpacing = Settings.SolidFillPathSpacingMM(),
                     ToolWidth = Settings.Machine.NozzleDiamMM,
                     AngleDeg = LayerFillAngleF(layer_data.layer_i),
-                    FilterSelfOverlaps = Settings.ClipSelfOverlaps,
-                    FillType = new SolidFillType(),
-                    TypeFlags = FillTypeFlags.Invalid
+                    FilterSelfOverlaps = Settings.ClipSelfOverlaps
                 };
 
                 solid_gen.Compute();
@@ -914,7 +911,6 @@ namespace gs
             {
                 FillPolyline2d pline = new FillPolyline2d(slice.Paths[pi])
                 {
-                    TypeFlags = FillTypeFlags.Invalid,
                     FillType = new OpenShellCurveFillType()
                 };
 

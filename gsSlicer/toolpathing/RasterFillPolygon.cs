@@ -83,7 +83,6 @@ namespace gs
                 {
                     FillPolyline2d fill_seg = new FillPolyline2d()
                     {
-                        TypeFlags = FillTypeFlags.Invalid,
                         FillType = new SolidFillType()
                     };
                     fill_seg.AppendVertex(seg.P0);
