@@ -9,7 +9,6 @@ namespace gs
                 Tuple.Create(FillTypeFlags.Unknown, "unknown"),
                 Tuple.Create(FillTypeFlags.PerimeterShell, "inner perimeter"),
                 Tuple.Create(FillTypeFlags.OutermostShell, "outer perimeter"),
-                Tuple.Create(FillTypeFlags.Skirt, "skirt"),
             });
 
         public static FeatureTypeLabeler Value { get => singleton; }

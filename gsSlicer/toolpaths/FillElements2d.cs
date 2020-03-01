@@ -14,9 +14,6 @@ namespace gs
         OutermostShell = 1 << 1,
         OuterPerimeter = PerimeterShell | OutermostShell,
 
-        Skirt = 1 << 12,
-        Priming = 1 << 13,
-
         Invalid = 1 << 14, // temporary for refactoring; check use new IFillType instead
 
         // Warning: default enum max size is 32 bits; cannot add flags past 1 << 31
