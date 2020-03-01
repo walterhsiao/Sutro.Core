@@ -3,7 +3,6 @@
     public class OuterPerimeterFillType : BaseFillType
     {
         public static string Label => "outer perimeter";
-        public static int Flag => 1 | 1 << 1;
 
         public override string GetLabel()
         {

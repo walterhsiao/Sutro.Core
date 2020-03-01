@@ -3,7 +3,6 @@
     public class SupportFillType : BaseFillType
     {
         public static string Label => "support";
-        public static int Flag => 1 << 10;
 
         public override string GetLabel()
         {

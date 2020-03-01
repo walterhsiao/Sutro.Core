@@ -1,8 +1,9 @@
 ﻿namespace gs.FillTypes
 {
-    public class DefaultFillType : BaseFillType
+
+    public class InteriorShellFillType : BaseFillType
     {
-        public static string Label => "unknown";
+        public static string Label => DefaultFillType.Label;
 
         public override string GetLabel()
         {

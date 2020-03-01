@@ -16,8 +16,6 @@
             return Label;
         }
 
-        public static int Flag => 1 << 11;
-
         public override double AdjustVolume(double volume)
         {
             return volume * settings.BridgeVolumeScale;

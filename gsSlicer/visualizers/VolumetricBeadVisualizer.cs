@@ -28,16 +28,28 @@ namespace gs
 
         public string Name => "Bead Visualizer";
 
+        public static readonly Dictionary<string, int> FillTypeIntegerId = new Dictionary<string, int>()
+        {
+            {DefaultFillType.Label, 0},
+            {InnerPerimeterFillType.Label, 1},
+            {OuterPerimeterFillType.Label, 2},
+            {OpenShellCurveFillType.Label, 3},
+            {SolidFillType.Label, 4},
+            {SparseFillType.Label, 5},
+            {SupportFillType.Label, 6},
+            {BridgeFillType.Label, 7},
+        };
+
         public Dictionary<int, FillType> FillTypes { get; protected set; } = new Dictionary<int, FillType>()
         {
-            {DefaultFillType.Flag, new FillType("Unknown", new Vector3f(0.5, 0.5, 0.5))},
-            {InnerPerimeterFillType.Flag, new FillType("Inner Perimeter", new Vector3f(1, 0, 0))},
-            {OuterPerimeterFillType.Flag, new FillType("Outer Perimeter", new Vector3f(1, 1, 0))},
-            {OpenShellCurveFillType.Flag, new FillType("Open Mesh Curve", new Vector3f(0, 1, 1))},
-            {SolidFillType.Flag, new FillType("Solid Fill", new Vector3f(0, 0.5f, 1))},
-            {SparseFillType.Flag, new FillType("Sparse Fill", new Vector3f(0.5f, 0, 1))},
-            {SupportFillType.Flag, new FillType("Support", new Vector3f(1, 0, 1))},
-            {BridgeFillType.Flag, new FillType("Bridge", new Vector3f(0, 0, 1))},
+            {FillTypeIntegerId[DefaultFillType.Label], new FillType("Unknown", new Vector3f(0.5, 0.5, 0.5))},
+            {FillTypeIntegerId[InnerPerimeterFillType.Label], new FillType("Inner Perimeter", new Vector3f(1, 0, 0))},
+            {FillTypeIntegerId[OuterPerimeterFillType.Label], new FillType("Outer Perimeter", new Vector3f(1, 1, 0))},
+            {FillTypeIntegerId[OpenShellCurveFillType.Label], new FillType("Open Mesh Curve", new Vector3f(0, 1, 1))},
+            {FillTypeIntegerId[SolidFillType.Label], new FillType("Solid Fill", new Vector3f(0, 0.5f, 1))},
+            {FillTypeIntegerId[SparseFillType.Label], new FillType("Sparse Fill", new Vector3f(0.5f, 0, 1))},
+            {FillTypeIntegerId[SupportFillType.Label], new FillType("Support", new Vector3f(1, 0, 1))},
+            {FillTypeIntegerId[BridgeFillType.Label], new FillType("Bridge", new Vector3f(0, 0, 1))},
         };
 
         private readonly FixedRangeCustomDataDetails customDataBeadWidth =
@@ -263,8 +275,7 @@ namespace gs
             var point = toolpath[toolpathIndex].Position;
             var dimensions = toolpath[toolpathIndex].Dimensions;
 
-            // TODO: Replace this with log
-            var fillType = 0;
+            int fillType = GetFillTypeInteger(toolpath[toolpathIndex]);
 
             var feedRate = toolpath[toolpathIndex].FeedRate;
             ToolpathPreviewJoint joint = new ToolpathPreviewJoint();
@@ -275,6 +286,18 @@ namespace gs
             joint.in3 = joint.out3 = AddVertex(vertices, layerIndex, point, fillType, dimensions, feedRate, miterNormal, new Vector2d(0, -1), miterSecant, 1, pointCount);
 
             return joint;
+        }
+
+        private static int GetFillTypeInteger(PrintVertex vertex)
+        {
+            if (vertex.Source is string s && FillTypeIntegerId.TryGetValue(s, out int newFillType))
+            {
+                return newFillType;
+            }
+            else
+            {
+                return FillTypeIntegerId[DefaultFillType.Label];
+            }
         }
 
         protected ToolpathPreviewJoint GenerateRightBevelJoint(List<PrintVertex> toolpath, int toolpathIndex,
@@ -292,8 +315,7 @@ namespace gs
             var point = toolpath[toolpathIndex].Position;
             var dimensions = toolpath[toolpathIndex].Dimensions;
 
-            // TODO: Replace with real implementation
-            var fillType = 0;
+            var fillType = GetFillTypeInteger(toolpath[toolpathIndex]);
 
             var feedRate = toolpath[toolpathIndex].FeedRate;
             ToolpathPreviewJoint joint = new ToolpathPreviewJoint();
@@ -334,8 +356,7 @@ namespace gs
             var point = toolpath[toolpathIndex].Position;
             var dimensions = toolpath[toolpathIndex].Dimensions;
 
-            // TODO: Replace with real implementation
-            var fillType = 0;
+            var fillType = GetFillTypeInteger(toolpath[toolpathIndex]);
 
             var feedRate = toolpath[toolpathIndex].FeedRate;
             ToolpathPreviewJoint joint = new ToolpathPreviewJoint();
