@@ -14,10 +14,6 @@ namespace gs
         OutermostShell = 1 << 1,
         OuterPerimeter = PerimeterShell | OutermostShell,
 
-        InteriorShell = 1 << 2,
-
-        OpenShellCurve = 1 << 3,    // ie for single-line-wide features
-
         Skirt = 1 << 12,
         Priming = 1 << 13,
 

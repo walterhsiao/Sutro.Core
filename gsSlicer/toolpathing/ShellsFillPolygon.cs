@@ -303,7 +303,10 @@ namespace gs
             if (nShell == 0 && ShellType == ShellTypes.ExternalPerimeters)
                 flags = FillTypeFlags.OutermostShell;
             else if (ShellType == ShellTypes.InternalShell)
-                flags = FillTypeFlags.InteriorShell;
+            {
+                fillType = new InteriorShellFillType();
+                flags = FillTypeFlags.Invalid;
+            }
             else if (ShellType == ShellTypes.BridgeShell)
             {
                 fillType = new BridgeFillType(settings);

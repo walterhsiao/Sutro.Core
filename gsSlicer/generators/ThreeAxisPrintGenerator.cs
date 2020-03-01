@@ -914,7 +914,8 @@ namespace gs
             {
                 FillPolyline2d pline = new FillPolyline2d(slice.Paths[pi])
                 {
-                    TypeFlags = FillTypeFlags.OpenShellCurve
+                    TypeFlags = FillTypeFlags.Invalid,
+                    FillType = new OpenShellCurveFillType()
                 };
 
                 // leave space for end-blobs (input paths are extent we want to hit)
