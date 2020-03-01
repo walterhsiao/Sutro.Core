@@ -1,9 +1,9 @@
-﻿namespace gs
+﻿namespace gs.FillTypes
 {
-    public class SupportFillType : DefaultFillType
+    public class SupportFillType : BaseFillType
     {
-        new public static string Label => "support";
-        new public static int Flag => 1 << 10;
+        public static string Label => "support";
+        public static int Flag => 1 << 10;
 
         public override string GetLabel()
         {

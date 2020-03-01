@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 
@@ -16,9 +17,6 @@ namespace gs
         InteriorShell = 1 << 2,
 
         OpenShellCurve = 1 << 3,    // ie for single-line-wide features
-
-        SolidInfill = 1 << 8,
-        SparseInfill = 1 << 9,
 
         Skirt = 1 << 12,
         Priming = 1 << 13,

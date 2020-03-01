@@ -1,6 +1,6 @@
-﻿namespace gs
+﻿namespace gs.FillTypes
 {
-    public class BridgeFillType : DefaultFillType
+    public class BridgeFillType : BaseFillType
     {
         private readonly SingleMaterialFFFSettings settings;
 
@@ -9,14 +9,14 @@
             this.settings = settings;
         }
 
-        new public static string Label => "bridge";
+        public static string Label => "bridge";
 
         public override string GetLabel()
         {
             return Label;
         }
 
-        new public static int Flag => 1 << 11;
+        public static int Flag => 1 << 11;
 
         public override double AdjustVolume(double volume)
         {

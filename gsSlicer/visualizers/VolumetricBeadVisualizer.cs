@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using gs.utility;
 using Sutro.PathWorks.Plugins.API;
 using System;
@@ -33,8 +34,8 @@ namespace gs
             {(int)FillTypeFlags.PerimeterShell, new FillType("Inner Perimeter", new Vector3f(1, 0, 0))},
             {(int)FillTypeFlags.OutermostShell, new FillType("Outer Perimeter", new Vector3f(1, 1, 0))},
             {(int)FillTypeFlags.OpenShellCurve, new FillType("Open Mesh Curve", new Vector3f(0, 1, 1))},
-            {(int)FillTypeFlags.SolidInfill, new FillType("Solid Fill", new Vector3f(0, 0.5f, 1))},
-            {(int)FillTypeFlags.SparseInfill, new FillType("Sparse Fill", new Vector3f(0.5f, 0, 1))},
+            {SolidFillType.Flag, new FillType("Solid Fill", new Vector3f(0, 0.5f, 1))},
+            {SparseFillType.Flag, new FillType("Sparse Fill", new Vector3f(0.5f, 0, 1))},
             {SupportFillType.Flag, new FillType("Support", new Vector3f(1, 0, 1))},
             {BridgeFillType.Flag, new FillType("Bridge", new Vector3f(0, 0, 1))},
         };

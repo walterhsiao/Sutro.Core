@@ -1,4 +1,5 @@
 ﻿using gs;
+using gs.FillTypes;
 using gs.utility;
 using gsCore.FunctionalTests.Models;
 using Sutro.PathWorks.Plugins.API;

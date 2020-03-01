@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 
@@ -82,7 +83,8 @@ namespace gs
                 {
                     FillPolyline2d fill_seg = new FillPolyline2d()
                     {
-                        TypeFlags = FillTypeFlags.SolidInfill
+                        TypeFlags = FillTypeFlags.Invalid,
+                        FillType = new SolidFillType()
                     };
                     fill_seg.AppendVertex(seg.P0);
                     fill_seg.AppendVertex(seg.P1);

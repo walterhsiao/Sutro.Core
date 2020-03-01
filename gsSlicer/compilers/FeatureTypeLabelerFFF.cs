@@ -9,8 +9,6 @@ namespace gs
                 Tuple.Create(FillTypeFlags.Unknown, "unknown"),
                 Tuple.Create(FillTypeFlags.PerimeterShell, "inner perimeter"),
                 Tuple.Create(FillTypeFlags.OutermostShell, "outer perimeter"),
-                Tuple.Create(FillTypeFlags.SolidInfill, "solid layer"),
-                Tuple.Create(FillTypeFlags.SparseInfill, "infill"),
                 Tuple.Create(FillTypeFlags.Skirt, "skirt"),
                 Tuple.Create(FillTypeFlags.OpenShellCurve, "external single extrusion"),
                 Tuple.Create(FillTypeFlags.InteriorShell, "interior shell")

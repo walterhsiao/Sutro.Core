@@ -2,9 +2,9 @@
 {
     public interface IFillType
     {
-        double ModifySpeed(double useSpeed, SchedulerSpeedHint speedHint);
+        double ModifySpeed(double speed, SchedulerSpeedHint speedHint);
 
-        double AdjustVolume(double vol_scale);
+        double AdjustVolume(double volume);
 
         static string Label { get; }
 

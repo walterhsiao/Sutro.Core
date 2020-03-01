@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -47,7 +48,7 @@ namespace gs
         public SimplificationLevel SimplifyAmount = SimplificationLevel.Minor;
 
         // this flag is set on all Paths
-        public FillTypeFlags TypeFlags = FillTypeFlags.SolidInfill;
+        public FillTypeFlags TypeFlags = FillTypeFlags.Invalid;
 
         public IFillType FillType { get; set; } = new DefaultFillType();
 

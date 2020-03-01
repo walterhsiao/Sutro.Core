@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 
 namespace gs
 {
@@ -10,7 +11,8 @@ namespace gs
         public SparseLinesFillPolygon(GeneralPolygon2d poly) : base(poly)
         {
             SimplifyAmount = SimplificationLevel.Moderate;
-            TypeFlags = FillTypeFlags.SparseInfill;
+            TypeFlags = FillTypeFlags.Invalid;
+            FillType = new SparseFillType();
         }
     }
 

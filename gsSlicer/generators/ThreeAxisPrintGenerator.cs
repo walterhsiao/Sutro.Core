@@ -1,4 +1,5 @@
 using g3;
+using gs.FillTypes;
 using Sutro.PathWorks.Plugins.API;
 using System;
 using System.Collections.Generic;
@@ -703,7 +704,9 @@ namespace gs
                     PathSpacing = Settings.SolidFillPathSpacingMM(),
                     ToolWidth = Settings.Machine.NozzleDiamMM,
                     AngleDeg = LayerFillAngleF(layer_data.layer_i),
-                    FilterSelfOverlaps = Settings.ClipSelfOverlaps
+                    FilterSelfOverlaps = Settings.ClipSelfOverlaps,
+                    FillType = new SolidFillType(),
+                    TypeFlags = FillTypeFlags.Invalid
                 };
 
                 solid_gen.Compute();
@@ -900,7 +903,7 @@ namespace gs
         /// schedule any non-polygonal paths for the given layer (eg paths
         /// that resulted from open meshes, for example)
         /// </summary>
-		protected virtual void add_open_paths(PrintLayerData layerdata, IFillPathScheduler2d scheduler)
+        protected virtual void add_open_paths(PrintLayerData layerdata, IFillPathScheduler2d scheduler)
         {
             PlanarSlice slice = layerdata.Slice;
             if (slice.Paths.Count == 0)
@@ -938,7 +941,7 @@ namespace gs
         /// return the set of shell-fills for a layer. This includes both the shell-fill paths
         /// and the remaining regions that need to be filled.
         /// </summary>
-		protected virtual List<IShellsFillPolygon> get_layer_shells(int layer_i)
+        protected virtual List<IShellsFillPolygon> get_layer_shells(int layer_i)
         {
             // evaluate shell on-demand
             //if ( LayerShells[layeri] == null ) {
@@ -1016,7 +1019,7 @@ namespace gs
         /// <summary>
         /// return the set of roof polygons for a layer
         /// </summary>
-		protected virtual List<GeneralPolygon2d> get_layer_roof_area(int layer_i)
+        protected virtual List<GeneralPolygon2d> get_layer_roof_area(int layer_i)
         {
             return LayerRoofAreas[layer_i];
         }
@@ -1024,7 +1027,7 @@ namespace gs
         /// <summary>
         /// return the set of floor polygons for a layer
         /// </summary>
-		protected virtual List<GeneralPolygon2d> get_layer_floor_area(int layer_i)
+        protected virtual List<GeneralPolygon2d> get_layer_floor_area(int layer_i)
         {
             return LayerFloorAreas[layer_i];
         }
@@ -1138,7 +1141,7 @@ namespace gs
         /// <summary>
         /// return the set of support-region polygons for a layer.
         /// </summary>
-		protected virtual List<GeneralPolygon2d> get_layer_support_area(int layer_i)
+        protected virtual List<GeneralPolygon2d> get_layer_support_area(int layer_i)
         {
             return LayerSupportAreas[layer_i];
         }
@@ -1287,8 +1290,8 @@ namespace gs
             bool bEnableInterLayerSmoothing = true;
 
             /*
-			 * Step 1: compute absolute support polygon for each layer
-			 */
+             * Step 1: compute absolute support polygon for each layer
+             */
 
             // For layer i, compute support region needed to support layer (i+1)
             // This is the *absolute* support area - no inset for filament width or spacing from model
@@ -1399,8 +1402,8 @@ namespace gs
             LayerSupportAreas[nLayers - 1] = new List<GeneralPolygon2d>();
 
             /*
-			 * Step 2: sweep support polygons downwards
-			 */
+             * Step 2: sweep support polygons downwards
+             */
 
             // now merge support layers. Process is to track "current" support area,
             // at layer below we union with that layers support, and then subtract
@@ -1546,8 +1549,8 @@ namespace gs
         }
 
         /*
-		 * Bridging and Support utility functions
-		 */
+         * Bridging and Support utility functions
+         */
 
         /// <summary>
         /// generate support point polygon (eg circle)
@@ -1630,7 +1633,7 @@ namespace gs
         /// <summary>
         /// Factory function to return a new PathScheduler to use for this layer.
         /// </summary>
-		protected virtual IFillPathScheduler2d get_layer_scheduler(PrintLayerData layer_data)
+        protected virtual IFillPathScheduler2d get_layer_scheduler(PrintLayerData layer_data)
         {
             SequentialScheduler2d scheduler = new SequentialScheduler2d(layer_data.PathAccum, layer_data.Settings);
 
