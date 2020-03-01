@@ -262,7 +262,10 @@ namespace gs
             var pointCount = startPointCount + toolpathIndex;
             var point = toolpath[toolpathIndex].Position;
             var dimensions = toolpath[toolpathIndex].Dimensions;
-            var fillType = (FillTypeFlags)(toolpath[toolpathIndex].Source ?? FillTypeFlags.Unknown);
+
+            // TODO: Replace this with log
+            var fillType = 0;
+
             var feedRate = toolpath[toolpathIndex].FeedRate;
             ToolpathPreviewJoint joint = new ToolpathPreviewJoint();
 
@@ -288,7 +291,10 @@ namespace gs
             var pointCount = startPointCount + toolpathIndex;
             var point = toolpath[toolpathIndex].Position;
             var dimensions = toolpath[toolpathIndex].Dimensions;
-            var fillType = (FillTypeFlags)toolpath[toolpathIndex].Source;
+
+            // TODO: Replace with real implementation
+            var fillType = 0;
+
             var feedRate = toolpath[toolpathIndex].FeedRate;
             ToolpathPreviewJoint joint = new ToolpathPreviewJoint();
 
@@ -327,7 +333,10 @@ namespace gs
             var pointCount = startPointCount + toolpathIndex;
             var point = toolpath[toolpathIndex].Position;
             var dimensions = toolpath[toolpathIndex].Dimensions;
-            var fillType = (FillTypeFlags)toolpath[toolpathIndex].Source;
+
+            // TODO: Replace with real implementation
+            var fillType = 0;
+
             var feedRate = toolpath[toolpathIndex].FeedRate;
             ToolpathPreviewJoint joint = new ToolpathPreviewJoint();
 
@@ -354,14 +363,14 @@ namespace gs
         }
 
         protected virtual int AddVertex(List<ToolpathPreviewVertex> vertices, int layerIndex, Vector3d point,
-            FillTypeFlags fillType, Vector2d dimensions, double feedrate, Vector3d miterNormal,
+            int fillType, Vector2d dimensions, double feedrate, Vector3d miterNormal,
             Vector2d crossSectionVertex, double secant, float brightness, int pointCount)
         {
             Vector3d offset = miterNormal * (dimensions.x * crossSectionVertex.x * secant) + new Vector3d(0, 0, dimensions.y * crossSectionVertex.y);
             Vector3d vertex = point + offset;
 
-            Vector3f color = FillTypes[(int)FillTypeFlags.Unknown].Color;
-            if (FillTypes.TryGetValue((int)fillType, out var fillInfo))
+            Vector3f color = FillTypes[0].Color;
+            if (FillTypes.TryGetValue(fillType, out var fillInfo))
             {
                 color = fillInfo.Color;
             }
@@ -371,14 +380,14 @@ namespace gs
             return vertices.Count - 1;
         }
 
-        protected virtual ToolpathPreviewVertex VertexFactory(int layerIndex, FillTypeFlags fillType, Vector2d dimensions, double feedrate, float brightness, int pointCount, Vector3d vertex, Vector3f color)
+        protected virtual ToolpathPreviewVertex VertexFactory(int layerIndex, int fillType, Vector2d dimensions, double feedrate, float brightness, int pointCount, Vector3d vertex, Vector3f color)
         {
             // Update adaptive ranges for custom data
             customDataFeedRate.ObserveValue((float)feedrate);
             customDataCompletion.ObserveValue(pointCount);
 
             return new ToolpathPreviewVertex(vertex,
-                (int)fillType, layerIndex, color, brightness,
+                fillType, layerIndex, color, brightness,
                 (float)dimensions.x, (float)feedrate, pointCount);
         }
 

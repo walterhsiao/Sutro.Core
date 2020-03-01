@@ -86,7 +86,7 @@ namespace gs
 
             double useSpeed = select_speed(poly);
 
-            Builder.AppendExtrude(loopV, useSpeed, poly.FillType, poly.TypeFlags, null);
+            Builder.AppendExtrude(loopV, useSpeed, poly.FillType, null);
         }
 
         private void AppendTravel(Vector2d startPt, Vector2d endPt)
@@ -161,7 +161,7 @@ namespace gs
             if (curve.CustomThickness > 0)
                 dimensions.x = curve.CustomThickness;
 
-            Builder.AppendExtrude(loopV, useSpeed, dimensions, curve.FillType, curve.TypeFlags, flags);
+            Builder.AppendExtrude(loopV, useSpeed, dimensions, curve.FillType, flags);
         }
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed

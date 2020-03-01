@@ -115,19 +115,14 @@ namespace gs
             return currentPos;
         }
 
-        public virtual Vector3d AppendExtrude(Vector2d toPos, double fSpeed,
-            IFillType fillType,
-            FillTypeFlags pathTypeFlags = FillTypeFlags.Unknown)
+        public virtual Vector3d AppendExtrude(Vector2d toPos, double fSpeed, IFillType fillType)
         {
-            return AppendExtrude(new Vector3d(toPos.x, toPos.y, currentPos.z), fSpeed, fillType, pathTypeFlags);
+            return AppendExtrude(new Vector3d(toPos.x, toPos.y, currentPos.z), fSpeed, fillType);
         }
 
-        public virtual Vector3d AppendExtrude(Vector3d toPos, double fSpeed,
-            IFillType fillType,
-            FillTypeFlags pathTypeFlags = FillTypeFlags.Unknown)
+        public virtual Vector3d AppendExtrude(Vector3d toPos, double fSpeed, IFillType fillType)
         {
             LinearToolpath extrusion = new LinearToolpath(MoveType);
-            extrusion.TypeModifiers = pathTypeFlags;
             extrusion.FillType = fillType;
             extrusion.AppendVertex(new PrintVertex(currentPos, NO_RATE, currentDims), TPVertexFlags.IsPathStart);
             extrusion.AppendVertex(new PrintVertex(toPos, fSpeed, currentDims), TPVertexFlags.IsPathEnd);
@@ -136,18 +131,13 @@ namespace gs
         }
 
         public virtual Vector3d AppendExtrude(List<Vector2d> toPoints, double fSpeed,
-            IFillType fillType,
-            FillTypeFlags pathTypeFlags = FillTypeFlags.Unknown,
-            List<TPVertexFlags> perVertexFlags = null)
+            IFillType fillType, List<TPVertexFlags> perVertexFlags = null)
         {
-            return AppendExtrude(toPoints, fSpeed, currentDims, fillType, pathTypeFlags, perVertexFlags);
+            return AppendExtrude(toPoints, fSpeed, currentDims, fillType, perVertexFlags);
         }
 
-        public virtual Vector3d AppendExtrude(List<Vector2d> toPoints,
-              double fSpeed, Vector2d dimensions,
-              IFillType fillType,
-              FillTypeFlags pathTypeFlags = FillTypeFlags.Unknown,
-              List<TPVertexFlags> perVertexFlags = null)
+        public virtual Vector3d AppendExtrude(List<Vector2d> toPoints, double fSpeed,
+            Vector2d dimensions, IFillType fillType, List<TPVertexFlags> perVertexFlags = null)
         {
             Vector2d useDims = currentDims;
             if (dimensions.x > 0 && dimensions.x != NO_DIM.x)
@@ -157,7 +147,6 @@ namespace gs
 
             LinearToolpath extrusion = new LinearToolpath(MoveType);
 
-            extrusion.TypeModifiers = pathTypeFlags;
             extrusion.FillType = fillType;
             extrusion.AppendVertex(new PrintVertex(currentPos, NO_RATE, useDims), TPVertexFlags.IsPathStart);
 
@@ -174,12 +163,9 @@ namespace gs
         }
 
         public virtual Vector3d AppendExtrude(List<Vector3d> toPoints, double fSpeed,
-            IFillType fillType,
-            FillTypeFlags pathTypeFlags = FillTypeFlags.Unknown,
-            List<TPVertexFlags> perVertexFlags = null)
+            IFillType fillType, List<TPVertexFlags> perVertexFlags = null)
         {
             LinearToolpath extrusion = new LinearToolpath(MoveType);
-            extrusion.TypeModifiers = pathTypeFlags;
             extrusion.FillType = fillType;
             extrusion.AppendVertex(new PrintVertex(currentPos, NO_RATE, currentDims), TPVertexFlags.IsPathStart);
             for (int k = 0; k < toPoints.Count; ++k)

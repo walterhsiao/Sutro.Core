@@ -8,7 +8,6 @@ namespace gs
     [Flags]
     public enum FillTypeFlags
     {
-        Unknown = 0,
         Invalid = 1 << 14, // temporary for refactoring; check use new IFillType instead
 
         // Warning: default enum max size is 32 bits; cannot add flags past 1 << 31
@@ -33,7 +32,7 @@ namespace gs
     /// </summary>
     public class FillPolygon2d : Polygon2d, FillCurve2d
     {
-        public FillTypeFlags TypeFlags = FillTypeFlags.Unknown;
+        public FillTypeFlags TypeFlags = FillTypeFlags.Invalid;
 
         public IFillType FillType { get; set; } = new DefaultFillType();
 
@@ -65,7 +64,7 @@ namespace gs
     /// </summary>
     public class FillPolyline2d : PolyLine2d, FillCurve2d
     {
-        public FillTypeFlags TypeFlags = FillTypeFlags.Unknown;
+        public FillTypeFlags TypeFlags = FillTypeFlags.Invalid;
         public IFillType FillType { get; set; } = new DefaultFillType();
 
         public bool HasTypeFlag(FillTypeFlags f)

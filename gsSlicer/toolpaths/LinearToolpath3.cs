@@ -9,7 +9,7 @@ namespace gs
     {
         private List<T> Path;
         private ToolpathTypes _pathtype;	// access via Type property
-        private FillTypeFlags _pathtype_flags = FillTypeFlags.Unknown;
+        private FillTypeFlags _pathtype_flags = FillTypeFlags.Invalid;
         public IFillType FillType { get; set; } = new DefaultFillType();
 
         // todo: add speed

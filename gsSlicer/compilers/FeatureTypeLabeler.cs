@@ -21,7 +21,7 @@ namespace gs
             }
             else
             {
-                return FlagToFeatureLabelDictionary[(int)FillTypeFlags.Unknown];
+                return FlagToFeatureLabelDictionary[0];
             }
         }
 
@@ -30,7 +30,7 @@ namespace gs
             foreach (var pair in FlagToFeatureLabelDictionary)
                 if (pair.Value.Equals(name))
                     return (FillTypeFlags)pair.Key;
-            return FillTypeFlags.Unknown;
+            return FillTypeFlags.Invalid;
         }
 
         protected Dictionary<int, string> FlagToFeatureLabelDictionary;
