@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
-using gs.info;
+﻿using gs.info;
 using Sutro.PathWorks.Plugins.API;
+using System.Collections.Generic;
 
 namespace gs.engines
 {
     public class SettingsManagerFFF : SettingsManager<SingleMaterialFFFSettings>
     {
-        public override List<SingleMaterialFFFSettings> FactorySettings { get
+        public override List<SingleMaterialFFFSettings> FactorySettings
+        {
+            get
             {
                 var factory_profiles = new List<SingleMaterialFFFSettings>();
 
@@ -18,7 +20,8 @@ namespace gs.engines
                 factory_profiles.AddRange(PrintrbotSettings.EnumerateDefaults());
 
                 return factory_profiles;
-            } }
+            }
+        }
 
         public override IUserSettingCollection<SingleMaterialFFFSettings> MachineUserSettings =>
             new MachineUserSettingsFFF<SingleMaterialFFFSettings>();

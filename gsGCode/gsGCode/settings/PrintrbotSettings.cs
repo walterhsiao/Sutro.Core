@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using g3;
-using Sutro.PathWorks.Plugins.API;
+﻿using Sutro.PathWorks.Plugins.API;
+using System.Collections.Generic;
 
 namespace gs.info
 {
-	public static class Printrbot
-	{
-		public const string UUID = "10dd0db9-df41-4b3e-8b73-d345c408b5ff";
+    public static class Printrbot
+    {
+        public const string UUID = "10dd0db9-df41-4b3e-8b73-d345c408b5ff";
 
-        public enum Models {
+        public enum Models
+        {
             Unknown = 0,
             Plus = 1
         };
@@ -19,10 +17,9 @@ namespace gs.info
         public const string UUID_Plus = "1c868178-5aa2-47c3-9a8c-6f86ef1d1ff6";
     }
 
-
-	public class PrintrbotSettings : GenericRepRapSettings
+    public class PrintrbotSettings : GenericRepRapSettings
     {
-		public Printrbot.Models ModelEnum;
+        public Printrbot.Models ModelEnum;
 
         public override IProfile Clone()
         {
@@ -31,7 +28,7 @@ namespace gs.info
 
         public override AssemblerFactoryF AssemblerType()
         {
-			return MakePrintrbotAssembler;
+            return MakePrintrbotAssembler;
         }
 
         public PrintrbotSettings()
@@ -42,14 +39,13 @@ namespace gs.info
 
         public PrintrbotSettings(Printrbot.Models model)
         {
-			ModelEnum = model;
+            ModelEnum = model;
 
-			if (model == Printrbot.Models.Plus)
+            if (model == Printrbot.Models.Plus)
                 configure_Plus();
             else
                 configure_unknown();
         }
-
 
         public static IEnumerable<SingleMaterialFFFSettings> EnumerateDefaults()
         {
@@ -57,14 +53,12 @@ namespace gs.info
             yield return new PrintrbotSettings(Printrbot.Models.Unknown);
         }
 
-
-
-        void configure_Plus()
+        private void configure_Plus()
         {
             Machine.ManufacturerName = "Printrbot";
-			Machine.ManufacturerUUID = Printrbot.UUID;
+            Machine.ManufacturerUUID = Printrbot.UUID;
             Machine.ModelIdentifier = "Plus";
-			Machine.ModelUUID = Printrbot.UUID_Plus;
+            Machine.ModelUUID = Printrbot.UUID_Plus;
             Machine.Class = MachineClass.PlasticFFFPrinter;
             Machine.BedSizeXMM = 250;
             Machine.BedSizeYMM = 250;
@@ -82,7 +76,6 @@ namespace gs.info
             Machine.MaxRetractSpeedMMM = 45 * 60;
             Machine.MinLayerHeightMM = 0.05;
             Machine.MaxLayerHeightMM = 0.3;
-
 
             LayerHeightMM = 0.2;
 
@@ -104,10 +97,7 @@ namespace gs.info
             Machine.EnableAutoBedLeveling = true;
         }
 
-
-
-
-        void configure_unknown()
+        private void configure_unknown()
         {
             Machine.ManufacturerName = "Printrbot";
             Machine.ManufacturerUUID = Printrbot.UUID;
@@ -150,28 +140,21 @@ namespace gs.info
             OuterPerimeterSpeedX = 0.5;
         }
 
-
-
-
-
-
-
         public BaseDepositionAssembler MakePrintrbotAssembler(
-			GCodeBuilder builder, SingleMaterialFFFSettings settings)
-		{
-			var asm = new RepRapAssembler(builder, settings);
-			asm.HeaderCustomizerF = HeaderCustomF;
-			return asm;
-		}
+            GCodeBuilder builder, SingleMaterialFFFSettings settings)
+        {
+            var asm = new RepRapAssembler(builder, settings);
+            asm.HeaderCustomizerF = HeaderCustomF;
+            return asm;
+        }
 
-		protected void HeaderCustomF(RepRapAssembler.HeaderState state, GCodeBuilder Builder)
-		{
-			if (state == RepRapAssembler.HeaderState.BeforePrime) {
-                if ( Machine.HasAutoBedLeveling && Machine.EnableAutoBedLeveling )
-				    Builder.BeginGLine(29, "auto-level bed");
-			}
-		}
-
+        protected void HeaderCustomF(RepRapAssembler.HeaderState state, GCodeBuilder Builder)
+        {
+            if (state == RepRapAssembler.HeaderState.BeforePrime)
+            {
+                if (Machine.HasAutoBedLeveling && Machine.EnableAutoBedLeveling)
+                    Builder.BeginGLine(29, "auto-level bed");
+            }
+        }
     }
-
 }

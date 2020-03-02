@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Sutro.PathWorks.Plugins.API;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sutro.PathWorks.Plugins.API;
-using Newtonsoft.Json;
-using g3;
 
 namespace gs
 {
-    public abstract class SettingsManager<TSettings> : ISettingsManager<TSettings> 
+    public abstract class SettingsManager<TSettings> : ISettingsManager<TSettings>
         where TSettings : PlanarAdditiveSettings, IProfile
     {
         public abstract List<TSettings> FactorySettings { get; }
@@ -17,7 +16,8 @@ namespace gs
 
         List<IProfile> ISettingsManager.FactorySettings
         {
-            get {
+            get
+            {
                 var settings = new List<IProfile>();
                 foreach (TSettings setting in FactorySettings)
                     settings.Add(setting);
@@ -60,8 +60,7 @@ namespace gs
         {
             Func<string, string> SimplifyName = (s) => s.Replace(" ", "").Replace("_", "").ToLower();
 
-            Func<string, string, bool> MatchName = (a, b) => SimplifyName(a) == SimplifyName(b); 
-
+            Func<string, string, bool> MatchName = (a, b) => SimplifyName(a) == SimplifyName(b);
 
             var profiles = (from profile in FactorySettings
                             where MatchName(profile.BaseMachine.ManufacturerName, manufacturer) &&

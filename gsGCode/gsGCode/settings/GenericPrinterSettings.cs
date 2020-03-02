@@ -22,7 +22,8 @@ namespace gs.info
             configure_unknown();
         }
 
-        public GenericPrinterSettings(string mfgName, string mfgUUID, string defaultMachineUUID) {
+        public GenericPrinterSettings(string mfgName, string mfgUUID, string defaultMachineUUID)
+        {
             BaseMachine.ManufacturerName = mfgName;
             ManufacturerUUID = mfgUUID;
             DefaultMachineUUID = defaultMachineUUID;
@@ -30,7 +31,7 @@ namespace gs.info
             configure_unknown();
         }
 
-        void configure_unknown()
+        private void configure_unknown()
         {
             Machine.ManufacturerName = ManufacturerName;
             Machine.ManufacturerUUID = ManufacturerUUID;
@@ -69,8 +70,5 @@ namespace gs.info
             RapidExtrudeSpeed = Machine.MaxExtrudeSpeedMMM;
             OuterPerimeterSpeedX = 0.5;
         }
-
-
     }
-
 }

@@ -7,7 +7,9 @@ namespace gs
 {
     public class SettingsContainsReferenceType : Exception
     {
-        public SettingsContainsReferenceType() : base() { }
+        public SettingsContainsReferenceType() : base()
+        {
+        }
 
         public SettingsContainsReferenceType(string message) : base(message)
         {
@@ -17,7 +19,6 @@ namespace gs
         {
         }
     }
-
 
     /// <summary>
     /// Base class for settings objects.
@@ -130,5 +131,4 @@ namespace gs
             get { return GetType().ToString(); }
         }
     }
-
 }

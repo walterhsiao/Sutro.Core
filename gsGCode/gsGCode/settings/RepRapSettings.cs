@@ -1,26 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using g3;
-using Sutro.PathWorks.Plugins.API;
+﻿using Sutro.PathWorks.Plugins.API;
+using System.Collections.Generic;
 
 namespace gs.info
 {
-	public static class RepRap
-	{
+    public static class RepRap
+    {
         public const string UUID = "e95dcaaa-4315-412f-bd80-5049fb74f384";
 
-        public enum Models {
+        public enum Models
+        {
             Unknown = 0
         };
 
         public const string UUID_Unknown = "bb097486-bb07-4a95-950f-1a1de992e782";
     }
 
-
-	public class RepRapSettings : GenericRepRapSettings
+    public class RepRapSettings : GenericRepRapSettings
     {
-		public RepRap.Models ModelEnum;
+        public RepRap.Models ModelEnum;
 
         public override IProfile Clone()
         {
@@ -38,22 +35,20 @@ namespace gs.info
             configure_unknown();
         }
 
-		public RepRapSettings(RepRap.Models model)
+        public RepRapSettings(RepRap.Models model)
         {
-			ModelEnum = model;
+            ModelEnum = model;
 
             if (model == RepRap.Models.Unknown)
                 configure_unknown();
         }
-
 
         public static IEnumerable<SingleMaterialFFFSettings> EnumerateDefaults()
         {
             yield return new RepRapSettings(RepRap.Models.Unknown);
         }
 
-
-        void configure_unknown()
+        private void configure_unknown()
         {
             Machine.ManufacturerName = "RepRap";
             Machine.ManufacturerUUID = RepRap.UUID;
@@ -95,8 +90,5 @@ namespace gs.info
             RapidExtrudeSpeed = Machine.MaxExtrudeSpeedMMM;
             OuterPerimeterSpeedX = 0.5;
         }
-
-
     }
-
 }

@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
-using Sutro.PathWorks.Plugins.API;
+﻿using Sutro.PathWorks.Plugins.API;
+using System.Collections.Generic;
 
 namespace gs.info
 {
     public static class Monoprice
-	{
+    {
         public const string UUID = "860432eb-dec6-4b20-8f97-3643a50daf1d";
 
-        public enum Models {
+        public enum Models
+        {
             Unknown = 0,
             MP_Select_Mini_V2 = 1
         };
@@ -16,11 +17,10 @@ namespace gs.info
         public const string UUID_MP_Select_Mini_V2 = "4a498843-9080-4c97-aa82-b587f415ab1f";
     }
 
-
-	public class MonopriceSettings : GenericRepRapSettings
+    public class MonopriceSettings : GenericRepRapSettings
     {
-		public Monoprice.Models ModelEnum;
-		
+        public Monoprice.Models ModelEnum;
+
         public override IProfile Clone()
         {
             return CloneAs<MonopriceSettings>();
@@ -39,7 +39,7 @@ namespace gs.info
 
         public MonopriceSettings(Monoprice.Models model)
         {
-			ModelEnum = model;
+            ModelEnum = model;
 
             if (model == Monoprice.Models.MP_Select_Mini_V2)
                 configure_MP_Select_Mini_V2();
@@ -53,7 +53,7 @@ namespace gs.info
             yield return new MonopriceSettings(Monoprice.Models.Unknown);
         }
 
-        void configure_MP_Select_Mini_V2()
+        private void configure_MP_Select_Mini_V2()
         {
             Machine.ManufacturerName = "Monoprice";
             Machine.ManufacturerUUID = Monoprice.UUID;
@@ -77,7 +77,6 @@ namespace gs.info
             Machine.MinLayerHeightMM = 0.1;
             Machine.MaxLayerHeightMM = 0.3;
 
-
             LayerHeightMM = 0.2;
 
             ExtruderTempC = 200;
@@ -94,7 +93,7 @@ namespace gs.info
             OuterPerimeterSpeedX = 0.5;
         }
 
-        void configure_unknown()
+        private void configure_unknown()
         {
             Machine.ManufacturerName = "Monoprice";
             Machine.ManufacturerUUID = Monoprice.UUID;

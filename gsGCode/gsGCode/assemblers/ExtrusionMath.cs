@@ -1,5 +1,4 @@
 ﻿using System;
-using g3;
 
 namespace gs
 {
@@ -8,7 +7,6 @@ namespace gs
     /// </summary>
     public static class ExtrusionMath
     {
-
         /// <summary>
         /// This function computes the amount of filament to extrude (ie how
         /// much to turn extruder stepper) along pathLen distance.
@@ -16,7 +14,7 @@ namespace gs
         /// </summary>
         public static double PathLengthToFilamentLength(
             double layerHeight, double nozzleDiam, double filamentDiam,
-            double pathLen, 
+            double pathLen,
             double volumeScale = 1.0)
         {
             double section_area = nozzleDiam * layerHeight;
@@ -30,24 +28,19 @@ namespace gs
             return filament_len;
         }
 
+        public static double PathLengthToVolume(
+            double layerHeight, double nozzleDiam,
+            double pathLen)
+        {
+            double section_area = nozzleDiam * layerHeight;
+            double linear_volume = pathLen * section_area;
+            return linear_volume;
+        }
 
-
-		public static double PathLengthToVolume(
-			double layerHeight, double nozzleDiam,
-			double pathLen)
-		{
-			double section_area = nozzleDiam * layerHeight;
-			double linear_volume = pathLen * section_area;
-			return linear_volume;			
-		}
-
-
-		public static double WidthFromTargetVolume(
-			double layerHeight, double pathLen, double targetVolume)
-		{
-			return targetVolume / (pathLen * layerHeight);
-		}
-
-
+        public static double WidthFromTargetVolume(
+            double layerHeight, double pathLen, double targetVolume)
+        {
+            return targetVolume / (pathLen * layerHeight);
+        }
     }
 }

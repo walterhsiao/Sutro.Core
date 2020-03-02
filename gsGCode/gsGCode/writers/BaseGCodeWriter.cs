@@ -1,14 +1,14 @@
-﻿using System;
+﻿using g3;
+using Sutro.PathWorks.Plugins.API;
+using System;
+using System.Globalization;
 using System.IO;
 using System.Threading;
-using System.Globalization;
-using g3;
-using Sutro.PathWorks.Plugins.API;
 
-namespace gs 
+namespace gs
 {
-	public abstract class BaseGCodeWriter 
-	{
+    public abstract class BaseGCodeWriter
+    {
         /// <summary>
         /// If the mesh format we are writing is text, then the OS will write in the number style
         /// of the current language. So in Germany, numbers are written 1,00 instead of 1.00, for example.
@@ -16,26 +16,27 @@ namespace gs
         /// </summary>
         public bool WriteInvariantCulture = true;
 
-
-        public virtual IOWriteResult WriteFile(GCodeFile file, TextWriter outStream) 
-		{
+        public virtual IOWriteResult WriteFile(GCodeFile file, TextWriter outStream)
+        {
             // save current culture
             var current_culture = Thread.CurrentThread.CurrentCulture;
 
-            try {  
+            try
+            {
                 if (WriteInvariantCulture)
                     Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-                foreach ( var line in file.AllLines() )
-				    WriteLine(line, outStream);
+                foreach (var line in file.AllLines())
+                    WriteLine(line, outStream);
 
                 // restore culture
                 if (WriteInvariantCulture)
                     Thread.CurrentThread.CurrentCulture = current_culture;
 
                 return IOWriteResult.Ok;
-
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 // restore culture
                 if (WriteInvariantCulture)
                     Thread.CurrentThread.CurrentCulture = current_culture;
@@ -43,8 +44,6 @@ namespace gs
             }
         }
 
-
-		public abstract void WriteLine(GCodeLine line, TextWriter outStream);
-
-	}
+        public abstract void WriteLine(GCodeLine line, TextWriter outStream);
+    }
 }

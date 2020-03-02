@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using g3;
-using Sutro.PathWorks.Plugins.API;
+﻿using Sutro.PathWorks.Plugins.API;
+using System.Collections.Generic;
 
 namespace gs.info
 {
-	public static class Prusa
-	{
+    public static class Prusa
+    {
         public const string UUID = "4530287d-cd23-416c-b74b-4876c385750a";
 
-        public enum Models {
+        public enum Models
+        {
             Unknown = 0,
             i3_MK3 = 1
         };
@@ -19,10 +17,9 @@ namespace gs.info
         public const string UUID_I3_MK3 = "fc09f99c-aee0-45e9-bca3-3e088ccb0b55";
     }
 
-
-	public class PrusaSettings : GenericRepRapSettings
+    public class PrusaSettings : GenericRepRapSettings
     {
-		public Prusa.Models ModelEnum;
+        public Prusa.Models ModelEnum;
 
         public override IProfile Clone()
         {
@@ -31,7 +28,7 @@ namespace gs.info
 
         public override AssemblerFactoryF AssemblerType()
         {
-			return MakePrusaAssembler;
+            return MakePrusaAssembler;
         }
 
         public PrusaSettings()
@@ -40,10 +37,9 @@ namespace gs.info
             configure_unknown();
         }
 
-
         public PrusaSettings(Prusa.Models model)
         {
-			ModelEnum = model;
+            ModelEnum = model;
 
             if (model == Prusa.Models.i3_MK3)
                 configure_i3_MK3();
@@ -51,20 +47,18 @@ namespace gs.info
                 configure_unknown();
         }
 
-
         public static IEnumerable<SingleMaterialFFFSettings> EnumerateDefaults()
         {
             yield return new PrusaSettings(Prusa.Models.i3_MK3);
             yield return new PrusaSettings(Prusa.Models.Unknown);
         }
 
-
-        void configure_i3_MK3()
+        private void configure_i3_MK3()
         {
             Machine.ManufacturerName = "Prusa";
-			Machine.ManufacturerUUID = Prusa.UUID;
+            Machine.ManufacturerUUID = Prusa.UUID;
             Machine.ModelIdentifier = "i3 MK3";
-			Machine.ModelUUID = Prusa.UUID_I3_MK3;
+            Machine.ModelUUID = Prusa.UUID_I3_MK3;
             Machine.Class = MachineClass.PlasticFFFPrinter;
             Machine.BedSizeXMM = 250;
             Machine.BedSizeYMM = 210;
@@ -102,10 +96,7 @@ namespace gs.info
             OuterPerimeterSpeedX = 0.5;
         }
 
-
-
-
-        void configure_unknown()
+        private void configure_unknown()
         {
             Machine.ManufacturerName = "Prusa";
             Machine.ManufacturerUUID = Prusa.UUID;
@@ -148,42 +139,39 @@ namespace gs.info
             OuterPerimeterSpeedX = 0.5;
         }
 
-
-
-
-
         public BaseDepositionAssembler MakePrusaAssembler(
-			GCodeBuilder builder, SingleMaterialFFFSettings settings)
-		{
-			var asm = new RepRapAssembler(builder, settings);
+            GCodeBuilder builder, SingleMaterialFFFSettings settings)
+        {
+            var asm = new RepRapAssembler(builder, settings);
             asm.HomeSequenceF = this.HomeSequence;
-			asm.HeaderCustomizerF = HeaderCustomF;
+            asm.HeaderCustomizerF = HeaderCustomF;
             asm.TravelGCode = 1;
             return asm;
-		}
-
+        }
 
         protected virtual void HomeSequence(GCodeBuilder builder)
         {
-            if (Machine.HasAutoBedLeveling && Machine.EnableAutoBedLeveling) {
+            if (Machine.HasAutoBedLeveling && Machine.EnableAutoBedLeveling)
+            {
                 builder.BeginGLine(28).AppendL("W").AppendComment("home all without bed level");
                 builder.BeginGLine(80, "auto-level bed");
-            } else {
+            }
+            else
+            {
                 // standard home sequenece
                 builder.BeginGLine(28, "home x/y").AppendI("X", 0).AppendI("Y", 0);
                 builder.BeginGLine(28, "home z").AppendI("Z", 0);
             }
-
         }
 
-
-		protected virtual void HeaderCustomF(RepRapAssembler.HeaderState state, GCodeBuilder Builder)
-		{
-            if (state == RepRapAssembler.HeaderState.AfterComments ) {
-
-                if ( ModelEnum == Prusa.Models.i3_MK3 ) {
+        protected virtual void HeaderCustomF(RepRapAssembler.HeaderState state, GCodeBuilder Builder)
+        {
+            if (state == RepRapAssembler.HeaderState.AfterComments)
+            {
+                if (ModelEnum == Prusa.Models.i3_MK3)
+                {
                     Builder.BeginMLine(201)
-                        .AppendI("X",1000).AppendI("Y",1000).AppendI("Z",200).AppendI("E",5000)
+                        .AppendI("X", 1000).AppendI("Y", 1000).AppendI("Z", 200).AppendI("E", 5000)
                         .AppendComment("Set maximum accelleration in mm/sec^2");
                     Builder.BeginMLine(203)
                         .AppendI("X", 200).AppendI("Y", 200).AppendI("Z", 12).AppendI("E", 120)
@@ -198,11 +186,7 @@ namespace gs.info
                         .AppendI("S", 0).AppendI("T", 0)
                         .AppendComment("Set minimum extrude and travel feed rate in mm/sec");
                 }
-
-
-            } 
-		}
-
+            }
+        }
     }
-
 }

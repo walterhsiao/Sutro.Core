@@ -1,23 +1,23 @@
-﻿using System.Collections.Generic;
-using Sutro.PathWorks.Plugins.API;
+﻿using Sutro.PathWorks.Plugins.API;
+using System.Collections.Generic;
 
 namespace gs.info
 {
     public static class Flashforge
-	{
+    {
         public const string UUID = "5974064e-8751-4048-a700-73a023add74f";
 
-        public enum Models {
+        public enum Models
+        {
             Unknown,
-			CreatorPro
-		};
+            CreatorPro
+        };
 
         public const string UUID_Unknown = "f387a3d4-ba39-4a60-9e68-93ce7af4d92a";
         public const string UUID_CreatorPro = "0dd884e1-9b19-436e-9558-e4cb5fb27f7d";
     }
 
-
-	public class FlashforgeSettings : SingleMaterialFFFSettings, ISailfishSettings
+    public class FlashforgeSettings : SingleMaterialFFFSettings, ISailfishSettings
     {
         public Flashforge.Models ModelEnum;
 
@@ -36,18 +36,16 @@ namespace gs.info
             ModelEnum = Flashforge.Models.Unknown;
             configure_unknown();
         }
-        
+
         public FlashforgeSettings(Flashforge.Models model)
         {
-			ModelEnum = model;
+            ModelEnum = model;
 
             if (model == Flashforge.Models.CreatorPro)
                 configure_CreatorPro();
             else
                 configure_unknown();
-
         }
-
 
         public static IEnumerable<SingleMaterialFFFSettings> EnumerateDefaults()
         {
@@ -55,9 +53,10 @@ namespace gs.info
             yield return new FlashforgeSettings(Flashforge.Models.Unknown);
         }
 
-
-        public string GPXModelFlag {
-            get {
+        public string GPXModelFlag
+        {
+            get
+            {
                 if (ModelEnum == Flashforge.Models.CreatorPro)
                     return "-m fcp";
                 else
@@ -65,8 +64,7 @@ namespace gs.info
             }
         }
 
-
-        void configure_CreatorPro()
+        private void configure_CreatorPro()
         {
             Machine.ManufacturerName = "Flashforge";
             Machine.ManufacturerUUID = Flashforge.UUID;
@@ -106,8 +104,7 @@ namespace gs.info
             OuterPerimeterSpeedX = 0.5;
         }
 
-
-        void configure_unknown()
+        private void configure_unknown()
         {
             Machine.ManufacturerName = "Flashforge";
             Machine.ManufacturerUUID = Flashforge.UUID;
@@ -147,7 +144,5 @@ namespace gs.info
             RapidExtrudeSpeed = Machine.MaxExtrudeSpeedMMM;
             OuterPerimeterSpeedX = 0.5;
         }
-
     }
-
 }

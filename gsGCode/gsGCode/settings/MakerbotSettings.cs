@@ -1,29 +1,28 @@
-﻿using System.Collections.Generic;
-using Sutro.PathWorks.Plugins.API;
+﻿using Sutro.PathWorks.Plugins.API;
+using System.Collections.Generic;
 
 namespace gs.info
 {
     public static class Makerbot
-	{
+    {
         public const string UUID = "77b7ed08-dcc8-4c2e-a189-18aa549bf94b";
 
-        public enum Models {
+        public enum Models
+        {
             Unknown,
-			Replicator2
-		};
+            Replicator2
+        };
 
         public const string UUID_Unknown = "625aa5dc-8e9d-4240-86ff-8bc369cd5124";
         public const string UUID_Replicator2 = "a1c13f61-1ae6-4b1a-9c8c-18b2170e82b1";
     }
-
 
     public interface ISailfishSettings
     {
         string GPXModelFlag { get; }
     }
 
-
-	public class MakerbotSettings : SingleMaterialFFFSettings, ISailfishSettings
+    public class MakerbotSettings : SingleMaterialFFFSettings, ISailfishSettings
     {
         public Makerbot.Models ModelEnum;
 
@@ -45,13 +44,12 @@ namespace gs.info
 
         public MakerbotSettings(Makerbot.Models model)
         {
-			ModelEnum = model;
+            ModelEnum = model;
 
             if (model == Makerbot.Models.Replicator2)
                 configure_Replicator_2();
             else
                 configure_unknown();
-
         }
 
         public static IEnumerable<SingleMaterialFFFSettings> EnumerateDefaults()
@@ -60,8 +58,10 @@ namespace gs.info
             yield return new MakerbotSettings(Makerbot.Models.Unknown);
         }
 
-        public string GPXModelFlag {
-            get {
+        public string GPXModelFlag
+        {
+            get
+            {
                 if (ModelEnum == Makerbot.Models.Replicator2)
                     return "-m r2";
                 else
@@ -69,7 +69,7 @@ namespace gs.info
             }
         }
 
-        void configure_Replicator_2()
+        private void configure_Replicator_2()
         {
             Machine.ManufacturerName = "Makerbot";
             Machine.ManufacturerUUID = Makerbot.UUID;
@@ -93,7 +93,6 @@ namespace gs.info
             Machine.MinLayerHeightMM = 0.1;
             Machine.MaxLayerHeightMM = 0.3;
 
-
             LayerHeightMM = 0.2;
 
             ExtruderTempC = 230;
@@ -110,7 +109,7 @@ namespace gs.info
             OuterPerimeterSpeedX = 0.5;
         }
 
-        void configure_unknown()
+        private void configure_unknown()
         {
             Machine.ManufacturerName = "Makerbot";
             Machine.ManufacturerUUID = Makerbot.UUID;
@@ -134,7 +133,6 @@ namespace gs.info
             Machine.MinLayerHeightMM = 0.1;
             Machine.MaxLayerHeightMM = 0.3;
 
-
             LayerHeightMM = 0.2;
 
             ExtruderTempC = 230;
@@ -150,7 +148,5 @@ namespace gs.info
             RapidExtrudeSpeed = Machine.MaxExtrudeSpeedMMM;
             OuterPerimeterSpeedX = 0.5;
         }
-
     }
-
 }
