@@ -77,21 +77,21 @@ namespace gs
                     pathHint = loop.speedHint;
                     if (idx.c != 0)
                     {
-                        // TODO: Reimplement loop shuffling
-                        //int iStart = idx.c;
-                        //FillPolygon2d o = new FillPolygon2d();
-                        //int N = loop.curve.VertexCount;
-                        //for (int i = 0; i < N; ++i) {
-                        //    o.AppendVertex(loop.curve[(i + iStart) % N]);
-                        //}
-                        //o.TypeFlags = loop.curve.TypeFlags;
-                        paths.Append(loop.curve);
-                        OutPoint = loop.curve.Vertices[0];
+                        int iStart = idx.c;
+                        FillPolygon2d o = new FillPolygon2d();
+                        int N = loop.curve.VertexCount;
+                        for (int i = 0; i < N; ++i)
+                        {
+                            o.AppendVertex(loop.curve[(i + iStart) % N]);
+                        }
+                        o.TypeFlags = loop.curve.TypeFlags;
+                        paths.Append(o);
+                        OutPoint = o[0];
                     }
                     else
                     {
                         paths.Append(loop.curve);
-                        OutPoint = loop.curve.Vertices[0];
+                        OutPoint = loop.curve[0];
                     }
                 }
                 else

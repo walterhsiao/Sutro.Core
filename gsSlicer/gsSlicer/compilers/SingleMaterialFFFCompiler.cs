@@ -129,8 +129,6 @@ namespace gs
         {
         }
 
-        private string PreviousTag = "";
-
         /// <summary>
         /// Compile this set of toolpaths and pass to assembler.
         /// Settings are optional, pass null to ignore

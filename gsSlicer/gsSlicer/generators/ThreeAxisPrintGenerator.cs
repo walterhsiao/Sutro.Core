@@ -1145,7 +1145,7 @@ namespace gs
             List<IShellsFillPolygon> layer_skirts = new List<IShellsFillPolygon>();
 
             // we can compute the resolution as a function of skirt diameter, but probably not worth optimizing
-            const double angularResolution = 64; // number of segments around circle
+            //const double angularResolution = 64; // number of segments around circle
 
             // the skirt is computed at each level independently instead of computing the outer path and using offsets
             // this improves the quality of the brim, as it will work in areas that have a narrow gap, and avoids overlaps

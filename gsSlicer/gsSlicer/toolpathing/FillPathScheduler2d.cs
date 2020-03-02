@@ -1,6 +1,7 @@
 ﻿using g3;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace gs
 {
@@ -102,7 +103,7 @@ namespace gs
                 loopV.Add(poly[k]);
             }
 
-            double useSpeed = select_speed(poly);
+            double useSpeed = select_speed(poly.TypeFlags);
 
             Builder.AppendExtrude(loopV, useSpeed, poly.TypeFlags, null);
         }
@@ -153,26 +154,20 @@ namespace gs
 
             List<Vector2d> loopV;
             List<TPVertexFlags> flags = null;
-            if (bReverse)
-            {
-                loopV = new List<Vector2d>(N);
-                for (int i = N - 1; i >= 0; --i)
-                    loopV.Add(curve[i]);
-                if (curve.HasFlags)
-                {
-                    flags = new List<TPVertexFlags>(N);
-                    for (int i = N - 1; i >= 0; --i)
-                        flags.Add(curve.GetFlag(i));
-                }
-            }
-            else
-            {
-                loopV = new List<Vector2d>(curve);
-                if (curve.HasFlags)
-                    flags = new List<TPVertexFlags>(curve.Flags());
-            }
 
-            double useSpeed = select_speed(curve);
+            loopV = new List<Vector2d>(N);
+            flags = new List<TPVertexFlags>(N);
+
+            var range = Enumerable.Range(0, N);
+            if (bReverse) range.Reverse();
+
+            foreach (int i in range)
+            {
+                var point = curve.GetPoint(i, bReverse);
+                loopV.Add(point.Vertex);
+                flags.Add(point.SegmentInfo != null && point.SegmentInfo.IsConnector ? TPVertexFlags.IsConnector : TPVertexFlags.None);
+            }
+            double useSpeed = select_speed(curve.TypeFlags);
 
             Vector2d dimensions = GCodeUtil.UnspecifiedDimensions;
             if (curve.CustomThickness > 0)
@@ -181,21 +176,26 @@ namespace gs
             Builder.AppendExtrude(loopV, useSpeed, dimensions, curve.TypeFlags, flags);
         }
 
+        private bool HasTypeFlag(FillTypeFlags typeFlags, FillTypeFlags f)
+        {
+            return (typeFlags & f) != 0;
+        }
+
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
         //       (currently this is only set on first layer)
         // 2) if this is an outer perimeter, scale by outer perimeter speed multiplier
         // 3) if we are being "careful" and this is support, also use that multiplier
         //       (bit of a hack, currently means on first layer we do support extra slow)
-        protected virtual double select_speed(FillCurve2d pathCurve)
+        protected virtual double select_speed(FillTypeFlags flags)
         {
-            bool bIsSupport = pathCurve.HasTypeFlag(FillTypeFlags.SupportMaterial);
-            bool bIsOuterPerimeter = pathCurve.HasTypeFlag(FillTypeFlags.OuterPerimeter);
+            bool bIsSupport = HasTypeFlag(flags, FillTypeFlags.SupportMaterial);
+            bool bIsOuterPerimeter = HasTypeFlag(flags, FillTypeFlags.OuterPerimeter);
             bool bCareful = (SpeedHint == SchedulerSpeedHint.Careful);
             double useSpeed = bCareful ? Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;
             if (bIsOuterPerimeter || (bCareful && bIsSupport))
                 useSpeed *= Settings.OuterPerimeterSpeedX;
 
-            bool bIsBridgeSupport = pathCurve.HasTypeFlag(FillTypeFlags.BridgeSupport);
+            bool bIsBridgeSupport = HasTypeFlag(flags, FillTypeFlags.BridgeSupport);
             if (bIsBridgeSupport)
                 useSpeed = Settings.CarefulExtrudeSpeed * Settings.BridgeExtrudeSpeedX;
 

@@ -16,7 +16,6 @@ namespace gs
 
         private static readonly Vector2d NO_DIM = GCodeUtil.UnspecifiedDimensions;
         private static readonly double NO_RATE = GCodeUtil.UnspecifiedValue;
-        public static readonly double MOVE_EPSILON = 0.00001;
 
         private Vector3d currentPos;
 
@@ -52,7 +51,7 @@ namespace gs
             }
             else
             {
-                if (!currentPos.EpsilonEqual(p.StartPosition, MOVE_EPSILON))
+                if (!currentPos.EpsilonEqual(p.StartPosition, MathUtil.Epsilon))
                     throw new Exception("PathSetBuilder.AppendPath: disconnected path");
                 Paths.Append(p);
                 currentPos = p.EndPosition;
@@ -156,7 +155,7 @@ namespace gs
             extrusion.TypeModifiers = pathTypeFlags;
             extrusion.AppendVertex(new PrintVertex(currentPos, NO_RATE, useDims), TPVertexFlags.IsPathStart);
 
-            for (int k = 0; k < toPoints.Count; ++k)
+            for (int k = 1; k < toPoints.Count; ++k)
             {
                 Vector3d pos = new Vector3d(toPoints[k].x, toPoints[k].y, currentPos.z);
                 TPVertexFlags flag = (k == toPoints.Count - 1) ? TPVertexFlags.IsPathEnd : TPVertexFlags.None;
