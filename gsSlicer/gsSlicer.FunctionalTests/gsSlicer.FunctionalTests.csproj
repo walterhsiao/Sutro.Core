@@ -21,10 +21,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Sutro.gsGCode" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\gsGCode\gsGCode\gsGCode.csproj" />
     <ProjectReference Include="..\gsSlicer\gsSlicer.csproj" />
   </ItemGroup>
 </Project>
