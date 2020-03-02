@@ -148,7 +148,7 @@ namespace gs
 
                         if (i == 0)
                         {
-                            Util.gDevAssert(dist == 0);     // next path starts at end of previous!!
+                            Util.gDevAssert(dist < 1e-12);     // next path starts at end of previous!!
                             if (inRetract)
                             {
                                 curA += FixedRetractDistance;
@@ -160,9 +160,29 @@ namespace gs
                             curPos = newPos;
                             curRate = newRate;
 
+                            double segment_height, segment_width;
+                            if (GCodeUtil.UnspecifiedDimensions != path[i].Dimensions)
+                            {
+                                segment_height = path[i].Dimensions[0];
+                                segment_width = path[i].Dimensions[1];
+                            }
+                            else
+                            {
+                                segment_height = path_height;
+                                segment_width = path_width;
+                            }
+
                             double feed = ExtrusionMath.PathLengthToFilamentLength(
-                                path_height, path_width, Settings.Machine.FilamentDiamMM,
+                                segment_height, segment_width, Settings.Machine.FilamentDiamMM,
                                 dist, vol_scale);
+
+                            // Change the extrusion amount if a modifier is present.
+                            // TODO: This is a bit of a hack since the modifier acts on a Vector3d
+                            //       and we're ignoring data in the second & third positions.
+                            var modifier = path[i]?.ExtendedData?.ExtrusionModifierF;
+                            if (modifier != null)
+                                feed = modifier(new Vector3d(feed, 0, 0))[0];
+
                             curA += feed;
                         }
                     }

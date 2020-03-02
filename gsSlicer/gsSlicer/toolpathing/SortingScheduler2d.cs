@@ -27,28 +27,28 @@ namespace gs
         /// </summary>
         public Vector2d OutPoint;
 
-        private class PathItem
+        protected class PathItem
         {
             public SchedulerSpeedHint speedHint;
         }
 
-        private class PathLoop : PathItem
+        protected class PathLoop : PathItem
         {
             public FillPolygon2d curve;
             public bool reverse = false;
         }
 
-        private List<PathLoop> Loops = new List<PathLoop>();
+        protected List<PathLoop> Loops = new List<PathLoop>();
 
-        private class PathSpan : PathItem
+        protected class PathSpan : PathItem
         {
             public FillPolyline2d curve;
             public bool reverse = false;
         }
 
-        private List<PathSpan> Spans = new List<PathSpan>();
+        protected List<PathSpan> Spans = new List<PathSpan>();
 
-        public void AppendCurveSets(List<FillCurveSet2d> paths)
+        public virtual void AppendCurveSets(List<FillCurveSet2d> paths)
         {
             foreach (FillCurveSet2d polySet in paths)
             {
@@ -60,7 +60,7 @@ namespace gs
             }
         }
 
-        public void SortAndAppendTo(Vector2d startPoint, IFillPathScheduler2d scheduler)
+        public virtual void SortAndAppendTo(Vector2d startPoint, IFillPathScheduler2d scheduler)
         {
             var saveHint = scheduler.SpeedHint;
             OutPoint = startPoint;
@@ -77,16 +77,16 @@ namespace gs
                     pathHint = loop.speedHint;
                     if (idx.c != 0)
                     {
-                        int iStart = idx.c;
-                        FillPolygon2d o = new FillPolygon2d();
-                        int N = loop.curve.VertexCount;
-                        for (int i = 0; i < N; ++i)
-                        {
-                            o.AppendVertex(loop.curve[(i + iStart) % N]);
-                        }
-                        o.TypeFlags = loop.curve.TypeFlags;
-                        paths.Append(o);
-                        OutPoint = o.Vertices[0];
+                        // TODO: Reimplement loop shuffling
+                        //int iStart = idx.c;
+                        //FillPolygon2d o = new FillPolygon2d();
+                        //int N = loop.curve.VertexCount;
+                        //for (int i = 0; i < N; ++i) {
+                        //    o.AppendVertex(loop.curve[(i + iStart) % N]);
+                        //}
+                        //o.TypeFlags = loop.curve.TypeFlags;
+                        paths.Append(loop.curve);
+                        OutPoint = loop.curve.Vertices[0];
                     }
                     else
                     {
@@ -117,7 +117,7 @@ namespace gs
         //DenseMatrix spanSS;
         //DenseMatrix spanSE;
 
-        private List<Index3i> find_short_path_v1(Vector2d vStart)
+        protected virtual List<Index3i> find_short_path_v1(Vector2d vStart)
         {
             int N = Spans.Count;
             int M = Loops.Count;
@@ -160,7 +160,7 @@ namespace gs
             return order;
         }
 
-        private Index3i find_nearest(Index3i from, HashSet<Index2i> remaining)
+        protected virtual Index3i find_nearest(Index3i from, HashSet<Index2i> remaining)
         {
             Vector2d pt = get_point(from);
 
@@ -200,7 +200,7 @@ namespace gs
             return nearest_idx;
         }
 
-        private Index3i find_nearest(Vector2d pt, HashSet<Index2i> remaining)
+        protected virtual Index3i find_nearest(Vector2d pt, HashSet<Index2i> remaining)
         {
             double nearest_sqr = double.MaxValue;
             Index3i nearest_idx = Index3i.Max;
@@ -238,7 +238,7 @@ namespace gs
             return nearest_idx;
         }
 
-        private Vector2d get_point(Index3i idx)
+        protected virtual Vector2d get_point(Index3i idx)
         {
             if (idx.a == 0)
             { // loop
@@ -248,7 +248,11 @@ namespace gs
             else
             {  // span
                 PathSpan span = Spans[idx.b];
-                return (idx.c == 0) ? span.curve.Start : span.curve.End;
+
+                // [GDM] Reversed this logic 2019.10.23; by my thinking:
+                // - if the curve ISN'T reversed, the exit point should be the end
+                // - if the curve IS reversed, the exit point should be the start
+                return (idx.c == 0) ? span.curve.End : span.curve.Start;
             }
         }
 

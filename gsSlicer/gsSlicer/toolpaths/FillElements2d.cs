@@ -30,6 +30,13 @@ namespace gs
         //    enum FillTypeFlags : Int64
     }
 
+    [Flags]
+    public enum TravelTypeFlags
+    {
+        Unknown = 0,
+        Leaky = 1,
+    }
+
     /// <summary>
     /// things that are common to FillPolyline2d and FillPolygon2d
     /// </summary>
@@ -67,6 +74,27 @@ namespace gs
         public FillPolygon2d(Polygon2d p) : base(p)
         {
             CustomThickness = 0;
+        }
+
+        public FillPolygon2d(FillPolygon2d other) : base(other)
+        {
+            CustomThickness = other.CustomThickness;
+            TypeFlags = other.TypeFlags;
+        }
+
+        public FillPolygon2d Roll(int iStart)
+        {
+            var result = new FillPolygon2d(this);
+            result.vertices.Clear();
+            result.TypeFlags = TypeFlags;
+
+            for (int i = iStart; i < VertexCount; ++i)
+                result.AppendVertex(Vertices[i]);
+
+            for (int i = 0; i < iStart; ++i)
+                result.AppendVertex(Vertices[i]);
+
+            return result;
         }
     }
 
@@ -135,7 +163,11 @@ namespace gs
         {
             base.Reverse();
             if (flags != null)
+            {
+                flags.RemoveAt(0);
                 flags.Reverse();
+                flags.Insert(0, TPVertexFlags.None);
+            }
         }
 
         public override void Simplify(double clusterTol = 0.0001,
@@ -196,7 +228,7 @@ namespace gs
             return;
         }
 
-        public void AppendVertex(Vector2d v, TPVertexFlags flag)
+        public virtual void AppendVertex(Vector2d v, TPVertexFlags flag)
         {
             alloc_flags();
             base.AppendVertex(v);
@@ -204,7 +236,7 @@ namespace gs
             has_flags = true;
         }
 
-        public void AppendVertices(IEnumerable<Vector2d> v, IEnumerable<TPVertexFlags> f)
+        public virtual void AppendVertices(IEnumerable<Vector2d> v, IEnumerable<TPVertexFlags> f)
         {
             alloc_flags();
             base.AppendVertices(v);

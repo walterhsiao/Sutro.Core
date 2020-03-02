@@ -9,7 +9,7 @@ namespace gsSlicer.FunctionalTests.Utility
         public static PrintTestRunner CreateTestRunner(string caseName, SingleMaterialFFFSettings settings)
         {
             var resultGenerator = CreateResultGenerator(settings);
-            var resultAnalyzer = new ResultAnalyzer<FeatureInfo>(new FeatureInfoFactoryFFF());
+            var resultAnalyzer = new ResultAnalyzer<FeatureInfo>(new FeatureInfoFactoryFFF(), new ConsoleLogger());
             return new PrintTestRunner(caseName, resultGenerator, resultAnalyzer);
         }
 

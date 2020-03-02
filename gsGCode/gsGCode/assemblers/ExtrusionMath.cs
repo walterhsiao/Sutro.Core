@@ -42,5 +42,11 @@ namespace gs
         {
             return targetVolume / (pathLen * layerHeight);
         }
+
+        public static double PathLengthFromTargetVolume(
+            double layerHeight, double pathWidth, double targetVolume)
+        {
+            return targetVolume / (pathWidth * layerHeight);
+        }
     }
 }

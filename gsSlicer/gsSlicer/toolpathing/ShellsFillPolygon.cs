@@ -34,8 +34,11 @@ namespace gs
         public double ToolWidth = 0.4;
         public double PathSpacing = 0.4;
 
-        public double DiscardTinyPerimterLengthMM = 1.0;
+        public double DiscardTinyPerimeterLengthMM = 1.0;
         public double DiscardTinyPolygonAreaMM2 = 1.0;
+
+        // Replace this to use a different inset distance calculations
+        public Func<int, double> InsetDistanceFactoryF;
 
         // When offsets collide, we try to find polyline paths that will "fit"
         // This is multiplier on ToolWidth, we discard path segments within
@@ -111,6 +114,14 @@ namespace gs
         {
             Polygon = poly;
             Shells = new List<FillCurveSet2d>();
+
+            InsetDistanceFactoryF = (shell_i) =>
+            {
+                if (shell_i == 0)
+                    return ToolWidth * InsetFromInputPolygonX;
+                else
+                    return PathSpacing;
+            };
         }
 
         public bool Compute()
@@ -145,17 +156,18 @@ namespace gs
             {
                 FillCurveSet2d paths = ShellPolysToPaths(current, i);
                 Shells.Add(paths);
+                double insetDistance = InsetDistanceFactoryF(i + 1);
 
                 List<GeneralPolygon2d> all_next = new List<GeneralPolygon2d>();
                 foreach (GeneralPolygon2d gpoly in current)
                 {
                     List<GeneralPolygon2d> offsets =
-                        ClipperUtil.ComputeOffsetPolygon(gpoly, -PathSpacing, true);
+                        ClipperUtil.ComputeOffsetPolygon(gpoly, -insetDistance, true);
 
                     List<GeneralPolygon2d> filtered = new List<GeneralPolygon2d>();
                     foreach (var v in offsets)
                     {
-                        bool bTooSmall = (v.Perimeter < DiscardTinyPerimterLengthMM ||
+                        bool bTooSmall = (v.Perimeter < DiscardTinyPerimeterLengthMM ||
                                           v.Area < DiscardTinyPolygonAreaMM2);
                         if (bTooSmall)
                             continue;
@@ -179,7 +191,7 @@ namespace gs
             // failedShells have no space for internal contours. But
             // we might be able to fit a single line...
             //foreach (GeneralPolygon2d gpoly in failedShells) {
-            //	if (gpoly.Perimeter < DiscardTinyPerimterLengthMM ||
+            //	if (gpoly.Perimeter < DiscardTinyPerimeterLengthMM ||
             //		 gpoly.Area < DiscardTinyPolygonAreaMM2)
             //		continue;
 
@@ -209,7 +221,7 @@ namespace gs
         protected virtual List<GeneralPolygon2d> ComputeInitialInsetPolygon(
             bool bForcePreserveTopology)
         {
-            double fInset = ToolWidth * InsetFromInputPolygonX;
+            double fInset = InsetDistanceFactoryF(0);
             List<GeneralPolygon2d> insetPolys =
                 ClipperUtil.MiterOffset(Polygon, -fInset);
 
@@ -325,15 +337,33 @@ namespace gs
 
                 DGraph2Util.Curves c = DGraph2Util.ExtractCurves(repair.GetResultGraph());
 
-                foreach (var polygon in c.Loops)
+                #region Borrow nesting calculations from PlanarSlice to enforce winding direction
+
+                PlanarComplex complex = new PlanarComplex();
+                foreach (Polygon2d poly in c.Loops)
+                    complex.Add(poly);
+
+                PlanarComplex.FindSolidsOptions options
+                             = PlanarComplex.FindSolidsOptions.Default;
+                options.WantCurveSolids = false;
+                options.SimplifyDeviationTolerance = 0.001;
+                options.TrustOrientations = false;
+                options.AllowOverlappingHoles = false;
+
+                PlanarComplex.SolidRegionInfo solids = complex.FindSolidRegions(options);
+                foreach (var polygon in solids.Polygons)
                 {
+                    polygon.EnforceCounterClockwise();
                     paths.Append(polygon, flags);
                 }
+
+                #endregion Borrow nesting calculations from PlanarSlice to enforce winding direction
+
                 foreach (var polyline in c.Paths)
                 {
-                    if (polyline.ArcLength < DiscardTinyPerimterLengthMM)
+                    if (polyline.ArcLength < DiscardTinyPerimeterLengthMM)
                         continue;
-                    if (polyline.Bounds.MaxDim < DiscardTinyPerimterLengthMM)
+                    if (polyline.Bounds.MaxDim < DiscardTinyPerimeterLengthMM)
                         continue;
                     paths.Append(new FillPolyline2d(polyline) { TypeFlags = flags });
                 }

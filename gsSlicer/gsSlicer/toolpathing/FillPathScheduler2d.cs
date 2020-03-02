@@ -70,16 +70,35 @@ namespace gs
             if (N < 2)
                 throw new Exception("PathScheduler.AppendPolygon2d: degenerate curve!");
 
-            int iNearest = CurveUtils2.FindNearestVertex(currentPos2, poly.Vertices);
+            bool isOutermostShell = poly.HasTypeFlag(FillTypeFlags.OutermostShell);
 
-            Vector2d startPt = poly[iNearest];
+            int startIndex;
+            if (Settings.ZipperAlignedToPoint && isOutermostShell)
+            {
+                // split edges to position zipper closer to the desired point?
+                Vector2d zipperLocation = new Vector2d(Settings.ZipperLocationX, Settings.ZipperLocationY);
+                startIndex = CurveUtils2.FindNearestVertex(zipperLocation, poly.Vertices);
+            }
+            else if (Settings.ShellRandomizeStart && isOutermostShell)
+            {
+                // split edges for a actual random location along the perimeter instead of a random vertex?
+                Random rnd = new Random();
+                startIndex = rnd.Next(poly.VertexCount);
+            }
+            else
+            {
+                // use the vertex closest to the current nozzle position
+                startIndex = CurveUtils2.FindNearestVertex(currentPos2, poly.Vertices);
+            }
+
+            Vector2d startPt = poly[startIndex];
 
             AppendTravel(currentPos2, startPt);
 
             List<Vector2d> loopV = new List<Vector2d>(N + 1);
             for (int i = 0; i <= N; i++)
             {
-                int k = (iNearest + i) % N;
+                int k = (startIndex + i) % N;
                 loopV.Add(poly[k]);
             }
 
@@ -88,7 +107,7 @@ namespace gs
             Builder.AppendExtrude(loopV, useSpeed, poly.TypeFlags, null);
         }
 
-        private void AppendTravel(Vector2d startPt, Vector2d endPt)
+        protected void AppendTravel(Vector2d startPt, Vector2d endPt)
         {
             double travelDistance = startPt.Distance(endPt);
 
@@ -167,7 +186,7 @@ namespace gs
         // 2) if this is an outer perimeter, scale by outer perimeter speed multiplier
         // 3) if we are being "careful" and this is support, also use that multiplier
         //       (bit of a hack, currently means on first layer we do support extra slow)
-        private double select_speed(FillCurve2d pathCurve)
+        protected virtual double select_speed(FillCurve2d pathCurve)
         {
             bool bIsSupport = pathCurve.HasTypeFlag(FillTypeFlags.SupportMaterial);
             bool bIsOuterPerimeter = pathCurve.HasTypeFlag(FillTypeFlags.OuterPerimeter);

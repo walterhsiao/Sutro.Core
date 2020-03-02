@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -511,6 +511,12 @@
   <data name="SelfOverlapToleranceX.Name" xml:space="preserve">
     <value>Trim Overlapping Perimeters Tolerance</value>
   </data>
+  <data name="ShellRandomizeStart.Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ShellRandomizeStart.Name" xml:space="preserve">
+    <value>Randomize Shell Start Locations</value>
+  </data>
   <data name="Shells.Description" xml:space="preserve">
     <value />
   </data>
@@ -618,6 +624,24 @@
   </data>
   <data name="SupportVolumeScale.Name" xml:space="preserve">
     <value>Volume Scale (%)</value>
+  </data>
+  <data name="ZipperAlignedToPoint.Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ZipperAlignedToPoint.Name" xml:space="preserve">
+    <value>Align Zipper to Point</value>
+  </data>
+  <data name="ZipperLocationX.Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ZipperLocationX.Name" xml:space="preserve">
+    <value>Zipper Location X</value>
+  </data>
+  <data name="ZipperLocationY.Description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ZipperLocationY.Name" xml:space="preserve">
+    <value>Zipper Location Y</value>
   </data>
   <data name="ZTravelSpeed.Description" xml:space="preserve">
     <value />

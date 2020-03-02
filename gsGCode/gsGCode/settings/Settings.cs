@@ -34,7 +34,15 @@ namespace gs
             {
                 if (prop_this.CanWrite)
                 {
-                    PropertyInfo prop_other = other.GetType().GetProperty(prop_this.Name);
+                    PropertyInfo prop_other = null;
+                    try
+                    {
+                        prop_other = other.GetType().GetProperty(prop_this.Name);
+                    }
+                    catch (AmbiguousMatchException e)
+                    {
+                        prop_other = other.GetType().GetProperty(prop_this.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+                    }
                     if (prop_other != null)
                     {
                         if (prop_this.PropertyType.IsEnum)
@@ -54,7 +62,15 @@ namespace gs
 
             foreach (FieldInfo field_this in GetType().GetFields())
             {
-                FieldInfo field_other = other.GetType().GetField(field_this.Name);
+                FieldInfo field_other = null;
+                try
+                {
+                    field_other = other.GetType().GetField(field_this.Name);
+                }
+                catch (AmbiguousMatchException e)
+                {
+                    field_other = other.GetType().GetField(field_this.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+                }
 
                 if (field_other != null)
                 {

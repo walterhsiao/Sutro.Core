@@ -1,5 +1,4 @@
 ﻿using Sutro.PathWorks.Plugins.API;
-using Sutro.PathWorks.Plugins.Core;
 using System.Globalization;
 
 namespace gs.engines

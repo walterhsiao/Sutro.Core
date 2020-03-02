@@ -1,5 +1,4 @@
 ﻿using Sutro.PathWorks.Plugins.API;
-using Sutro.PathWorks.Plugins.Core;
 using System.Globalization;
 
 namespace gs.engines
@@ -237,6 +236,38 @@ namespace gs.engines
             (settings) => settings.ShellsFillNozzleDiamStepX,
             (settings, val) => settings.ShellsFillNozzleDiamStepX = val,
             UserSettingNumericValidations<double>.ValidateMin(0, ValidationResult.Level.Error));
+
+        public UserSettingBool<TSettings> ShellRandomizeStart = new UserSettingBool<TSettings>(
+            "PrintUserSettingsFFF.ShellRandomizeStart",
+            () => UserSettingTranslations.ShellRandomizeStart_Name,
+            () => UserSettingTranslations.ShellRandomizeStart_Description,
+            GroupPerimeters,
+            (settings) => settings.ShellRandomizeStart,
+            (settings, val) => settings.ShellRandomizeStart = val);
+
+        public UserSettingBool<TSettings> ZipperAlignedToPoint = new UserSettingBool<TSettings>(
+            "PrintUserSettingsFFF.ZipperAlignedToPoint",
+            () => UserSettingTranslations.ZipperAlignedToPoint_Name,
+            () => UserSettingTranslations.ZipperAlignedToPoint_Description,
+            GroupPerimeters,
+            (settings) => settings.ZipperAlignedToPoint,
+            (settings, val) => settings.ZipperAlignedToPoint = val);
+
+        public UserSettingDouble<TSettings> ZipperLocationX = new UserSettingDouble<TSettings>(
+            "PrintUserSettingsFFF.ZipperLocationX",
+            () => UserSettingTranslations.ZipperLocationX_Name,
+            () => UserSettingTranslations.ZipperLocationX_Description,
+            GroupPerimeters,
+            (settings) => settings.ZipperLocationX,
+            (settings, val) => settings.ZipperLocationX = val);
+
+        public UserSettingDouble<TSettings> ZipperLocationY = new UserSettingDouble<TSettings>(
+            "PrintUserSettingsFFF.ZipperLocationY",
+            () => UserSettingTranslations.ZipperLocationY_Name,
+            () => UserSettingTranslations.ZipperLocationY_Description,
+            GroupPerimeters,
+            (settings) => settings.ZipperLocationY,
+            (settings, val) => settings.ZipperLocationY = val);
 
         #endregion Perimeters
 

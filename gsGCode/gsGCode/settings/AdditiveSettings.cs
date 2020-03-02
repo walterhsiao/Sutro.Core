@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Sutro.PathWorks.Plugins.API;
 using System;
+using System.Collections.Generic;
 
 namespace gs
 {
@@ -157,14 +158,25 @@ namespace gs
         public int ExtruderTempC = 210;
         public int HeatedBedTempC = 0;
 
+        // Material Info
+        public double FilamentCostPerKG { get; set; } = 19.19;
+
+        public double FilamentGramsPerCubicMM { get; set; } = 0.00125;
+
         /*
 		 * Distances.
 		 * All units are mm
 		 */
 
         public bool EnableRetraction = true;
+        public bool UseFirmwareRetraction = false;
         public double RetractDistanceMM = 1.3;
         public double MinRetractTravelLength = 2.5;     // don't retract if we are travelling less than this distance
+
+        public bool ZipperAlignedToPoint = false; // overrides ShellRandomizeStart if set
+        public double ZipperLocationX = 0.0;
+        public double ZipperLocationY = 0.0;
+        public bool ShellRandomizeStart = false;  // not compatible with ZipperAlignedToPoint
 
         /*
 		 * Speeds.
@@ -218,8 +230,8 @@ namespace gs
         /*
 		 * Roof/Floors
 		 */
-        public int RoofLayers { get; set; } = 2;
-        public int FloorLayers { get; set; } = 2;
+        public virtual int RoofLayers { get; set; } = 2;
+        public virtual int FloorLayers { get; set; } = 2;
 
         /*
          *  Solid fill settings
@@ -242,11 +254,21 @@ namespace gs
         public double SparseFillBorderOverlapX = 0.25f;     // this is a multiplier on Machine.NozzleDiamMM, defines how far we
                                                             // overlap solid fill onto border shells (if 0, no overlap)
 
+        public List<double> InfillAngles = new List<double> { -45, 45 };
+
         /*
          * Start layer controls
          */
         public int StartLayers = 0;                      // number of start layers, special handling
         public double StartLayerHeightMM = 0;            // height of start layers. If 0, same as regular layers
+
+        /*
+         * Skirt controls
+         */
+        public int SkirtCount = 0;
+        public int SkirtLayers = 0;
+        public double SkirtGap = 0;
+        public double SkirtSpacingStepX = 1.0;
 
         /*
          * Support settings
@@ -281,6 +303,7 @@ namespace gs
         public double MinLayerTime = 5.0;                // minimum layer time in seconds
         public bool ClipSelfOverlaps = false;            // if true, try to remove portions of toolpaths that will self-overlap
         public double SelfOverlapToleranceX = 0.75;      // what counts as 'self-overlap'. this is a multiplier on NozzleDiamMM
+        public double MinInfillLengthMM = 2.0;
 
         /*
          * Debug/Utility options
@@ -294,22 +317,24 @@ namespace gs
 
         private int LayerRangeFilterMax { get { return LayerRangeFilter.b; } set { LayerRangeFilter.b = value; } }
 
+        public bool RepairMesh = true;                  // run a mesh auto-repair after it's been loaded
+
         /*
          * functions that calculate derived values
          * NOTE: these cannot be properties because then they will be json-serialized!
          */
 
-        public double ShellsFillPathSpacingMM()
+        public virtual double ShellsFillPathSpacingMM()
         {
             return Machine.NozzleDiamMM * ShellsFillNozzleDiamStepX;
         }
 
-        public double SolidFillPathSpacingMM()
+        public virtual double SolidFillPathSpacingMM()
         {
             return Machine.NozzleDiamMM * SolidFillNozzleDiamStepX;
         }
 
-        public double BridgeFillPathSpacingMM()
+        public virtual double BridgeFillPathSpacingMM()
         {
             return Machine.NozzleDiamMM * BridgeFillNozzleDiamStepX;
         }

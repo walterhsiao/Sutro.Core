@@ -7,6 +7,8 @@ namespace gs
 {
     public class GenericGCodeParser
     {
+        public Func<string, bool> IsMacroF = (token) => { return false; };
+
         public GCodeFile Parse(TextReader input)
         {
             GCodeFile file = new GCodeFile();
@@ -24,13 +26,9 @@ namespace gs
             return file;
         }
 
-        virtual protected GCodeLine ParseLine(string line, int nLineNum)
+        // removes the comment from the input line (the line is modified) and returns the comment, including the semicolon
+        virtual protected string removeComment(ref string line)
         {
-            if (line.Length == 0)
-                return make_blank(nLineNum);
-            if (line[0] == ';')
-                return make_comment(line, nLineNum);
-
             // strip off trailing comment
             string comment = null;
             int ci = line.IndexOf(';');
@@ -46,6 +44,17 @@ namespace gs
                 comment = line.Substring(ci);
                 line = line.Substring(0, ci);
             }
+            return comment;
+        }
+
+        virtual protected GCodeLine ParseLine(string line, int nLineNum)
+        {
+            if (line.Length == 0)
+                return make_blank(nLineNum);
+            if (line[0] == ';')
+                return make_comment(line, nLineNum);
+
+            string comment = removeComment(ref line);
 
             string[] tokens = line.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
 
@@ -54,28 +63,35 @@ namespace gs
                 return make_blank(nLineNum);
 
             GCodeLine gcode = null;
-            switch (tokens[0][0])
+            if (!IsMacroF(tokens[0]))
             {
-                case ';':
-                    gcode = make_comment(line, nLineNum);
-                    break;
+                switch (tokens[0][0])
+                {
+                    case ';':
+                        gcode = make_comment(line, nLineNum);
+                        break;
 
-                case 'N':
-                    gcode = make_N_code_line(line, tokens, nLineNum);
-                    break;
+                    case 'N':
+                        gcode = make_N_code_line(line, tokens, nLineNum);
+                        break;
 
-                case 'G':
-                case 'M':
-                    gcode = make_GM_code_line(line, tokens, nLineNum);
-                    break;
+                    case 'G':
+                    case 'M':
+                        gcode = make_GM_code_line(line, tokens, nLineNum);
+                        break;
 
-                case ':':
-                    gcode = make_control_line(line, tokens, nLineNum);
-                    break;
+                    case ':':
+                        gcode = make_control_line(line, tokens, nLineNum);
+                        break;
 
-                default:
-                    gcode = make_string_line(line, nLineNum);
-                    break;
+                    default:
+                        gcode = make_string_line(line, nLineNum);
+                        break;
+                }
+            }
+            else
+            {
+                gcode = make_string_line(line, nLineNum);
             }
 
             if (comment != null)
@@ -96,7 +112,10 @@ namespace gs
             GCodeLine l = new GCodeLine(nLineNum, eType);
             l.orig_string = line;
 
-            l.N = int.Parse(tokens[0].Substring(1));
+            bool valid = int.TryParse(tokens[0].Substring(1), out l.N);
+
+            // if we can't parse it as a valid G or M code, treat the entire line as an unknow string
+            if (!valid) return make_string_line(line, nLineNum);
 
             // [TODO] comments
 
@@ -127,7 +146,10 @@ namespace gs
             GCodeLine l = new GCodeLine(nLineNum, eType);
             l.orig_string = line;
 
-            l.N = int.Parse(tokens[0].Substring(1));
+            bool valid = int.TryParse(tokens[0].Substring(1), out l.N);
+
+            // if we can't parse it as a valid N code, treat the entire line as an unknow string
+            if (!valid) return make_string_line(line, nLineNum);
 
             // [TODO] comments
 

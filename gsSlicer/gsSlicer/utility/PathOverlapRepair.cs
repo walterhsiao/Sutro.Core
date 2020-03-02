@@ -19,7 +19,7 @@ namespace gs
 
         public double OverlapRadius = 0.4f;
         public double CollisionRadius = 0.4f;
-        public double FinalFlatCollapseAngleThreshDeg = 2.5;
+        public double FinalFlatCollapseAngleThreshDeg = 0.1;
 
         public Func<int, bool> PreserveEdgeFilterF = (eid) => { return false; };
 

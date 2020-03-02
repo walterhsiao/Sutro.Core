@@ -30,7 +30,10 @@ namespace gs
         IsConnector = 1,            // connects spans of a linear fill. also currently not used (!)
         IsSupport = 1 << 1,        // unused currently?
         IsPathStart = 1 << 2,
-        IsPathEnd = 1 << 3
+        IsPathEnd = 1 << 3,
+        IsWipeStart = 1 << 4,
+        IsWipeEnd = 1 << 5,
+        IsPrime = 1 << 6
     }
 
     public class TPVertexData
@@ -64,7 +67,7 @@ namespace gs
         TPVertexData ExtendedData { get; set; }
     }
 
-    public struct PrintVertex : IToolpathVertex
+    public class PrintVertex : IToolpathVertex
     {
         public Vector3d Position { get; set; }
         public double FeedRate { get; set; }

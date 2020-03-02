@@ -3,6 +3,7 @@ using gs.utility;
 using Sutro.PathWorks.Plugins.API;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace gs
 {
@@ -39,21 +40,21 @@ namespace gs
             {(int)FillTypeFlags.BridgeSupport, new FillType("Bridge", new Vector3f(0, 0, 1))},
         };
 
-        private readonly FixedRangeCustomDataDetails customDataBeadWidth =
+        protected readonly FixedRangeCustomDataDetails customDataBeadWidth =
             new FixedRangeCustomDataDetails(
                 () => "Bead Width",
                 (value) => $"{value:F2} mm", 0.1f, 0.8f);
 
         public IVisualizerCustomDataDetails CustomDataDetails0 => customDataBeadWidth;
 
-        private readonly AdaptiveRangeCustomDataDetails customDataFeedRate =
+        protected readonly AdaptiveRangeCustomDataDetails customDataFeedRate =
             new AdaptiveRangeCustomDataDetails(
                 () => "Feed Rate",
                 (value) => $"{value:F0} mm/min");
 
         public IVisualizerCustomDataDetails CustomDataDetails1 => customDataFeedRate;
 
-        private readonly NormalizedAdaptiveRangeCustomDataDetails customDataCompletion =
+        protected readonly NormalizedAdaptiveRangeCustomDataDetails customDataCompletion =
             new NormalizedAdaptiveRangeCustomDataDetails(
                 () => "Completion",
                 (value) => $"{value:P0}");

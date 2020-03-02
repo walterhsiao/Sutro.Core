@@ -1,5 +1,6 @@
 ﻿using g3;
 using System;
+using System.Collections.Generic;
 
 namespace gs
 {
@@ -25,15 +26,17 @@ namespace gs
         void AppendComment(string comment);
 
         void End();
+
+        IEnumerable<string> GenerateTotalExtrusionReport(SingleMaterialFFFSettings settings);
     }
 
     public class SingleMaterialFFFCompiler : ThreeAxisPrinterCompiler
     {
         private SingleMaterialFFFSettings Settings;
         private GCodeBuilder Builder;
-        private BaseDepositionAssembler Assembler;
+        protected BaseDepositionAssembler Assembler;
 
-        private AssemblerFactoryF AssemblerF;
+        protected AssemblerFactoryF AssemblerF;
 
         /// <summary>
         /// compiler will call this to emit status messages / etc
@@ -91,6 +94,43 @@ namespace gs
             Assembler.AppendFooter();
         }
 
+        public virtual void HandleDepositionPath(LinearToolpath path, SingleMaterialFFFSettings useSettings)
+        {
+            // end travel / retract if we are in that state
+            if (Assembler.InTravel)
+            {
+                if (Assembler.InRetract)
+                {
+                    Assembler.EndRetract(path[0].Position, useSettings.RetractSpeed, path[0].Extrusion.x);
+                }
+                Assembler.EndTravel();
+                Assembler.EnableFan();
+            }
+        }
+
+        public virtual void HandleTravelAndPlaneChangePath(LinearToolpath path, int pathIndex, SingleMaterialFFFSettings useSettings)
+        {
+            if (Assembler.InTravel == false)
+            {
+                Assembler.DisableFan();
+
+                // do retract cycle
+                if (path[0].Extrusion.x < Assembler.ExtruderA)
+                {
+                    if (Assembler.InRetract)
+                        throw new Exception("SingleMaterialFFFCompiler.AppendPaths: path " + pathIndex + ": already in retract!");
+                    Assembler.BeginRetract(path[0].Position, useSettings.RetractSpeed, path[0].Extrusion.x);
+                }
+                Assembler.BeginTravel();
+            }
+        }
+
+        public virtual void HandleDepositionEnd()
+        {
+        }
+
+        private string PreviousTag = "";
+
         /// <summary>
         /// Compile this set of toolpaths and pass to assembler.
         /// Settings are optional, pass null to ignore
@@ -121,31 +161,13 @@ namespace gs
                     throw new Exception("SingleMaterialFFFCompiler.AppendPaths: path " + path_index + ": Start of path is not same as end of previous path!");
 
                 int i = 0;
-                if ((p.Type == ToolpathTypes.Travel || p.Type == ToolpathTypes.PlaneChange) && Assembler.InTravel == false)
+                if (p.Type == ToolpathTypes.Travel || p.Type == ToolpathTypes.PlaneChange)
                 {
-                    //Assembler.DisableFan();
-
-                    // do retract cycle
-                    if (p[0].Extrusion.x < Assembler.ExtruderA)
-                    {
-                        if (Assembler.InRetract)
-                            throw new Exception("SingleMaterialFFFCompiler.AppendPaths: path " + path_index + ": already in retract!");
-                        Assembler.BeginRetract(p[0].Position, useSettings.RetractSpeed, p[0].Extrusion.x);
-                    }
-                    Assembler.BeginTravel();
+                    HandleTravelAndPlaneChangePath(p, path_index, useSettings);
                 }
                 else if (p.Type == ToolpathTypes.Deposition)
                 {
-                    // end travel / retract if we are in that state
-                    if (Assembler.InTravel)
-                    {
-                        if (Assembler.InRetract)
-                        {
-                            Assembler.EndRetract(p[0].Position, useSettings.RetractSpeed, p[0].Extrusion.x);
-                        }
-                        Assembler.EndTravel();
-                        //Assembler.EnableFan();
-                    }
+                    HandleDepositionPath(p, useSettings);
                 }
 
                 i = 1;      // do not need to emit code for first point of path,
@@ -160,12 +182,6 @@ namespace gs
 
                 for (; i < p.VertexCount; ++i)
                 {
-                    if (p.Type == ToolpathTypes.Deposition && !p[i].Dimensions.EpsilonEqual(currentDimensions, 1e-6))
-                    {
-                        currentDimensions = p[i].Dimensions;
-                        AppendDimensions(p[i].Dimensions);
-                    }
-
                     if (p.Type == ToolpathTypes.Travel)
                     {
                         Assembler.AppendMoveTo(p[i].Position, p[i].FeedRate, "Travel");
@@ -176,14 +192,24 @@ namespace gs
                     }
                     else
                     {
-                        Assembler.AppendExtrudeTo(p[i].Position, p[i].FeedRate, p[i].Extrusion.x);
+                        if (p.Type == ToolpathTypes.Deposition && !p[i].Dimensions.EpsilonEqual(currentDimensions, 1e-6))
+                        {
+                            currentDimensions = p[i].Dimensions;
+                            AppendDimensions(p[i].Dimensions);
+                        }
+                        Assembler.AppendExtrudeTo(p[i].Position, p[i].FeedRate, p[i].Extrusion.x, null);
                     }
                 }
             }
 
+            /*
+             * TODO: Should there be an EndTravel() call here?
+             */
+            HandleDepositionEnd();
             Assembler.FlushQueues();
         }
 
+        // annotate paths with S3D compatible (mostly) comments
         private void AddFeatureTypeLabel(FillTypeFlags typeModifier)
         {
             var featureLabel = featureTypeLabeler.FeatureLabelFromFillTypeFlag(typeModifier);
@@ -243,6 +269,11 @@ namespace gs
         {
             if (EmitMessageF != null)
                 EmitMessageF(string.Format(text, args));
+        }
+
+        public IEnumerable<string> GenerateTotalExtrusionReport(SingleMaterialFFFSettings settings)
+        {
+            return Assembler.GenerateTotalExtrusionReport(settings);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using gs;
+using gs;
 using gs.utility;
 using gsCore.FunctionalTests.Models;
 using Sutro.PathWorks.Plugins.API;
@@ -11,10 +11,12 @@ namespace gsCore.FunctionalTests.Utility
     public class ResultAnalyzer<TFeatureInfo> : IResultAnalyzer where TFeatureInfo : IFeatureInfo, new()
     {
         private readonly IFeatureInfoFactory<TFeatureInfo> featureInfoFactory;
+        private readonly ILogger logger;
 
-        public ResultAnalyzer(IFeatureInfoFactory<TFeatureInfo> featureInfoFactory)
+        public ResultAnalyzer(IFeatureInfoFactory<TFeatureInfo> featureInfoFactory, ILogger logger)
         {
             this.featureInfoFactory = featureInfoFactory;
+            this.logger = logger;
         }
 
         public void CompareResults(string pathExpected, string pathActual)
@@ -29,6 +31,7 @@ namespace gsCore.FunctionalTests.Utility
 
             for (int layerIndex = 0; layerIndex < actual.Count; layerIndex++)
             {
+                logger.WriteLine($"Checking layer {layerIndex}");
                 actual[layerIndex].AssertEqualsExpected(expected[layerIndex]);
             }
         }
@@ -69,7 +72,7 @@ namespace gsCore.FunctionalTests.Utility
                         currentLayer.AddFeatureInfo(featureInfoFactory.SwitchFeature(fillType));
                         layers.Add(currentLayer);
                     }
-                    currentLayer = new LayerInfo<TFeatureInfo>();
+                    currentLayer = new LayerInfo<TFeatureInfo>(logger);
                     continue;
                 }
 
