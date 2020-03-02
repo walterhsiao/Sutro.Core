@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Sutro.gsSlicer</PackageId>
+    <Version>1.0.3</Version>
+    <PackageDescription>GCode parsing, manipulation and generation library.</PackageDescription>
+    <RepositoryUrl>https://github.com/SutroMachine/gsSlicer</RepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>
+      $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
+    </AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>gs</RootNamespace>
+    <Authors>Ryan Schmidt</Authors>
+    <Company>gradientspace</Company>
+    <Copyright>Copyright © Ryan Schmidt/gradientspace  2017</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Description>GCode parsing, manipulation and generation library.</Description>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Sutro.Clipper" Version="1.0.0" />
+    <PackageReference Include="Sutro.gsGCode" Version="1.0.2" />
+    <PackageReference Include="Sutro.PathWorks.Plugins.API" Version="2.0.0" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
