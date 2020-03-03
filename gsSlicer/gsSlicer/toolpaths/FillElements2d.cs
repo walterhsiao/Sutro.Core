@@ -1,50 +1,18 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 
 namespace gs
 {
-    [Flags]
-    public enum FillTypeFlags
-    {
-        Unknown = 0,
-
-        PerimeterShell = 1,
-        OutermostShell = 1 << 1,
-        OuterPerimeter = PerimeterShell | OutermostShell,
-
-        InteriorShell = 1 << 2,
-
-        OpenShellCurve = 1 << 3,    // ie for single-line-wide features
-
-        SolidInfill = 1 << 8,
-        SparseInfill = 1 << 9,
-
-        SupportMaterial = 1 << 10,
-        BridgeSupport = 1 << 11,
-        Skirt = 1 << 12,
-        Priming = 1 << 13
-
-        // Warning: default enum max size is 32 bits; cannot add flags past 1 << 31
-        // If more are needed, may need to change defintion to the following:
-        //    enum FillTypeFlags : Int64
-    }
-
-    [Flags]
-    public enum TravelTypeFlags
-    {
-        Unknown = 0,
-        Leaky = 1,
-    }
-
     /// <summary>
     /// things that are common to FillPolyline2d and FillPolygon2d
     /// </summary>
     public interface FillCurve2d
     {
-        bool HasTypeFlag(FillTypeFlags f);
-
         double CustomThickness { get; }
+
+        IFillType FillType { get; }
     }
 
     /// <summary>
@@ -52,12 +20,7 @@ namespace gs
     /// </summary>
     public class FillPolygon2d : Polygon2d, FillCurve2d
     {
-        public FillTypeFlags TypeFlags = FillTypeFlags.Unknown;
-
-        public bool HasTypeFlag(FillTypeFlags f)
-        {
-            return (TypeFlags & f) != 0;
-        }
+        public IFillType FillType { get; set; } = new DefaultFillType();
 
         public double CustomThickness { get; set; }
 
@@ -79,14 +42,14 @@ namespace gs
         public FillPolygon2d(FillPolygon2d other) : base(other)
         {
             CustomThickness = other.CustomThickness;
-            TypeFlags = other.TypeFlags;
+            FillType = other.FillType;
         }
 
         public FillPolygon2d Roll(int iStart)
         {
             var result = new FillPolygon2d(this);
             result.vertices.Clear();
-            result.TypeFlags = TypeFlags;
+            result.FillType = FillType;
 
             for (int i = iStart; i < VertexCount; ++i)
                 result.AppendVertex(Vertices[i]);
@@ -103,12 +66,7 @@ namespace gs
     /// </summary>
     public class FillPolyline2d : PolyLine2d, FillCurve2d
     {
-        public FillTypeFlags TypeFlags = FillTypeFlags.Unknown;
-
-        public bool HasTypeFlag(FillTypeFlags f)
-        {
-            return (TypeFlags & f) == f;
-        }
+        public IFillType FillType { get; set; } = new DefaultFillType();
 
         // [TODO] maybe remove? see below.
         private List<TPVertexFlags> flags;

@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 
@@ -21,9 +22,6 @@ namespace gs
 
         // if true, we inset half of tool-width from Polygon
         public bool InsetFromInputPolygon = true;
-
-        // this flag is set on all Paths
-        public FillTypeFlags TypeFlags = FillTypeFlags.SolidInfill;
 
         // fill paths
         public List<FillCurveSet2d> FillCurves { get; set; }
@@ -85,7 +83,7 @@ namespace gs
                 {
                     FillPolyline2d fill_seg = new FillPolyline2d()
                     {
-                        TypeFlags = this.TypeFlags
+                        FillType = new SolidFillType()
                     };
                     fill_seg.AppendVertex(seg.P0);
                     fill_seg.AppendVertex(seg.P1);

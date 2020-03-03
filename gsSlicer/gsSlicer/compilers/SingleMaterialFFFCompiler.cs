@@ -43,19 +43,11 @@ namespace gs
         /// </summary>
         public virtual Action<string> EmitMessageF { get; set; }
 
-        private FeatureTypeLabeler featureTypeLabeler;
-
         public SingleMaterialFFFCompiler(GCodeBuilder builder, SingleMaterialFFFSettings settings, AssemblerFactoryF AssemblerF)
         {
             Builder = builder;
             Settings = settings;
             this.AssemblerF = AssemblerF;
-            featureTypeLabeler = CreateFeatureTypeLabeler();
-        }
-
-        protected virtual FeatureTypeLabeler CreateFeatureTypeLabeler()
-        {
-            return FeatureTypeLabelerFFF.Value;
         }
 
         public Vector3d NozzlePosition
@@ -129,8 +121,6 @@ namespace gs
         {
         }
 
-        private string PreviousTag = "";
-
         /// <summary>
         /// Compile this set of toolpaths and pass to assembler.
         /// Settings are optional, pass null to ignore
@@ -176,7 +166,7 @@ namespace gs
                 var currentDimensions = p[1].Dimensions;
                 if (p.Type == ToolpathTypes.Deposition)
                 {
-                    AddFeatureTypeLabel(p.TypeModifiers);
+                    AddFeatureTypeLabel(p.FillType.GetLabel());
                     AppendDimensions(currentDimensions);
                 }
 
@@ -209,11 +199,8 @@ namespace gs
             Assembler.FlushQueues();
         }
 
-        // annotate paths with S3D compatible (mostly) comments
-        private void AddFeatureTypeLabel(FillTypeFlags typeModifier)
+        private void AddFeatureTypeLabel(string featureLabel)
         {
-            var featureLabel = featureTypeLabeler.FeatureLabelFromFillTypeFlag(typeModifier);
-
             Builder.AddExplicitLine("");
             Builder.AddCommentLine(" feature " + featureLabel);
         }

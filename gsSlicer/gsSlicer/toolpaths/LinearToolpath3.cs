@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace gs
     {
         private List<T> Path;
         private ToolpathTypes _pathtype;	// access via Type property
-        private FillTypeFlags _pathtype_flags = FillTypeFlags.Unknown;
+        public IFillType FillType { get; set; } = new DefaultFillType();
 
         // todo: add speed
         //  ?? extend PolyLine3d ??
@@ -70,12 +71,6 @@ namespace gs
         {
             get { return _pathtype; }
             set { _pathtype = value; }
-        }
-
-        public FillTypeFlags TypeModifiers
-        {
-            get { return _pathtype_flags; }
-            set { _pathtype_flags = value; }
         }
 
         public virtual Vector3d StartPosition

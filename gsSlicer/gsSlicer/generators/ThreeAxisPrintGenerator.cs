@@ -1,4 +1,5 @@
 using g3;
+using gs.FillTypes;
 using Sutro.PathWorks.Plugins.API;
 using System;
 using System.Collections.Generic;
@@ -655,7 +656,7 @@ namespace gs
 
             if (nShells > 0)
             {
-                ShellsFillPolygon shells_gen = new ShellsFillPolygon(support_poly);
+                ShellsFillPolygon shells_gen = new ShellsFillPolygon(support_poly, Settings);
                 shells_gen.PathSpacing = shell_spacing;
                 shells_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
                 shells_gen.Layers = nShells;
@@ -668,8 +669,13 @@ namespace gs
                 shells_gen.DiscardTinyPerimeterLengthMM = 0.0;
                 shells_gen.Compute();
                 List<FillCurveSet2d> shell_fill_curves = shells_gen.GetFillCurves();
+
+                // Note: this will wipe out fill types for inner and outer perimeters;
+                // may need to create sub-fill types for support shells
                 foreach (var fillpath in shell_fill_curves)
-                    fillpath.AddFlags(FillTypeFlags.SupportMaterial);
+                {
+                    fillpath.SetFillType(new SupportFillType(Settings));
+                }
                 scheduler.AppendCurveSets(shell_fill_curves);
 
                 // expand inner polygon so that infill overlaps shell
@@ -683,7 +689,7 @@ namespace gs
 
             foreach (var poly in infill_polys)
             {
-                SupportLinesFillPolygon infill_gen = new SupportLinesFillPolygon(poly)
+                SupportLinesFillPolygon infill_gen = new SupportLinesFillPolygon(poly, Settings)
                 {
                     InsetFromInputPolygon = (Settings.EnableSupportShell == false),
                     PathSpacing = support_spacing,
@@ -769,7 +775,7 @@ namespace gs
             //   came from where. Would need to do loop above per-polygon
             if (bIsInfillAdjacent && Settings.InteriorSolidRegionShells > 0)
             {
-                ShellsFillPolygon interior_shells = new ShellsFillPolygon(solid_poly);
+                ShellsFillPolygon interior_shells = new ShellsFillPolygon(solid_poly, Settings);
                 interior_shells.PathSpacing = Settings.ShellsFillPathSpacingMM();
                 interior_shells.ToolWidth = Settings.Machine.NozzleDiamMM;
                 interior_shells.Layers = Settings.InteriorSolidRegionShells;
@@ -797,7 +803,7 @@ namespace gs
 
         protected virtual void fill_solid_region(PrintLayerData layer_data, GeneralPolygon2d fillPoly, IFillPathScheduler2d scheduler)
         {
-            ICurvesFillPolygon solid_gen = new ParallelLinesFillPolygon(fillPoly)
+            ICurvesFillPolygon solid_gen = new ParallelLinesFillPolygon(fillPoly, new SolidFillType())
             {
                 InsetFromInputPolygon = false,
                 PathSpacing = Settings.SolidFillPathSpacingMM(),
@@ -832,7 +838,7 @@ namespace gs
             //	fillPolys = ClipperUtil.MiterOffset(fillPolys, offset);
             //}
 
-            BridgeLinesFillPolygon fill_gen = new BridgeLinesFillPolygon(poly)
+            BridgeLinesFillPolygon fill_gen = new BridgeLinesFillPolygon(poly, Settings)
             {
                 InsetFromInputPolygon = false,
                 PathSpacing = spacing,
@@ -862,7 +868,7 @@ namespace gs
 
                 GeneralPolygon2d gp = new GeneralPolygon2d(polypart);
 
-                ShellsFillPolygon shells_fill = new ShellsFillPolygon(gp);
+                ShellsFillPolygon shells_fill = new ShellsFillPolygon(gp, Settings);
                 shells_fill.PathSpacing = Settings.SolidFillPathSpacingMM();
                 shells_fill.ToolWidth = Settings.Machine.NozzleDiamMM;
                 shells_fill.Layers = 1;
@@ -878,7 +884,7 @@ namespace gs
 
                 foreach (var fp in fillPolys)
                 {
-                    BridgeLinesFillPolygon fill_gen = new BridgeLinesFillPolygon(fp)
+                    BridgeLinesFillPolygon fill_gen = new BridgeLinesFillPolygon(fp, Settings)
                     {
                         InsetFromInputPolygon = false,
                         PathSpacing = spacing,
@@ -1000,7 +1006,7 @@ namespace gs
         /// schedule any non-polygonal paths for the given layer (eg paths
         /// that resulted from open meshes, for example)
         /// </summary>
-		protected virtual void add_open_paths(PrintLayerData layerdata, IFillPathScheduler2d scheduler)
+        protected virtual void add_open_paths(PrintLayerData layerdata, IFillPathScheduler2d scheduler)
         {
             PlanarSlice slice = layerdata.Slice;
             if (slice.Paths.Count == 0)
@@ -1011,7 +1017,7 @@ namespace gs
             {
                 FillPolyline2d pline = new FillPolyline2d(slice.Paths[pi])
                 {
-                    TypeFlags = FillTypeFlags.OpenShellCurve
+                    FillType = new OpenShellCurveFillType()
                 };
 
                 // leave space for end-blobs (input paths are extent we want to hit)
@@ -1038,7 +1044,7 @@ namespace gs
         /// return the set of shell-fills for a layer. This includes both the shell-fill paths
         /// and the remaining regions that need to be filled.
         /// </summary>
-		protected virtual List<IShellsFillPolygon> get_layer_shells(int layer_i)
+        protected virtual List<IShellsFillPolygon> get_layer_shells(int layer_i)
         {
             // evaluate shell on-demand
             //if ( LayerShells[layeri] == null ) {
@@ -1107,7 +1113,7 @@ namespace gs
         /// </summary>
         protected virtual IShellsFillPolygon compute_shells_for_shape(GeneralPolygon2d shape, int layer_i)
         {
-            ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape);
+            ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape, Settings);
             shells_gen.PathSpacing = Settings.ShellsFillPathSpacingMM();
             shells_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
             shells_gen.Layers = Settings.Shells;
@@ -1145,7 +1151,7 @@ namespace gs
             List<IShellsFillPolygon> layer_skirts = new List<IShellsFillPolygon>();
 
             // we can compute the resolution as a function of skirt diameter, but probably not worth optimizing
-            const double angularResolution = 64; // number of segments around circle
+            // const double angularResolution = 64; // number of segments around circle
 
             // the skirt is computed at each level independently instead of computing the outer path and using offsets
             // this improves the quality of the brim, as it will work in areas that have a narrow gap, and avoids overlaps
@@ -1161,10 +1167,6 @@ namespace gs
                 foreach (GeneralPolygon2d shape in dilated)
                 {
                     IShellsFillPolygon skirt_gen = compute_skirts_for_shape(shape, slice.LayerIndex);
-                    var curves = skirt_gen.GetFillCurves();
-                    foreach (var path in curves)
-                        path.SetFlags(FillTypeFlags.Skirt);
-
                     layer_skirts.Add(skirt_gen);
                 }
             }
@@ -1177,7 +1179,8 @@ namespace gs
         /// </summary>
         protected virtual IShellsFillPolygon compute_skirts_for_shape(GeneralPolygon2d shape, int layer_i)
         {
-            ShellsFillPolygon skirt_gen = new ShellsFillPolygon(shape);
+            ShellsFillPolygon skirt_gen = new ShellsFillPolygon(shape, Settings);
+            skirt_gen.ShellType = ShellsFillPolygon.ShellTypes.SkirtBrimShell;
             skirt_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
             skirt_gen.PathSpacing = Settings.Machine.NozzleDiamMM * Settings.SkirtSpacingStepX;
             skirt_gen.Layers = 1; // the path is computed indepedently for each distance.
@@ -1196,7 +1199,7 @@ namespace gs
         /// <summary>
         /// return the set of roof polygons for a layer
         /// </summary>
-		protected virtual List<GeneralPolygon2d> get_layer_roof_area(int layer_i)
+        protected virtual List<GeneralPolygon2d> get_layer_roof_area(int layer_i)
         {
             return LayerRoofAreas[layer_i];
         }
@@ -1204,7 +1207,7 @@ namespace gs
         /// <summary>
         /// return the set of floor polygons for a layer
         /// </summary>
-		protected virtual List<GeneralPolygon2d> get_layer_floor_area(int layer_i)
+        protected virtual List<GeneralPolygon2d> get_layer_floor_area(int layer_i)
         {
             return LayerFloorAreas[layer_i];
         }
@@ -1327,7 +1330,7 @@ namespace gs
         /// <summary>
         /// return the set of support-region polygons for a layer.
         /// </summary>
-		protected virtual List<GeneralPolygon2d> get_layer_support_area(int layer_i)
+        protected virtual List<GeneralPolygon2d> get_layer_support_area(int layer_i)
         {
             return LayerSupportAreas[layer_i];
         }
@@ -1500,8 +1503,8 @@ namespace gs
             bool bEnableInterLayerSmoothing = true;
 
             /*
-			 * Step 1: compute absolute support polygon for each layer
-			 */
+             * Step 1: compute absolute support polygon for each layer
+             */
 
             // For layer i, compute support region needed to support layer (i+1)
             // This is the *absolute* support area - no inset for filament width or spacing from model
@@ -1622,8 +1625,8 @@ namespace gs
             LayerSupportAreas[nLayers - 1] = new List<GeneralPolygon2d>();
 
             /*
-			 * Step 2: sweep support polygons downwards
-			 */
+             * Step 2: sweep support polygons downwards
+             */
 
             // now merge support layers. Process is to track "current" support area,
             // at layer below we union with that layers support, and then subtract
@@ -1769,8 +1772,8 @@ namespace gs
         }
 
         /*
-		 * Bridging and Support utility functions
-		 */
+         * Bridging and Support utility functions
+         */
 
         /// <summary>
         /// generate support point polygon (eg circle)
@@ -1853,7 +1856,7 @@ namespace gs
         /// <summary>
         /// Factory function to return a new PathScheduler to use for this layer.
         /// </summary>
-		protected virtual IFillPathScheduler2d get_layer_scheduler(PrintLayerData layer_data)
+        protected virtual IFillPathScheduler2d get_layer_scheduler(PrintLayerData layer_data)
         {
             SequentialScheduler2d scheduler = new SequentialScheduler2d(layer_data.PathAccum, layer_data.Settings);
 

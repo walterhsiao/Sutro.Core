@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 
@@ -70,16 +71,14 @@ namespace gs
             if (N < 2)
                 throw new Exception("PathScheduler.AppendPolygon2d: degenerate curve!");
 
-            bool isOutermostShell = poly.HasTypeFlag(FillTypeFlags.OutermostShell);
-
             int startIndex;
-            if (Settings.ZipperAlignedToPoint && isOutermostShell)
+            if (Settings.ZipperAlignedToPoint && poly.FillType.IsEntryLocationSpecified())
             {
                 // split edges to position zipper closer to the desired point?
                 Vector2d zipperLocation = new Vector2d(Settings.ZipperLocationX, Settings.ZipperLocationY);
                 startIndex = CurveUtils2.FindNearestVertex(zipperLocation, poly.Vertices);
             }
-            else if (Settings.ShellRandomizeStart && isOutermostShell)
+            else if (Settings.ShellRandomizeStart && poly.FillType.IsEntryLocationSpecified())
             {
                 // split edges for a actual random location along the perimeter instead of a random vertex?
                 Random rnd = new Random();
@@ -104,7 +103,7 @@ namespace gs
 
             double useSpeed = select_speed(poly);
 
-            Builder.AppendExtrude(loopV, useSpeed, poly.TypeFlags, null);
+            Builder.AppendExtrude(loopV, useSpeed, poly.FillType, null);
         }
 
         protected void AppendTravel(Vector2d startPt, Vector2d endPt)
@@ -115,7 +114,8 @@ namespace gs
             if (ExtrudeOnShortTravels &&
                 travelDistance < ShortTravelDistance)
             {
-                Builder.AppendExtrude(endPt, Settings.RapidTravelSpeed);
+                // TODO: Add strategy for extrude move?
+                Builder.AppendExtrude(endPt, Settings.RapidTravelSpeed, new DefaultFillType());
             }
             else if (Settings.TravelLiftEnabled &&
                 travelDistance > Settings.TravelLiftDistanceThreshold)
@@ -178,28 +178,17 @@ namespace gs
             if (curve.CustomThickness > 0)
                 dimensions.x = curve.CustomThickness;
 
-            Builder.AppendExtrude(loopV, useSpeed, dimensions, curve.TypeFlags, flags);
+            Builder.AppendExtrude(loopV, useSpeed, dimensions, curve.FillType, flags);
         }
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
         //       (currently this is only set on first layer)
-        // 2) if this is an outer perimeter, scale by outer perimeter speed multiplier
-        // 3) if we are being "careful" and this is support, also use that multiplier
-        //       (bit of a hack, currently means on first layer we do support extra slow)
-        protected virtual double select_speed(FillCurve2d pathCurve)
+        private double select_speed(FillCurve2d pathCurve)
         {
-            bool bIsSupport = pathCurve.HasTypeFlag(FillTypeFlags.SupportMaterial);
-            bool bIsOuterPerimeter = pathCurve.HasTypeFlag(FillTypeFlags.OuterPerimeter);
-            bool bCareful = (SpeedHint == SchedulerSpeedHint.Careful);
-            double useSpeed = bCareful ? Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;
-            if (bIsOuterPerimeter || (bCareful && bIsSupport))
-                useSpeed *= Settings.OuterPerimeterSpeedX;
+            double speed = SpeedHint == SchedulerSpeedHint.Careful ?
+                Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;
 
-            bool bIsBridgeSupport = pathCurve.HasTypeFlag(FillTypeFlags.BridgeSupport);
-            if (bIsBridgeSupport)
-                useSpeed = Settings.CarefulExtrudeSpeed * Settings.BridgeExtrudeSpeedX;
-
-            return useSpeed;
+            return pathCurve.FillType.ModifySpeed(speed, SpeedHint);
         }
     }
 }

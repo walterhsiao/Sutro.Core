@@ -18,7 +18,7 @@ namespace gsCore.FunctionalTests.Utility
             "retract", "travel"
         };
 
-        public FeatureInfo SwitchFeature(FillTypeFlags featureType)
+        public FeatureInfo SwitchFeature(string featureType)
         {
             var result = currentFeatureInfo;
             currentFeatureInfo = new FeatureInfo(featureType);

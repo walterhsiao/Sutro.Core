@@ -24,7 +24,6 @@ namespace gs
         private double NozzleDiam = 0.4;
         private double LayerHeight = 0.2;
         private double FixedRetractDistance = 1.3;
-        private double SupportExtrudeScale = 0.9;
 
         // [RMS] if we travel less than this distance, we don't retract
         private double MinRetractTravelLength = 2.5;
@@ -45,7 +44,6 @@ namespace gs
             LayerHeight = settings.LayerHeightMM;
             FixedRetractDistance = settings.RetractDistanceMM;
             MinRetractTravelLength = settings.MinRetractTravelLength;
-            SupportExtrudeScale = settings.SupportVolumeScale;
         }
 
         public void Calculate(Vector3d vStartPos, double fStartA, bool alreadyInRetract = false)
@@ -92,10 +90,10 @@ namespace gs
                 if (path.Type == ToolpathTypes.Travel && path.Length < MinRetractTravelLength)
                 {
                     bool prev_is_model_deposition =
-                        (prev_path != null) && (prev_path.Type == ToolpathTypes.Deposition) && ((prev_path.TypeModifiers & FillTypeFlags.SupportMaterial) == 0);
+                        (prev_path != null) && (prev_path.Type == ToolpathTypes.Deposition) && prev_path.FillType.IsPart();
                     LinearToolpath3<PrintVertex> next_path = (pi < N - 1) ? (allPaths[pi + 1] as LinearToolpath3<PrintVertex>) : null;
                     bool next_is_model_deposition =
-                        (next_path != null) && (next_path.Type == ToolpathTypes.Deposition) && ((next_path.TypeModifiers & FillTypeFlags.SupportMaterial) == 0);
+                        (next_path != null) && (next_path.Type == ToolpathTypes.Deposition) && next_path.FillType.IsPart();
                     skip_retract = prev_is_model_deposition && next_is_model_deposition;
                 }
                 if (EnableRetraction == false)
@@ -103,10 +101,7 @@ namespace gs
 
                 // figure out volume scaling based on path type
                 double vol_scale = 1.0;
-                if ((path.TypeModifiers & FillTypeFlags.SupportMaterial) != 0)
-                    vol_scale *= SupportExtrudeScale;
-                else if ((path.TypeModifiers & FillTypeFlags.BridgeSupport) != 0)
-                    vol_scale *= Settings.BridgeVolumeScale;
+                vol_scale = path.FillType.AdjustVolume(vol_scale);
 
                 for (int i = 0; i < path.VertexCount; ++i)
                 {

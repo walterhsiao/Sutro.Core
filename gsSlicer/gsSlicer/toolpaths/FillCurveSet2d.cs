@@ -18,28 +18,28 @@ namespace gs
         {
         }
 
-        public void Append(GeneralPolygon2d poly, FillTypeFlags typeFlags)
+        public void Append(GeneralPolygon2d poly, IFillType fillType)
         {
-            Loops.Add(new FillPolygon2d(poly.Outer) { TypeFlags = typeFlags });
+            Loops.Add(new FillPolygon2d(poly.Outer) { FillType = fillType });
             foreach (var h in poly.Holes)
-                Loops.Add(new FillPolygon2d(h) { TypeFlags = typeFlags });
+                Loops.Add(new FillPolygon2d(h) { FillType = fillType });
         }
 
-        public void Append(List<GeneralPolygon2d> polys, FillTypeFlags typeFlags)
+        public void Append(List<GeneralPolygon2d> polys, IFillType fillType)
         {
             foreach (var p in polys)
-                Append(p, typeFlags);
+                Append(p, fillType);
         }
 
-        public void Append(Polygon2d poly, FillTypeFlags typeFlags)
+        public void Append(Polygon2d poly, IFillType fillType)
         {
-            Loops.Add(new FillPolygon2d(poly) { TypeFlags = typeFlags });
+            Loops.Add(new FillPolygon2d(poly) { FillType = fillType });
         }
 
-        public void Append(List<Polygon2d> polys, FillTypeFlags typeFlags)
+        public void Append(List<Polygon2d> polys, IFillType fillType)
         {
             foreach (var p in polys)
-                Append(p, typeFlags);
+                Append(p, fillType);
         }
 
         public void Append(FillPolygon2d loop)
@@ -64,20 +64,13 @@ namespace gs
                 Append(p);
         }
 
-        public void SetFlags(FillTypeFlags flags)
+        public void SetFillType(IFillType fillType)
         {
             foreach (var loop in Loops)
-                loop.TypeFlags = flags;
-            foreach (var curve in Curves)
-                curve.TypeFlags = flags;
-        }
+                loop.FillType = fillType;
 
-        public void AddFlags(FillTypeFlags flags)
-        {
-            foreach (var loop in Loops)
-                loop.TypeFlags |= flags;
             foreach (var curve in Curves)
-                curve.TypeFlags |= flags;
+                curve.FillType = fillType;
         }
 
         public double TotalLength()

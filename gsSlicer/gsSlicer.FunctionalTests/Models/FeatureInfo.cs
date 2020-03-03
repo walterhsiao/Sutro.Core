@@ -9,7 +9,7 @@ namespace gsCore.FunctionalTests.Models
         {
         }
 
-        public FillTypeFlags FillType { get; set; }
+        public string FillType { get; set; }
 
         public AxisAlignedBox2d BoundingBox = AxisAlignedBox2d.Empty;
         public Vector2d CenterOfMass => UnweightedCenterOfMass / Extrusion;
@@ -24,7 +24,7 @@ namespace gsCore.FunctionalTests.Models
         protected double distanceTolerance = 1e-1;
         protected double durationTolerance = 1e-1;
 
-        public FeatureInfo(FillTypeFlags fillType)
+        public FeatureInfo(string fillType)
         {
             FillType = fillType;
         }

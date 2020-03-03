@@ -181,7 +181,7 @@ namespace gs
             //   came from where. Would need to do loop above per-polygon
             if (bIsInfillAdjacent && Settings.InteriorSolidRegionShells > 0)
             {
-                ShellsFillPolygon interior_shells = new ShellsFillPolygon(solid_poly);
+                ShellsFillPolygon interior_shells = new ShellsFillPolygon(solid_poly, Settings);
                 interior_shells.PathSpacing = Settings.SolidFillPathSpacingMM();
                 interior_shells.ToolWidth = Settings.Machine.NozzleDiamMM;
                 interior_shells.Layers = Settings.InteriorSolidRegionShells;
@@ -231,7 +231,7 @@ namespace gs
 
                 foreach (GeneralPolygon2d shape in solids)
                 {
-                    ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape);
+                    ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape, Settings);
                     shells_gen.PathSpacing = Settings.SolidFillPathSpacingMM();
                     shells_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
                     shells_gen.Layers = Settings.Shells;

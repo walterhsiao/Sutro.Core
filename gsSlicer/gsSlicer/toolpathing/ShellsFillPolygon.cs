@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -63,7 +64,8 @@ namespace gs
         {
             ExternalPerimeters,
             InternalShell,
-            BridgeShell
+            BridgeShell,
+            SkirtBrimShell
         }
 
         public ShellTypes ShellType = ShellTypes.ExternalPerimeters;
@@ -74,7 +76,8 @@ namespace gs
         public bool PreserveOuterShells = true;         // if true, we do not try to filter self-overlaps for shell 0
         public double SelfOverlapTolerance = 0.3;
 
-        public bool OuterShellLast = false;				// if true, outer shell is scheduled last
+        public bool OuterShellLast = false;             // if true, outer shell is scheduled last
+        private readonly SingleMaterialFFFSettings settings;
 
         // Outputs
 
@@ -105,12 +108,14 @@ namespace gs
         // remaining interior polygons (to fill w/ other strategy, etc)
         public List<GeneralPolygon2d> InnerPolygons { get; set; }
 
+        public SupportFillType FillType { get; internal set; }
+
         public List<GeneralPolygon2d> GetInnerPolygons()
         {
             return InnerPolygons;
         }
 
-        public ShellsFillPolygon(GeneralPolygon2d poly)
+        public ShellsFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings)
         {
             Polygon = poly;
             Shells = new List<FillCurveSet2d>();
@@ -122,6 +127,8 @@ namespace gs
                 else
                     return PathSpacing;
             };
+
+            this.settings = settings;
         }
 
         public bool Compute()
@@ -304,18 +311,32 @@ namespace gs
         {
             FillCurveSet2d paths = new FillCurveSet2d();
 
-            FillTypeFlags flags = FillTypeFlags.PerimeterShell;
-            if (nShell == 0 && ShellType == ShellTypes.ExternalPerimeters)
-                flags = FillTypeFlags.OutermostShell;
+            IFillType fillType = new DefaultFillType();
+
+            if (ShellType == ShellTypes.ExternalPerimeters)
+            {
+                if (nShell == 0)
+                    fillType = new OuterPerimeterFillType(settings);
+                else
+                    fillType = new InnerPerimeterFillType();
+            }
             else if (ShellType == ShellTypes.InternalShell)
-                flags = FillTypeFlags.InteriorShell;
+            {
+                fillType = new InteriorShellFillType();
+            }
             else if (ShellType == ShellTypes.BridgeShell)
-                flags = FillTypeFlags.BridgeSupport;
+            {
+                fillType = new BridgeFillType(settings);
+            }
+            else if (ShellType == ShellTypes.SkirtBrimShell)
+            {
+                fillType = new SkirtBrimFillType();
+            }
 
             if (FilterSelfOverlaps == false)
             {
                 foreach (GeneralPolygon2d shell in shell_polys)
-                    paths.Append(shell, flags);
+                    paths.Append(shell, fillType);
                 return paths;
             }
 
@@ -354,7 +375,7 @@ namespace gs
                 foreach (var polygon in solids.Polygons)
                 {
                     polygon.EnforceCounterClockwise();
-                    paths.Append(polygon, flags);
+                    paths.Append(polygon, fillType);
                 }
 
                 #endregion Borrow nesting calculations from PlanarSlice to enforce winding direction
@@ -365,7 +386,7 @@ namespace gs
                         continue;
                     if (polyline.Bounds.MaxDim < DiscardTinyPerimeterLengthMM)
                         continue;
-                    paths.Append(new FillPolyline2d(polyline) { TypeFlags = flags });
+                    paths.Append(new FillPolyline2d(polyline));
                 }
             }
             return paths;
