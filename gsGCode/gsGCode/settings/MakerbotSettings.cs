@@ -25,11 +25,6 @@ namespace gs.info
     {
         public Makerbot.Models ModelEnum;
 
-        public object Clone()
-        {
-            return CloneAs<MakerbotSettings>();
-        }
-
         public override AssemblerFactoryF AssemblerType()
         {
             return MakerbotAssembler.Factory;

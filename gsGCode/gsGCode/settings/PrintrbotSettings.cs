@@ -20,11 +20,6 @@ namespace gs.info
     {
         public Printrbot.Models ModelEnum;
 
-        public object Clone()
-        {
-            return CloneAs<PrintrbotSettings>();
-        }
-
         public override AssemblerFactoryF AssemblerType()
         {
             return MakePrintrbotAssembler;

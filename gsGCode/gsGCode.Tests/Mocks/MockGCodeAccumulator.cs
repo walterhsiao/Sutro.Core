@@ -1,13 +1,13 @@
 ﻿using gs;
 using System.Collections.Generic;
 
-namespace gsGCode.builders.mockClasses
+namespace gsGCode.Tests.Mocks
 {
-    public class MockIGCodeAccumulator : IGCodeAccumulator
+    public class MockGCodeAccumulator : IGCodeAccumulator
     {
         public List<GCodeLine> Lines { get; }
 
-        public MockIGCodeAccumulator() => Lines = new List<GCodeLine>();
+        public MockGCodeAccumulator() => Lines = new List<GCodeLine>();
 
         public void AddLine(GCodeLine line)
         {

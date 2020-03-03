@@ -20,11 +20,6 @@ namespace gs.info
     {
         public Prusa.Models ModelEnum;
 
-        public object Clone()
-        {
-            return CloneAs<PrusaSettings>();
-        }
-
         public override AssemblerFactoryF AssemblerType()
         {
             return MakePrusaAssembler;

@@ -18,11 +18,6 @@ namespace gs.info
     {
         public RepRap.Models ModelEnum;
 
-        public object Clone()
-        {
-            return CloneAs<RepRapSettings>();
-        }
-
         public override AssemblerFactoryF AssemblerType()
         {
             return RepRapAssembler.Factory;

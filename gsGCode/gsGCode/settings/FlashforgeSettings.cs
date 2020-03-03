@@ -20,11 +20,6 @@ namespace gs.info
     {
         public Flashforge.Models ModelEnum;
 
-        public object Clone()
-        {
-            return CloneAs<FlashforgeSettings>();
-        }
-
         public override AssemblerFactoryF AssemblerType()
         {
             return MakerbotAssembler.Factory;

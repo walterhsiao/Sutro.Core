@@ -2,11 +2,6 @@
 {
     public class GenericPrinterSettings : GenericRepRapSettings
     {
-        public object Clone()
-        {
-            return CloneAs<GenericPrinterSettings>();
-        }
-
         public override AssemblerFactoryF AssemblerType()
         {
             return RepRapAssembler.Factory;

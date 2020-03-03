@@ -20,11 +20,6 @@ namespace gs.info
     {
         public Monoprice.Models ModelEnum;
 
-        public object Clone()
-        {
-            return CloneAs<MonopriceSettings>();
-        }
-
         public override AssemblerFactoryF AssemblerType()
         {
             return RepRapAssembler.Factory;
