@@ -8,6 +8,8 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Git LFS
-        run: git lfs pull
+        run: |
+          git lfs fetch
+          git lfs checkout
       - name: Build & test project
         run: dotnet test -c Release
