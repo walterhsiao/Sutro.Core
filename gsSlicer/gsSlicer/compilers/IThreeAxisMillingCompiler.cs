@@ -6,7 +6,7 @@ namespace gs
     // [TODO] be able to not hardcode this type?
     using LinearToolpath = LinearToolpath3<PrintVertex>;
 
-    public interface ThreeAxisMillingCompiler : ICNCCompiler
+    public interface IThreeAxisMillingCompiler : ICNCCompiler
     {
         // current tool position
         Vector3d ToolPosition { get; }
@@ -23,7 +23,7 @@ namespace gs
         void End();
     }
 
-    public class BaseThreeAxisMillingCompiler : ThreeAxisMillingCompiler
+    public class BaseThreeAxisMillingCompiler : IThreeAxisMillingCompiler
     {
         public SingleMaterialFFFSettings Settings;
         public GCodeBuilder Builder;

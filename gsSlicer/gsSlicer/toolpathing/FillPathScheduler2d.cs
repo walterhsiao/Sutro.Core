@@ -183,7 +183,7 @@ namespace gs
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
         //       (currently this is only set on first layer)
-        private double select_speed(FillCurve2d pathCurve)
+        protected virtual double select_speed(IFillCurve2d pathCurve)
         {
             double speed = SpeedHint == SchedulerSpeedHint.Careful ?
                 Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;

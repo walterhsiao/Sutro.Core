@@ -8,7 +8,7 @@ namespace gs
     /// <summary>
     /// things that are common to FillPolyline2d and FillPolygon2d
     /// </summary>
-    public interface FillCurve2d
+    public interface IFillCurve2d
     {
         double CustomThickness { get; }
 
@@ -18,7 +18,7 @@ namespace gs
     /// <summary>
     /// Additive polygon fill curve
     /// </summary>
-    public class FillPolygon2d : Polygon2d, FillCurve2d
+    public class FillPolygon2d : Polygon2d, IFillCurve2d
     {
         public IFillType FillType { get; set; } = new DefaultFillType();
 
@@ -64,7 +64,7 @@ namespace gs
     /// <summary>
     /// Additive polyline fill curve
     /// </summary>
-    public class FillPolyline2d : PolyLine2d, FillCurve2d
+    public class FillPolyline2d : PolyLine2d, IFillCurve2d
     {
         public IFillType FillType { get; set; } = new DefaultFillType();
 

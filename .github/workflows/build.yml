@@ -7,5 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Git LFS pull
+        run: git lfs pull
       - name: Build & test project
         run: dotnet test -c Release

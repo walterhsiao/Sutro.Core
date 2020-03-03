@@ -11,7 +11,7 @@ namespace gs
     {
     }
 
-    public interface ThreeAxisPrinterCompiler : ICNCCompiler
+    public interface IThreeAxisPrinterCompiler : ICNCCompiler
     {
         // current nozzle position
         Vector3d NozzlePosition { get; }
@@ -30,7 +30,7 @@ namespace gs
         IEnumerable<string> GenerateTotalExtrusionReport(SingleMaterialFFFSettings settings);
     }
 
-    public class SingleMaterialFFFCompiler : ThreeAxisPrinterCompiler
+    public class SingleMaterialFFFCompiler : IThreeAxisPrinterCompiler
     {
         private SingleMaterialFFFSettings Settings;
         private GCodeBuilder Builder;
