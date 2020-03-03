@@ -40,7 +40,7 @@ namespace gs
     /// <summary>
     /// things that are common to FillPolyline2d and FillPolygon2d
     /// </summary>
-    public interface FillCurve2d
+    public interface IFillCurve2d
     {
         bool HasTypeFlag(FillTypeFlags f);
 
@@ -50,7 +50,7 @@ namespace gs
     /// <summary>
     /// Additive polygon fill curve
     /// </summary>
-    public class FillPolygon2d : Polygon2d, FillCurve2d
+    public class FillPolygon2d : Polygon2d, IFillCurve2d
     {
         public FillTypeFlags TypeFlags = FillTypeFlags.Unknown;
 
@@ -101,7 +101,7 @@ namespace gs
     /// <summary>
     /// Additive polyline fill curve
     /// </summary>
-    public class FillPolyline2d : PolyLine2d, FillCurve2d
+    public class FillPolyline2d : PolyLine2d, IFillCurve2d
     {
         public FillTypeFlags TypeFlags = FillTypeFlags.Unknown;
 
