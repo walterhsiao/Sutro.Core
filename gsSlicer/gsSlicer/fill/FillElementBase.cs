@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 
 namespace gs
 {
@@ -12,5 +13,7 @@ namespace gs
             public Vector2d Vertex;
             public TVertexInfo VertexInfo;
         }
+
+        public IFillType FillType { get; set; } = new DefaultFillType();
     }
 }

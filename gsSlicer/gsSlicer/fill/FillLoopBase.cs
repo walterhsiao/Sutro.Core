@@ -17,12 +17,11 @@ namespace gs
         protected List<TSegmentInfo> SegmentInfo = new List<TSegmentInfo>();
         protected List<TVertexInfo> VertexInfo = new List<TVertexInfo>();
         public double CustomThickness { get; set; }
-        public IFillType FillType { get; set; } = new DefaultFillType();
+
+        // Pass through some properties & methods from wrapped Polygon
+
         public double Perimeter { get => Polygon.Perimeter; }
-
-        // Expose some properties & methods from underlying Polygon
         public int VertexCount { get => Polygon.VertexCount; }
-
         public IEnumerable<Vector2d> Vertices { get => Polygon.VerticesItr(false); }
         public Vector2d this[int i] { get => Polygon[i]; }
 

@@ -13,20 +13,19 @@ namespace gs
         where TVertexInfo : BasicVertexInfo, new()
         where TSegmentInfo : BasicSegmentInfo, new()
     {
-        private PolyLine2d Polyline = new PolyLine2d();
-        private List<TSegmentInfo> SegmentInfo = new List<TSegmentInfo>();
-        private List<TVertexInfo> VertexInfo = new List<TVertexInfo>();
-        public double ArcLength { get => Polyline.ArcLength; }
+        protected PolyLine2d Polyline = new PolyLine2d();
+        protected List<TSegmentInfo> SegmentInfo = new List<TSegmentInfo>();
+        protected List<TVertexInfo> VertexInfo = new List<TVertexInfo>();
+
         public double CustomThickness { get; set; }
+
+        // Pass through some properties & methods from wrapped Polyline
+
+        public double ArcLength { get => Polyline.ArcLength; }
         public Vector2d End { get => Polyline.Vertices[Polyline.VertexCount - 1]; }
-        public IFillType FillType { get; set; } = new DefaultFillType();
         public Vector2d Start { get => Polyline.Vertices[0]; }
-
-        // Expose some properties & methods from underlying Polyline
         public int VertexCount { get => Polyline.VertexCount; }
-
         public IEnumerable<Vector2d> Vertices { get => Polyline.Vertices; }
-
         public Vector2d this[int i] { get => Polyline[i]; }
 
         public void AppendVertex(Vector2d pt, TVertexInfo vInfo = null, TSegmentInfo sInfo = null)
