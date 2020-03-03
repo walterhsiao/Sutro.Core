@@ -1,7 +1,6 @@
 ﻿using gs;
 using gsGCode.builders.mockClasses;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sutro.PathWorks.Plugins.API;
 using System;
 
 namespace gsCore.UnitTests

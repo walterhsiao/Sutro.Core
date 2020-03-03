@@ -1,5 +1,4 @@
-﻿using Sutro.PathWorks.Plugins.API;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace gs.info
 {
@@ -21,7 +20,7 @@ namespace gs.info
     {
         public Monoprice.Models ModelEnum;
 
-        public override IProfile Clone()
+        public object Clone()
         {
             return CloneAs<MonopriceSettings>();
         }

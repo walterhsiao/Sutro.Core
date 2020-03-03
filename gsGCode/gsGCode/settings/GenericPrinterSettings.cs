@@ -1,10 +1,8 @@
-﻿using Sutro.PathWorks.Plugins.API;
-
-namespace gs.info
+﻿namespace gs.info
 {
     public class GenericPrinterSettings : GenericRepRapSettings
     {
-        public override IProfile Clone()
+        public object Clone()
         {
             return CloneAs<GenericPrinterSettings>();
         }

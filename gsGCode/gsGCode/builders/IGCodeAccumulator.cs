@@ -1,6 +1,4 @@
-﻿using Sutro.PathWorks.Plugins.API;
-
-namespace gs
+﻿namespace gs
 {
     public interface IGCodeAccumulator
     {

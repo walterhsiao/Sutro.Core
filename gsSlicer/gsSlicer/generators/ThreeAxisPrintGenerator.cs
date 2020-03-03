@@ -1,6 +1,5 @@
 using g3;
 using gs.FillTypes;
-using Sutro.PathWorks.Plugins.API;
 using System;
 using System.Collections.Generic;
 using System.Threading;

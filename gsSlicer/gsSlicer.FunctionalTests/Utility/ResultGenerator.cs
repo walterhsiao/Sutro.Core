@@ -1,6 +1,5 @@
 ﻿using g3;
 using gs;
-using Sutro.PathWorks.Plugins.API;
 using System;
 using System.IO;
 

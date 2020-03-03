@@ -1,5 +1,4 @@
 ﻿using g3;
-using Sutro.PathWorks.Plugins.API;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
