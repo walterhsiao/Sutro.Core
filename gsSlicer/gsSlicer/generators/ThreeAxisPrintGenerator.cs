@@ -73,7 +73,7 @@ namespace gs
         public PrintMeshAssembly PrintMeshes { get; protected set; }
 
         public PlanarSliceStack Slices { get; protected set; }
-        public ThreeAxisPrinterCompiler Compiler { get; protected set; }
+        public IThreeAxisPrinterCompiler Compiler { get; protected set; }
         public SingleMaterialFFFSettings Settings;      // public because you could modify
                                                         // this during process, ie in BeginLayerF
                                                         // to implement per-layer settings
@@ -145,7 +145,7 @@ namespace gs
 
         // Called after we have finished print generation, use this to post-process the paths, etc.
         // By default appends a comment block with print time & material usage statistics
-        public Action<ThreeAxisPrinterCompiler, ThreeAxisPrintGenerator> PostProcessCompilerF
+        public Action<IThreeAxisPrinterCompiler, ThreeAxisPrintGenerator> PostProcessCompilerF
             = PrintGeneratorDefaults.AppendPrintStatistics;
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace gs
         public ThreeAxisPrintGenerator(PrintMeshAssembly meshes,
                                        PlanarSliceStack slices,
                                        SingleMaterialFFFSettings settings,
-                                       ThreeAxisPrinterCompiler compiler)
+                                       IThreeAxisPrinterCompiler compiler)
         {
             Initialize(meshes, slices, settings, compiler);
         }
@@ -174,7 +174,7 @@ namespace gs
         public void Initialize(PrintMeshAssembly meshes,
                                PlanarSliceStack slices,
                                SingleMaterialFFFSettings settings,
-                               ThreeAxisPrinterCompiler compiler)
+                               IThreeAxisPrinterCompiler compiler)
         {
             PrintMeshes = meshes;
             Slices = slices;

@@ -10,7 +10,7 @@
          */
 
         public static void AppendPrintStatistics(
-            ThreeAxisPrinterCompiler compiler, ThreeAxisPrintGenerator printgen)
+            IThreeAxisPrinterCompiler compiler, ThreeAxisPrintGenerator printgen)
         {
             compiler.AppendComment("".PadRight(79, '-'));
             foreach (string line in printgen.TotalPrintTimeStatistics.ToStringList())

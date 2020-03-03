@@ -13,7 +13,7 @@ namespace gs
         protected PrintMeshAssembly PrintMeshes;
 
         protected PlanarSliceStack Slices;
-        protected ThreeAxisLaserCompiler Compiler;
+        protected IThreeAxisLaserCompiler Compiler;
         public SingleMaterialFFFSettings Settings;      // public because you could modify
                                                         // this during process, ie in BeginLayerF
                                                         // to implement per-layer settings
@@ -42,7 +42,7 @@ namespace gs
         public SLSPrintGenerator(PrintMeshAssembly meshes,
                                        PlanarSliceStack slices,
                                        SingleMaterialFFFSettings settings,
-                                       ThreeAxisLaserCompiler compiler)
+                                       IThreeAxisLaserCompiler compiler)
         {
             Initialize(meshes, slices, settings, compiler);
         }
@@ -50,7 +50,7 @@ namespace gs
         public void Initialize(PrintMeshAssembly meshes,
                                PlanarSliceStack slices,
                                SingleMaterialFFFSettings settings,
-                               ThreeAxisLaserCompiler compiler)
+                               IThreeAxisLaserCompiler compiler)
         {
             PrintMeshes = meshes;
             Slices = slices;
