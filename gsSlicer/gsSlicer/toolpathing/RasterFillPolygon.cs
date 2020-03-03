@@ -81,7 +81,7 @@ namespace gs
             {
                 foreach (Segment2d seg in seglist)
                 {
-                    FillPolyline2d fill_seg = new FillPolyline2d()
+                    BasicFillCurve fill_seg = new BasicFillCurve()
                     {
                         FillType = new SolidFillType()
                     };

@@ -144,7 +144,7 @@ namespace gs
                 int vid = start_vid;
                 int eid = pathGraph.GetVtxEdges(vid)[0];
 
-                FillPolyline2d path = new FillPolyline2d() { FillType = this.FillType };
+                BasicFillCurve path = new BasicFillCurve() { FillType = this.FillType };
 
                 path.AppendVertex(pathGraph.GetVertex(vid));
                 while (true)
@@ -155,7 +155,7 @@ namespace gs
                     int gid = pathGraph.GetEdgeGroup(eid);
                     if (gid < 0)
                     {
-                        path.AppendVertex(pathGraph.GetVertex(vid), new FillSegmentInfo() { IsConnector = true });
+                        path.AppendVertex(pathGraph.GetVertex(vid), new BasicSegmentInfo() { IsConnector = true });
                     }
                     else
                     {
@@ -191,7 +191,7 @@ namespace gs
                             simp.SimplifyDeviationThreshold = ToolWidth / 2; break;
                     }
                     simp.Simplify();
-                    path = new FillPolyline2d(simp.Result.ToArray()) { FillType = this.FillType };
+                    path = new BasicFillCurve(simp.Result.ToArray()) { FillType = this.FillType };
                 }
 
                 paths.Append(path);

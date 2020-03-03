@@ -386,15 +386,15 @@ namespace gs
                         continue;
                     if (polyline.Bounds.MaxDim < DiscardTinyPerimeterLengthMM)
                         continue;
-                    paths.Append(new FillPolyline2d(polyline));
+                    paths.Append(new BasicFillCurve(polyline));
                 }
             }
             return paths;
         }
 
-        public List<FillPolyline2d> thin_offset(GeneralPolygon2d p)
+        public List<BasicFillCurve> thin_offset(GeneralPolygon2d p)
         {
-            List<FillPolyline2d> result = new List<FillPolyline2d>();
+            List<BasicFillCurve> result = new List<BasicFillCurve>();
 
             // to support non-hole thin offsets we need to return polylines
             if (p.Holes.Count == 0)
@@ -410,7 +410,7 @@ namespace gs
             double clip_dist = ToolWidth * ToolWidthClipMultiplier;
             foreach (GeneralPolygon2d offset_poly in offsets)
             {
-                List<FillPolyline2d> clipped = clip_to_band(offset_poly.Outer, p, clip_dist);
+                List<BasicFillCurve> clipped = clip_to_band(offset_poly.Outer, p, clip_dist);
                 result.AddRange(clipped);
             }
 
@@ -436,7 +436,7 @@ namespace gs
         // vertices are discarded if outside clipPoly, or within clip_dist
         // remaining polylines are returned
         // In all-pass case currently returns polyline w/ explicit first==last vertices
-        public List<FillPolyline2d> clip_to_band(Polygon2d insetpoly, GeneralPolygon2d clipPoly, double clip_dist)
+        public List<BasicFillCurve> clip_to_band(Polygon2d insetpoly, GeneralPolygon2d clipPoly, double clip_dist)
         {
             double clipSqr = clip_dist * clip_dist;
 
@@ -467,19 +467,19 @@ namespace gs
                 midline[i] = po;
             }
             if (nClipped == N)
-                return new List<FillPolyline2d>();
+                return new List<BasicFillCurve>();
             if (nClipped == 0)
             {
-                FillPolyline2d all = new FillPolyline2d(midline);
+                BasicFillCurve all = new BasicFillCurve(midline);
                 all.AppendVertex(all.Start);
-                return new List<FillPolyline2d>() { all };
+                return new List<BasicFillCurve>() { all };
             }
 
             return find_polygon_spans(midline, clipped);
         }
 
         // extract set of spans from poly where clipped=false
-        private List<FillPolyline2d> find_polygon_spans(Vector2d[] poly, bool[] clipped)
+        private List<BasicFillCurve> find_polygon_spans(Vector2d[] poly, bool[] clipped)
         {
             // assumption: at least one vtx is clipped
             int iStart = 0;
@@ -495,13 +495,13 @@ namespace gs
                     iStart++;
             }
 
-            List<FillPolyline2d> result = new List<FillPolyline2d>();
+            List<BasicFillCurve> result = new List<BasicFillCurve>();
             int iCur = iStart;
             bool done = false;
 
             while (done == false)
             {
-                FillPolyline2d cur = new FillPolyline2d();
+                BasicFillCurve cur = new BasicFillCurve();
                 do
                 {
                     cur.AppendVertex(poly[iCur]);

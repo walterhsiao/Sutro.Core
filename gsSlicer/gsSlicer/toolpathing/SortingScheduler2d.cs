@@ -34,7 +34,7 @@ namespace gs
 
         protected class PathLoop : PathItem
         {
-            public FillPolygon2d curve;
+            public BasicFillLoop curve;
             public bool reverse = false;
         }
 
@@ -42,7 +42,7 @@ namespace gs
 
         protected class PathSpan : PathItem
         {
-            public FillPolyline2d curve;
+            public BasicFillCurve curve;
             public bool reverse = false;
         }
 
@@ -52,10 +52,10 @@ namespace gs
         {
             foreach (FillCurveSet2d polySet in paths)
             {
-                foreach (FillPolygon2d loop in polySet.Loops)
+                foreach (BasicFillLoop loop in polySet.Loops)
                     Loops.Add(new PathLoop() { curve = loop, speedHint = SpeedHint });
 
-                foreach (FillPolyline2d curve in polySet.Curves)
+                foreach (BasicFillCurve curve in polySet.Curves)
                     Spans.Add(new PathSpan() { curve = curve, speedHint = SpeedHint });
             }
         }
@@ -78,7 +78,7 @@ namespace gs
                     if (idx.c != 0)
                     {
                         int iStart = idx.c;
-                        FillPolygon2d o = new FillPolygon2d();
+                        BasicFillLoop o = new BasicFillLoop();
                         int N = loop.curve.VertexCount;
                         for (int i = 0; i < N; ++i)
                         {
