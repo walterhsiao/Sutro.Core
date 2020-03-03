@@ -1,4 +1,4 @@
-﻿using g3;
+using g3;
 using gs.FillTypes;
 using System;
 using System.Collections;
@@ -137,9 +137,8 @@ namespace gs
                 return;
             }
 
-            double dist = End.Position.Distance(v.Position);
-            // Add points if they aren't coincident or a prime
-            if (dist < ToolpathSetBuilder.MOVE_EPSILON && !flags.HasFlag(TPVertexFlags.IsPrime))
+            double distSqr = End.Position.DistanceSquared(v.Position);
+            if (distSqr < MathUtil.Epsilonf)
             {
                 if (is_end)
                     Path[Path.Count - 1] = v;
@@ -172,15 +171,6 @@ namespace gs
         public void ChangeType(ToolpathTypes type)
         {
             Type = type;
-        }
-
-        public void ReplaceVertices(List<T> newVertices)
-        {
-            if (!newVertices[0].Position.EpsilonEqual(Start.Position, 1e-8) || !newVertices[newVertices.Count - 1].Position.EpsilonEqual(End.Position, 1e-8))
-            {
-                throw new Exception("Must replace vertices with same start and end point");
-            }
-            Path = newVertices;
         }
 
         // computes opening angle in XY plane at vtx i

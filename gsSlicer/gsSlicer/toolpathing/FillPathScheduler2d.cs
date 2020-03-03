@@ -2,6 +2,7 @@
 using gs.FillTypes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace gs
 {
@@ -153,25 +154,19 @@ namespace gs
 
             List<Vector2d> loopV;
             List<TPVertexFlags> flags = null;
-            if (bReverse)
-            {
-                loopV = new List<Vector2d>(N);
-                for (int i = N - 1; i >= 0; --i)
-                    loopV.Add(curve[i]);
-                if (curve.HasFlags)
-                {
-                    flags = new List<TPVertexFlags>(N);
-                    for (int i = N - 1; i >= 0; --i)
-                        flags.Add(curve.GetFlag(i));
-                }
-            }
-            else
-            {
-                loopV = new List<Vector2d>(curve);
-                if (curve.HasFlags)
-                    flags = new List<TPVertexFlags>(curve.Flags());
-            }
 
+            loopV = new List<Vector2d>(N);
+            flags = new List<TPVertexFlags>(N);
+
+            var range = Enumerable.Range(0, N);
+            if (bReverse) range.Reverse();
+
+            foreach (int i in range)
+            {
+                var point = curve.GetPoint(i, bReverse);
+                loopV.Add(point.Vertex);
+                flags.Add(point.SegmentInfo != null && point.SegmentInfo.IsConnector ? TPVertexFlags.IsConnector : TPVertexFlags.None);
+            }
             double useSpeed = select_speed(curve);
 
             Vector2d dimensions = GCodeUtil.UnspecifiedDimensions;
@@ -183,7 +178,7 @@ namespace gs
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
         //       (currently this is only set on first layer)
-        protected virtual double select_speed(IFillCurve2d pathCurve)
+        protected virtual double select_speed(IFillElement pathCurve)
         {
             double speed = SpeedHint == SchedulerSpeedHint.Careful ?
                 Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;

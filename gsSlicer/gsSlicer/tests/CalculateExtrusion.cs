@@ -193,10 +193,5 @@ namespace gs
             NumPaths = N;
             ExtrusionLength = curA;
         } // Calculate()
-
-        private bool is_connection(Index3i flags)
-        {
-            return (flags.a & (int)TPVertexFlags.IsConnector) != 0;
-        }
     }
 }

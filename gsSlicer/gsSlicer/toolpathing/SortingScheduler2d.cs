@@ -86,12 +86,12 @@ namespace gs
                         }
                         o.FillType = loop.curve.FillType;
                         paths.Append(o);
-                        OutPoint = o.Vertices[0];
+                        OutPoint = o[0];
                     }
                     else
                     {
                         paths.Append(loop.curve);
-                        OutPoint = loop.curve.Vertices[0];
+                        OutPoint = loop.curve[0];
                     }
                 }
                 else
