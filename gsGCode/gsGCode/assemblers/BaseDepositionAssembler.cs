@@ -350,8 +350,8 @@ namespace gs
             Builder.BeginGLine(1, p.comment);
 
             BuildXParameter(p.toPos.x);
-            BuildYParameter(p.toPos.x);
-            BuildZParameter(p.toPos.x);
+            BuildYParameter(p.toPos.y);
+            BuildZParameter(p.toPos.z);
             BuildFeedrateParameter(p.feedRate);
             BuildExtrudeParameter(p.extruderA);
 
