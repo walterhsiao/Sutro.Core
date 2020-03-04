@@ -179,7 +179,7 @@ namespace gs
                 //  non-trivial overlaps here...
                 if (SimplifyAmount != SimplificationLevel.None && path.VertexCount > 2)
                 {
-                    var simp = new VertexListSimplification2(path.Vertices, false);
+                    var simp = new PolySimplification2(new PolyLine2d(path.Vertices));
                     switch (SimplifyAmount)
                     {
                         default:

@@ -137,43 +137,40 @@ namespace gs
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;
 
-            int N = curve.VertexCount;
-            if (N < 2)
+            if (curve.VertexCount < 2)
                 throw new Exception("PathScheduler.AppendPolyline2d: degenerate curve!");
 
-            int iNearest = 0;
-            bool bReverse = false;
             if (curve.Start.DistanceSquared(currentPos2) > curve.End.DistanceSquared(currentPos2))
             {
-                iNearest = N - 1;
-                bReverse = true;
+                // This modifies input; avoid?
+                curve.Reverse();
             }
 
-            Vector2d startPt = curve[iNearest];
-            AppendTravel(currentPos2, startPt);
+            AppendTravel(currentPos2, curve[0]);
 
-            List<Vector2d> loopV;
-            List<TPVertexFlags> flags = null;
+            var flags = new List<TPVertexFlags>(curve.VertexCount);
 
-            loopV = new List<Vector2d>(N);
-            flags = new List<TPVertexFlags>(N);
-
-            var range = Enumerable.Range(0, N);
-            if (bReverse) range.Reverse();
-
-            foreach (int i in range)
+            var vertices = new List<Vector2d>(curve.VertexCount);
+            for (int i = 0; i < curve.VertexCount; i++)
             {
-                var point = curve.GetPoint(i, bReverse);
-                loopV.Add(point.Vertex);
-                flags.Add(point.SegmentInfo != null && point.SegmentInfo.IsConnector ? TPVertexFlags.IsConnector : TPVertexFlags.None);
+                var p = curve.GetPoint(i, false);
+                var flag = TPVertexFlags.None;
+
+                if (i == 0)
+                    flag = TPVertexFlags.IsPathStart;
+                else if (p.SegmentInfo != null && p.SegmentInfo.IsConnector)
+                    flag = TPVertexFlags.IsConnector;
+
+                vertices.Add(p.Vertex);
+                flags.Add(flag);
             }
+
             double useSpeed = select_speed(curve);
 
             Vector2d dimensions = GCodeUtil.UnspecifiedDimensions;
             if (curve.CustomThickness > 0)
                 dimensions.x = curve.CustomThickness;
-
-            Builder.AppendExtrude(loopV, useSpeed, dimensions, curve.FillType, flags);
+            Builder.AppendExtrude(vertices, useSpeed, dimensions, curve.FillType, flags);
         }
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
