@@ -70,9 +70,10 @@ namespace gs
         // Makerbot uses G1 for travel as well as extrude, so need to be able to override this
         public int TravelGCode = 0;
 
-        public bool OmitDuplicateZ = false;
-        public bool OmitDuplicateF = false;
-        public bool OmitDuplicateE = false;
+        public bool OmitDuplicateXY { get; set; } = false;
+        public bool OmitDuplicateZ { get; set; } = false;
+        public bool OmitDuplicateF { get; set; } = false;
+        public bool OmitDuplicateE { get; set; } = false;
 
         // threshold for omitting "duplicate" Z/F/E parameters
         public double MoveEpsilon = 0.00001;
@@ -191,6 +192,8 @@ namespace gs
             get { return InTravel == false; }
         }
 
+        public string ExtrudeParamString => ExtrudeParam == ExtrudeParamType.ExtrudeParamA ? "A" : "E";
+
         /*
          * Code below is all to support MinExtrudeStepDistance > 0
          * In that case, we want to only emit the next gcode extrusion point once we have travelled
@@ -218,7 +221,6 @@ namespace gs
             public Vector3d toPos;
             public double feedRate;
             public double extruderA;
-            public char extrudeChar;
             public string comment;
 
             static public QueuedExtrude lerp(ref QueuedExtrude a, ref QueuedExtrude b, double t)
@@ -227,7 +229,6 @@ namespace gs
                 newp.toPos = Vector3d.Lerp(a.toPos, b.toPos, t);
                 newp.feedRate = Math.Max(a.feedRate, b.feedRate);
                 newp.extruderA = MathUtil.Lerp(a.extruderA, b.extruderA, t);
-                newp.extrudeChar = a.extrudeChar;
                 newp.comment = (a.comment == null) ? a.comment : b.comment;
                 return newp;
             }
@@ -258,24 +259,19 @@ namespace gs
             double write_x = toPos.x + PositionShift.x;
             double write_y = toPos.y + PositionShift.y;
 
-            Builder.BeginGLine(TravelGCode, comment).
-                   AppendF("X", write_x).AppendF("Y", write_y);
+            Builder.BeginGLine(TravelGCode, comment);
 
-            if (OmitDuplicateZ == false || MathUtil.EpsilonEqual(currentPos.z, toPos.z, MoveEpsilon) == false)
-            {
-                Builder.AppendF("Z", toPos.z);
-            }
-            if (OmitDuplicateF == false || MathUtil.EpsilonEqual(currentFeed, feedRate, MoveEpsilon) == false)
-            {
-                Builder.AppendF("F", feedRate);
-            }
+            BuildXParameter(toPos.x);
+            BuildYParameter(toPos.y);
+            BuildZParameter(toPos.z);
+            BuildFeedrateParameter(feedRate);
 
             currentPos = toPos;
             currentFeed = feedRate;
         }
 
         // push an extrude move onto queue
-        protected virtual void queue_extrude(Vector3d toPos, double feedRate, double e, char extrudeChar, string comment, bool bIsRetract)
+        protected virtual void queue_extrude(Vector3d toPos, double feedRate, double e, string comment, bool bIsRetract)
         {
             Util.gDevAssert(InExtrude || bIsRetract);
             if (EnableBoundsChecking && PositionBounds.Contains(toPos.xy) == false)
@@ -288,7 +284,6 @@ namespace gs
                 toPos = toPos,
                 feedRate = feedRate,
                 extruderA = e,
-                extrudeChar = extrudeChar,
                 comment = comment
             };
 
@@ -341,37 +336,24 @@ namespace gs
 
             // now we re-submit last point. This pushes the remaining bit of the last segment
             // back onto the queue. (should we skip this if t > nearly-one?)
-            queue_extrude(last_p.toPos, last_p.feedRate, last_p.extruderA, last_p.extrudeChar, last_p.comment, false);
+            queue_extrude(last_p.toPos, last_p.feedRate, last_p.extruderA, last_p.comment, false);
         }
 
         protected virtual void queue_extrude_to(Vector3d toPos, double feedRate, double extrudeDist, string comment, bool bIsRetract)
         {
-            if (ExtrudeParam == ExtrudeParamType.ExtrudeParamA)
-                queue_extrude(toPos, feedRate, extrudeDist, 'A', comment, bIsRetract);
-            else
-                queue_extrude(toPos, feedRate, extrudeDist, 'E', comment, bIsRetract);
+            queue_extrude(toPos, feedRate, extrudeDist, comment, bIsRetract);
         }
 
         // emit gcode for an extrude move
         protected virtual void emit_extrude(QueuedExtrude p)
         {
-            double write_x = p.toPos.x + PositionShift.x;
-            double write_y = p.toPos.y + PositionShift.y;
-            Builder.BeginGLine(1, p.comment).
-                   AppendF("X", write_x).AppendF("Y", write_y);
+            Builder.BeginGLine(1, p.comment);
 
-            if (OmitDuplicateZ == false || MathUtil.EpsilonEqual(p.toPos.z, currentPos.z, MoveEpsilon) == false)
-            {
-                Builder.AppendF("Z", p.toPos.z);
-            }
-            if (OmitDuplicateF == false || MathUtil.EpsilonEqual(p.feedRate, currentFeed, MoveEpsilon) == false)
-            {
-                Builder.AppendF("F", p.feedRate);
-            }
-            if (OmitDuplicateE == false || MathUtil.EpsilonEqual(p.extruderA, extruderA, MoveEpsilon) == false)
-            {
-                Builder.AppendF(p.extrudeChar.ToString(), p.extruderA);
-            }
+            BuildXParameter(p.toPos.x);
+            BuildYParameter(p.toPos.x);
+            BuildZParameter(p.toPos.x);
+            BuildFeedrateParameter(p.feedRate);
+            BuildExtrudeParameter(p.extruderA);
 
             currentPos = p.toPos;
             currentFeed = p.feedRate;
@@ -383,14 +365,8 @@ namespace gs
         {
             Builder.BeginGLine(1, p.comment);
 
-            if (OmitDuplicateF == false || MathUtil.EpsilonEqual(p.feedRate, currentFeed, MoveEpsilon) == false)
-            {
-                Builder.AppendF("F", p.feedRate);
-            }
-            if (OmitDuplicateE == false || MathUtil.EpsilonEqual(p.extruderA, extruderA, MoveEpsilon) == false)
-            {
-                Builder.AppendF(p.extrudeChar.ToString(), p.extruderA);
-            }
+            BuildFeedrateParameter(p.feedRate);
+            BuildExtrudeParameter(p.extruderA);
 
             currentPos = p.toPos;
             currentFeed = p.feedRate;
@@ -419,6 +395,40 @@ namespace gs
             extrude_queue_len = 0;
         }
 
+        protected void BuildXParameter(double x)
+        {
+            if (!OmitDuplicateXY || !MathUtil.EpsilonEqual(currentPos.x, x, MoveEpsilon))
+                Builder.AppendF("X", x + PositionShift.x);
+        }
+
+        protected void BuildYParameter(double y)
+        {
+            if (!OmitDuplicateXY || !MathUtil.EpsilonEqual(currentPos.y, y, MoveEpsilon))
+                Builder.AppendF("Y", y + PositionShift.y);
+        }
+
+        protected void BuildZParameter(double z)
+        {
+            if (!OmitDuplicateZ || !MathUtil.EpsilonEqual(currentPos.z, z, MoveEpsilon))
+                Builder.AppendF("Z", z);
+        }
+
+        protected void BuildFeedrateParameter(double feedRate)
+        {
+            if (!OmitDuplicateF || !MathUtil.EpsilonEqual(currentFeed, feedRate, MoveEpsilon))
+            {
+                Builder.AppendF("F", feedRate);
+            }
+        }
+
+        protected void BuildExtrudeParameter(double extrude)
+        {
+            if (!OmitDuplicateE || MathUtil.EpsilonEqual(extrude, extruderA, MoveEpsilon) == false)
+            {
+                Builder.AppendF(ExtrudeParamString, extrude);
+            }
+        }
+
         /*
          * Assembler API that Compiler uses
          */
@@ -435,30 +445,17 @@ namespace gs
 
         public virtual void AppendExtrudeTo(Vector3d pos, double feedRate, double extrudeDist, string comment = null)
         {
-            if (ExtrudeParam == ExtrudeParamType.ExtrudeParamA)
-                AppendMoveToA(pos, feedRate, extrudeDist, comment);
-            else
-                AppendMoveToE(pos, feedRate, extrudeDist, comment);
+            AppendMoveToE(pos, feedRate, extrudeDist, comment);
         }
 
         protected virtual void AppendMoveToE(double x, double y, double z, double f, double e, string comment = null)
         {
-            queue_extrude(new Vector3d(x, y, z), f, e, 'E', comment, InRetract);
+            queue_extrude(new Vector3d(x, y, z), f, e, comment, InRetract);
         }
 
         protected virtual void AppendMoveToE(Vector3d pos, double f, double e, string comment = null)
         {
             AppendMoveToE(pos.x, pos.y, pos.z, f, e, comment);
-        }
-
-        protected virtual void AppendMoveToA(double x, double y, double z, double f, double a, string comment = null)
-        {
-            queue_extrude(new Vector3d(x, y, z), f, a, 'A', comment, false);
-        }
-
-        protected virtual void AppendMoveToA(Vector3d pos, double f, double a, string comment = null)
-        {
-            AppendMoveToA(pos.x, pos.y, pos.z, f, a, comment);
         }
 
         public virtual void BeginRetractRelativeDist(Vector3d pos, double feedRate, double extrudeDelta, string comment = null)
