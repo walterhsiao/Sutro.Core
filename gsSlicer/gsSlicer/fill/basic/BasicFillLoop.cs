@@ -11,8 +11,8 @@ namespace gs
         public BasicFillLoop(IEnumerable<Vector2d> vertices)
         {
             var vertexEnumerator = vertices.GetEnumerator();
-            BeginLoop(vertexEnumerator.Current);
             vertexEnumerator.MoveNext();
+            BeginLoop(vertexEnumerator.Current);
 
             while (vertexEnumerator.MoveNext())
                 AddToLoop(vertexEnumerator.Current);

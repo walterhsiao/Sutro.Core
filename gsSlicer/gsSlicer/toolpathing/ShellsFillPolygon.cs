@@ -335,8 +335,14 @@ namespace gs
 
             if (FilterSelfOverlaps == false)
             {
-                foreach (GeneralPolygon2d shell in shell_polys)
-                    paths.Append(shell, fillType);
+                foreach (var shell in shell_polys)
+                {
+                    paths.Append(new BasicFillLoop(shell.Outer.Vertices) { FillType = fillType });
+                    foreach (var hole in shell.Holes)
+                    {
+                        paths.Append(new BasicFillLoop(hole.Vertices) { FillType = fillType, IsHoleShell = true }); ;
+                    }
+                }
                 return paths;
             }
 
