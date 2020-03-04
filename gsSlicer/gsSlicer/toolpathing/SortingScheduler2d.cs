@@ -80,10 +80,12 @@ namespace gs
                         int iStart = idx.c;
                         BasicFillLoop o = new BasicFillLoop();
                         int N = loop.curve.VertexCount;
-                        for (int i = 0; i < N; ++i)
+                        o.BeginLoop(loop.curve[iStart]);
+                        for (int i = 1; i < N; ++i)
                         {
-                            o.AppendVertex(loop.curve[(i + iStart) % N]);
+                            o.AddToLoop(loop.curve[(i + iStart) % N]);
                         }
+                        o.CloseLoop();
                         o.FillType = loop.curve.FillType;
                         paths.Append(o);
                         OutPoint = o[0];
@@ -243,7 +245,7 @@ namespace gs
             if (idx.a == 0)
             { // loop
                 PathLoop loop = Loops[idx.b];
-                return loop.curve.Segment(idx.c).Center;
+                return loop.curve.SegmentAfterIndex(idx.c).Center;
             }
             else
             {  // span

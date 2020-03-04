@@ -7,11 +7,17 @@ namespace gs
     {
         public BasicFillLoop()
         { }
-
+ 
         public BasicFillLoop(IEnumerable<Vector2d> vertices)
         {
-            foreach (var v in vertices)
-                AppendVertex(v);
+            var vertexEnumerator = vertices.GetEnumerator();
+            BeginLoop(vertexEnumerator.Current);
+            vertexEnumerator.MoveNext();
+
+            while (vertexEnumerator.MoveNext())
+                AddToLoop(vertexEnumerator.Current);
+
+            CloseLoop();
         }
     }
 }

@@ -25,6 +25,8 @@ namespace gs
         public Vector2d End { get => Polyline.Vertices[Polyline.VertexCount - 1]; }
         public Vector2d Start { get => Polyline.Vertices[0]; }
         public int VertexCount { get => Polyline.VertexCount; }
+        public int SegmentCount { get => SegmentInfo.Count; }
+
         public IEnumerable<Vector2d> Vertices { get => Polyline.Vertices; }
         public Vector2d this[int i] { get => Polyline[i]; }
 
@@ -68,6 +70,16 @@ namespace gs
             }
         }
 
+        public TSegmentInfo GetSegmentAfterVertex(int vertexIndex)
+        {
+            return SegmentInfo[vertexIndex];
+        }
+        
+        public TSegmentInfo GetSegmentBeforeVertex(int vertexIndex)
+        {
+            return SegmentInfo[vertexIndex - 1];
+        }
+
         public void Reverse()
         {
             // Reverse Lists
@@ -78,6 +90,16 @@ namespace gs
             // Reverse each segment in case segment data is directional
             foreach (var seg in SegmentInfo)
                 seg?.Reverse();
+        }
+
+        public void UpdateSegmentData(int vertexIndex, TSegmentInfo segmentInfo)
+        {
+            SegmentInfo[vertexIndex] = segmentInfo;
+        }
+
+        public void UpdateVertexData(int vertexIndex, TVertexInfo vertexInfo)
+        {
+            VertexInfo[vertexIndex] = vertexInfo;
         }
 
         public Segment2d Segment(int i)
