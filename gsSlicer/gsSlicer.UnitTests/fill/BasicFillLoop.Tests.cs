@@ -22,8 +22,8 @@ namespace gsSlicer.UnitTests.fill
             // Arrange
             var vertices = new List<Vector2d>()
             {
-                new Vector2d(0,0),
-                new Vector2d(3,0),
+                new Vector2d(2,0),
+                new Vector2d(2,4),
                 new Vector2d(0,4)
             };
 
@@ -33,6 +33,7 @@ namespace gsSlicer.UnitTests.fill
             // Assert
             Assert.AreEqual(3, loop.VertexCount);
             Assert.AreEqual(3, loop.SegmentCount);
+            Assert.AreEqual(2, loop[0].x);
         }
     }
 }
