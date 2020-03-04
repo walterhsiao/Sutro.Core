@@ -1,7 +1,6 @@
 ﻿using g3;
 using gs;
 using gsCore.FunctionalTests.Models;
-using Sutro.PathWorks.Plugins.API;
 using System.Collections.Generic;
 
 namespace gsCore.FunctionalTests.Utility

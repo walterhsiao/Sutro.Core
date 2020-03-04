@@ -51,11 +51,11 @@ namespace gs
 
             foreach (FillCurveSet2d polySet in paths)
             {
-                foreach (FillPolygon2d loop in polySet.Loops)
+                foreach (BasicFillLoop loop in polySet.Loops)
                 {
                     AppendPolygon2d(loop);
                 }
-                foreach (FillPolyline2d curve in polySet.Curves)
+                foreach (BasicFillCurve curve in polySet.Curves)
                 {
                     AppendPolyline2d(curve);
                 }
@@ -63,7 +63,7 @@ namespace gs
         }
 
         // [TODO] no reason we couldn't start on edge midpoint??
-        public virtual void AppendPolygon2d(FillPolygon2d poly)
+        public virtual void AppendPolygon2d(BasicFillLoop poly)
         {
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;
@@ -132,7 +132,7 @@ namespace gs
         }
 
         // [TODO] would it ever make sense to break polyline to avoid huge travel??
-        public virtual void AppendPolyline2d(FillPolyline2d curve)
+        public virtual void AppendPolyline2d(BasicFillCurve curve)
         {
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;

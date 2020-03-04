@@ -1,5 +1,4 @@
-﻿using Sutro.PathWorks.Plugins.API;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 

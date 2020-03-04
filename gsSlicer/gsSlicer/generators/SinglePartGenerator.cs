@@ -1,5 +1,4 @@
 ﻿using g3;
-using Sutro.PathWorks.Plugins.API;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +6,7 @@ using System.Reflection;
 
 namespace gs
 {
-    public class SinglePartGenerator<TPrintGenerator, TPrintSettings> : IGenerator<TPrintSettings>
+    public class SinglePartGenerator<TPrintGenerator, TPrintSettings>
             where TPrintGenerator : IPrintGenerator<TPrintSettings>, new()
             where TPrintSettings : IPlanarAdditiveSettings
     {

@@ -1,6 +1,5 @@
 using g3;
 using gs.FillTypes;
-using Sutro.PathWorks.Plugins.API;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -142,7 +141,7 @@ namespace gs
 
         // this is called on polyline paths, return *true* to filter out a path. Useful for things like very short segments, etc
         // In default Initialize(), is set to a constant multiple of tool size
-        public Func<FillPolyline2d, bool> PathFilterF = null;
+        public Func<BasicFillCurve, bool> PathFilterF = null;
 
         // Called after we have finished print generation, use this to post-process the paths, etc.
         // By default appends a comment block with print time & material usage statistics
@@ -1015,7 +1014,7 @@ namespace gs
             FillCurveSet2d paths = new FillCurveSet2d();
             for (int pi = 0; pi < slice.Paths.Count; ++pi)
             {
-                FillPolyline2d pline = new FillPolyline2d(slice.Paths[pi])
+                BasicFillCurve pline = new BasicFillCurve(slice.Paths[pi])
                 {
                     FillType = new OpenShellCurveFillType()
                 };

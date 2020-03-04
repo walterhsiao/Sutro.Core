@@ -1,6 +1,5 @@
 ﻿using g3;
 using Newtonsoft.Json;
-using Sutro.PathWorks.Plugins.API;
 using System;
 using System.Collections.Generic;
 
@@ -112,7 +111,7 @@ namespace gs
         public abstract AssemblerFactoryF AssemblerType();
     }
 
-    public class SingleMaterialFFFSettings : PlanarAdditiveSettings, IProfile
+    public class SingleMaterialFFFSettings : PlanarAdditiveSettings
     {
         // This is a bit of an odd place for this, but settings are where we actually
         // know what assembler we should be using...
@@ -214,11 +213,6 @@ namespace gs
         public double MachineBedSizeZMM => Machine.MaxHeightMM;
         public double MachineBedOriginFactorX => Machine.BedOriginFactorX;
         public double MachineBedOriginFactorY => Machine.BedOriginFactorY;
-
-        public virtual IProfile Clone()
-        {
-            return CloneAs<SingleMaterialFFFSettings>();
-        }
 
         /*
          * Shells

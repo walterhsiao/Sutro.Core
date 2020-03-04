@@ -10,8 +10,8 @@ namespace gs
     /// </summary>
 	public class FillCurveSet2d
     {
-        public List<IFillElementPolygon> Loops = new List<IFillElementPolygon>();
-        public List<IFillElementPolyline> Curves = new List<IFillElementPolyline>();
+        public List<IFillLoop> Loops = new List<IFillLoop>();
+        public List<IFillCurve> Curves = new List<IFillCurve>();
 
         public FillCurveSet2d()
         {
@@ -19,9 +19,9 @@ namespace gs
 
         public void Append(GeneralPolygon2d poly, IFillType fillType)
         {
-            Loops.Add(new FillPolygon2d(poly.Outer.VerticesItr(false)) { FillType = fillType });
+            Loops.Add(new BasicFillLoop(poly.Outer.VerticesItr(false)) { FillType = fillType });
             foreach (var h in poly.Holes)
-                Loops.Add(new FillPolygon2d(h.VerticesItr(false)) { FillType = fillType });
+                Loops.Add(new BasicFillLoop(h.VerticesItr(false)) { FillType = fillType });
         }
 
         public void Append(List<GeneralPolygon2d> polys, IFillType fillType)
@@ -32,7 +32,7 @@ namespace gs
 
         public void Append(Polygon2d poly, IFillType fillType)
         {
-            Loops.Add(new FillPolygon2d(poly.VerticesItr(false)) { FillType = fillType });
+            Loops.Add(new BasicFillLoop(poly.VerticesItr(false)) { FillType = fillType });
         }
 
         public void Append(List<Polygon2d> polys, IFillType fillType)
@@ -41,23 +41,23 @@ namespace gs
                 Append(p, fillType);
         }
 
-        public void Append(IFillElementPolygon loop)
+        public void Append(IFillLoop loop)
         {
             Loops.Add(loop);
         }
 
-        public void Append(List<IFillElementPolygon> loops)
+        public void Append(List<IFillLoop> loops)
         {
             foreach (var l in loops)
                 Loops.Add(l);
         }
 
-        public void Append(IFillElementPolyline curve)
+        public void Append(IFillCurve curve)
         {
             Curves.Add(curve);
         }
 
-        public void Append(List<IFillElementPolyline> curves)
+        public void Append(List<IFillCurve> curves)
         {
             foreach (var p in curves)
                 Append(p);

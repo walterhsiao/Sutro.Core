@@ -1,7 +1,6 @@
 ﻿using gs;
-using gsGCode.builders.mockClasses;
+using gsGCode.Tests.Mocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Sutro.PathWorks.Plugins.API;
 using System;
 
 namespace gsCore.UnitTests
@@ -12,7 +11,7 @@ namespace gsCore.UnitTests
         [TestMethod()]
         public void AddLine()
         {
-            MockIGCodeAccumulator mockGCA = new MockIGCodeAccumulator();
+            MockGCodeAccumulator mockGCA = new MockGCodeAccumulator();
             GCodeBuilder gcb = new GCodeBuilder(mockGCA);
 
             GCodeLine l = new GCodeLine(100, GCodeLine.LType.Comment);
@@ -41,7 +40,7 @@ namespace gsCore.UnitTests
         [TestMethod()]
         public void AddCommentLine()
         {
-            MockIGCodeAccumulator mockGCA = new MockIGCodeAccumulator();
+            MockGCodeAccumulator mockGCA = new MockGCodeAccumulator();
             GCodeBuilder gcb = new GCodeBuilder(mockGCA);
 
             gcb.AddCommentLine("comment");
@@ -54,7 +53,7 @@ namespace gsCore.UnitTests
         [TestMethod()]
         public void AddExplicitLine()
         {
-            MockIGCodeAccumulator mockGCA = new MockIGCodeAccumulator();
+            MockGCodeAccumulator mockGCA = new MockGCodeAccumulator();
             GCodeBuilder gcb = new GCodeBuilder(mockGCA);
 
             gcb.AddExplicitLine("explicit");
@@ -68,7 +67,7 @@ namespace gsCore.UnitTests
         [TestMethod()]
         public void BeginAndEndGLine()
         {
-            MockIGCodeAccumulator mockGCA = new MockIGCodeAccumulator();
+            MockGCodeAccumulator mockGCA = new MockGCodeAccumulator();
             GCodeBuilder gcb = new GCodeBuilder(mockGCA);
 
             gcb.BeginGLine(1, "comment");
@@ -84,7 +83,7 @@ namespace gsCore.UnitTests
         [TestMethod()]
         public void BeginAndEndMLine()
         {
-            MockIGCodeAccumulator mockGCA = new MockIGCodeAccumulator();
+            MockGCodeAccumulator mockGCA = new MockGCodeAccumulator();
             GCodeBuilder gcb = new GCodeBuilder(mockGCA);
 
             gcb.BeginMLine(1, "comment");
@@ -100,7 +99,7 @@ namespace gsCore.UnitTests
         [TestMethod()]
         public void BeginGLineAndAppend()
         {
-            MockIGCodeAccumulator mockGCA = new MockIGCodeAccumulator();
+            MockGCodeAccumulator mockGCA = new MockGCodeAccumulator();
             GCodeBuilder gcb = new GCodeBuilder(mockGCA);
 
             gcb.BeginGLine(1, "comment");
@@ -137,7 +136,7 @@ namespace gsCore.UnitTests
         [ExpectedException(typeof(Exception))]
         public void AddCommentToNullLine()
         {
-            MockIGCodeAccumulator mockGCA = new MockIGCodeAccumulator();
+            MockGCodeAccumulator mockGCA = new MockGCodeAccumulator();
             GCodeBuilder gcb = new GCodeBuilder(mockGCA);
 
             gcb.AppendComment("addingComment");
