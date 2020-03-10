@@ -193,7 +193,9 @@ namespace gs
         public double RapidExtrudeSpeed = 90 * 60;      // 5400
         public double MinExtrudeSpeed = 20 * 60;        // 600
 
-        public double OuterPerimeterSpeedX = 0.5;
+        public double OuterPerimeterSpeedX { get; set; } = 0.5;
+        public double InnerPerimeterSpeedX { get; set; } = 1;
+        public double SolidFillSpeedX { get; set; } = 1;
 
         public double FanSpeedX = 1.0;                  // default fan speed, fraction of max speed (generally unknown)
 
@@ -310,6 +312,7 @@ namespace gs
         private int LayerRangeFilterMin { get { return LayerRangeFilter.a; } set { LayerRangeFilter.a = value; } }
 
         private int LayerRangeFilterMax { get { return LayerRangeFilter.b; } set { LayerRangeFilter.b = value; } }
+
 
         public bool RepairMesh = true;                  // run a mesh auto-repair after it's been loaded
 

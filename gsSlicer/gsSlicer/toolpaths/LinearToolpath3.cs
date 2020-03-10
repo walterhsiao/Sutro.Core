@@ -12,6 +12,8 @@ namespace gs
         private ToolpathTypes _pathtype;	// access via Type property
         public IFillType FillType { get; set; } = new DefaultFillType();
 
+        public bool IsHole { get; set; } = false;
+
         // todo: add speed
         //  ?? extend PolyLine3d ??
 

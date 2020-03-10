@@ -2,7 +2,7 @@
 
 namespace gs
 {
-    public class BasicSegmentInfo : ICloneable
+    public class BasicSegmentInfo
     {
         public bool IsConnector;
 
@@ -11,7 +11,7 @@ namespace gs
             return (BasicSegmentInfo)this.MemberwiseClone();
         }
 
-        public void Reverse()
+        public virtual void Reverse()
         {
         }
     }

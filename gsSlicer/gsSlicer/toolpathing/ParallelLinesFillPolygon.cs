@@ -146,7 +146,7 @@ namespace gs
 
                 BasicFillCurve path = new BasicFillCurve() { FillType = this.FillType };
 
-                path.AppendVertex(pathGraph.GetVertex(vid));
+                path.BeginCurve(pathGraph.GetVertex(vid));
                 while (true)
                 {
                     Index2i next = DGraph2Util.NextEdgeAndVtx(eid, vid, pathGraph);
@@ -155,11 +155,11 @@ namespace gs
                     int gid = pathGraph.GetEdgeGroup(eid);
                     if (gid < 0)
                     {
-                        path.AppendVertex(pathGraph.GetVertex(vid), new BasicSegmentInfo() { IsConnector = true });
+                        path.AddToCurve(pathGraph.GetVertex(vid), null, new BasicSegmentInfo() { IsConnector = true });
                     }
                     else
                     {
-                        path.AppendVertex(pathGraph.GetVertex(vid));
+                        path.AddToCurve(pathGraph.GetVertex(vid));
                     }
 
                     if (boundaries.Contains(vid))

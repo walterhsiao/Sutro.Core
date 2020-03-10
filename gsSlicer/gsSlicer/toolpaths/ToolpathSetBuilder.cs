@@ -131,13 +131,13 @@ namespace gs
         }
 
         public virtual Vector3d AppendExtrude(List<Vector2d> toPoints, double fSpeed,
-            IFillType fillType, List<TPVertexFlags> perVertexFlags = null)
+            IFillType fillType, List<TPVertexFlags> perVertexFlags = null, bool isHole = false)
         {
-            return AppendExtrude(toPoints, fSpeed, currentDims, fillType, perVertexFlags);
+            return AppendExtrude(toPoints, fSpeed, currentDims, fillType, perVertexFlags, isHole);
         }
 
         public virtual Vector3d AppendExtrude(List<Vector2d> toPoints, double fSpeed,
-            Vector2d dimensions, IFillType fillType, List<TPVertexFlags> perVertexFlags = null)
+            Vector2d dimensions, IFillType fillType, List<TPVertexFlags> perVertexFlags = null, bool isHole = false)
         {
             Vector2d useDims = currentDims;
             if (dimensions.x > 0 && dimensions.x != NO_DIM.x)
@@ -146,8 +146,9 @@ namespace gs
                 useDims.y = dimensions.y;
 
             LinearToolpath extrusion = new LinearToolpath(MoveType);
-
             extrusion.FillType = fillType;
+            extrusion.IsHole = isHole;
+
             extrusion.AppendVertex(new PrintVertex(currentPos, NO_RATE, useDims), TPVertexFlags.IsPathStart);
 
             for (int k = 1; k < toPoints.Count; ++k)

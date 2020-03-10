@@ -2,7 +2,6 @@
 using gs.FillTypes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace gs
 {
@@ -44,33 +43,50 @@ namespace gs
             set { speed_hint = value; }
         }
 
-        public virtual void AppendCurveSets(List<FillCurveSet2d> paths)
+        protected virtual void AppendFill(IFillElement fill)
         {
-            if (OnAppendCurveSetsF != null)
-                OnAppendCurveSetsF(paths, this);
-
-            foreach (FillCurveSet2d polySet in paths)
+            switch (fill)
             {
-                foreach (BasicFillLoop loop in polySet.Loops)
-                {
-                    AppendPolygon2d(loop);
-                }
-                foreach (BasicFillCurve curve in polySet.Curves)
-                {
-                    AppendPolyline2d(curve);
-                }
+                case BasicFillLoop basicFillLoop:
+                    AppendBasicFillLoop(basicFillLoop);
+                    break;
+                case BasicFillCurve basicFillCurve:
+                    AppendBasicFillCurve(basicFillCurve);
+                    break;
+                default:
+                    throw new NotImplementedException($"{fill.GetType()} not supported by {nameof(SequentialScheduler2d)}");
             }
         }
 
+        public virtual void AppendCurveSets(List<FillCurveSet2d> fillSets)
+        {
+            OnAppendCurveSetsF?.Invoke(fillSets, this);
+            foreach (var fill in FlattenFillCurveSets(fillSets))
+            {
+                AppendFill(fill);
+            }
+        }
+
+        protected static List<IFillElement> FlattenFillCurveSets(List<FillCurveSet2d> fillSets)
+        {
+            var fillElements = new List<IFillElement>();
+
+            foreach (var fills in fillSets)
+            {
+                fillElements.AddRange(fills.Loops);
+                fillElements.AddRange(fills.Curves);
+            }
+
+            return fillElements;
+        }
+
         // [TODO] no reason we couldn't start on edge midpoint??
-        public virtual void AppendPolygon2d(BasicFillLoop poly)
+        public virtual void AppendBasicFillLoop(BasicFillLoop poly)
         {
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;
 
-            int N = poly.VertexCount;
-            if (N < 2)
-                throw new Exception("PathScheduler.AppendPolygon2d: degenerate curve!");
+            AssertValidLoop(poly, "AppendBasicFillLoop");
 
             int startIndex;
             if (Settings.ZipperAlignedToPoint && poly.FillType.IsEntryLocationSpecified())
@@ -95,10 +111,10 @@ namespace gs
 
             AppendTravel(currentPos2, startPt);
 
-            List<Vector2d> loopV = new List<Vector2d>(N + 1);
-            for (int i = 0; i <= N; i++)
+            List<Vector2d> loopV = new List<Vector2d>(poly.VertexCount + 1);
+            for (int i = 0; i <= poly.VertexCount; i++)
             {
-                int k = (startIndex + i) % N;
+                int k = (startIndex + i) % poly.VertexCount;
                 loopV.Add(poly[k]);
             }
 
@@ -132,13 +148,12 @@ namespace gs
         }
 
         // [TODO] would it ever make sense to break polyline to avoid huge travel??
-        public virtual void AppendPolyline2d(BasicFillCurve curve)
+        public virtual void AppendBasicFillCurve(BasicFillCurve curve)
         {
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;
 
-            if (curve.VertexCount < 2)
-                throw new Exception("PathScheduler.AppendPolyline2d: degenerate curve!");
+            AssertValidCurve(curve, "AppendBasicFillCurve");
 
             if (curve.Start.DistanceSquared(currentPos2) > curve.End.DistanceSquared(currentPos2))
             {
@@ -181,6 +196,20 @@ namespace gs
                 Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;
 
             return pathCurve.FillType.ModifySpeed(speed, SpeedHint);
+        }
+
+        protected void AssertValidCurve(IFillCurve curve, string methodName)
+        {
+            int N = curve.VertexCount;
+            if (N < 2)
+                throw new Exception($"{GetType().AssemblyQualifiedName}.{methodName}: degenerate curve!");
+        }
+
+        protected void AssertValidLoop(IFillLoop curve, string methodName)
+        {
+            int N = curve.VertexCount;
+            if (N < 3)
+                throw new Exception($"{GetType().AssemblyQualifiedName}.{methodName}: degenerate loop!");
         }
     }
 }

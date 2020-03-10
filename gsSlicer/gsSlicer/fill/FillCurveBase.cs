@@ -30,20 +30,53 @@ namespace gs
         public IEnumerable<Vector2d> Vertices { get => Polyline.Vertices; }
         public Vector2d this[int i] { get => Polyline[i]; }
 
-        public void AppendVertex(Vector2d pt, TVertexInfo vInfo = null, TSegmentInfo sInfo = null)
+        private bool curveStarted = false;
+
+        protected FillCurveBase()
+        {
+
+        }
+
+        protected FillCurveBase(FillCurveBase<TVertexInfo, TSegmentInfo> other)
+        {
+            FillType = other.FillType;
+            CustomThickness = other.CustomThickness;
+        }
+
+        public void BeginOrAppendCurve(Vector2d pt, TVertexInfo vInfo = null)
         {
             Polyline.AppendVertex(pt);
             VertexInfo.Add(vInfo);
-
-            if (Polyline.VertexCount > 0)
-                SegmentInfo.Add(sInfo);
-            else if (sInfo != null)
-                throw new Exception("Cannot add SegmentInfo to the first vertex.");
+            if (curveStarted)
+            {
+                SegmentInfo.Add(null);
+            }
+            else
+            {
+                curveStarted = true;
+            }
         }
 
-        public void AppendVertex(Vector2d pt, TSegmentInfo sInfo)
+        public void BeginCurve(Vector2d pt, TVertexInfo vInfo = null)
         {
-            AppendVertex(pt, null, sInfo);
+            if (curveStarted)
+                throw new MethodAccessException("BeginCurve called more than once.");
+
+            curveStarted = true;
+
+            Polyline.AppendVertex(pt);
+            VertexInfo.Add(vInfo);
+
+        }
+
+        public void AddToCurve(Vector2d pt, TVertexInfo vInfo = null, TSegmentInfo sInfo = null)
+        {
+            if (!curveStarted)
+                throw new MethodAccessException("AddToCurve called before BeginCurve.");
+
+            Polyline.AppendVertex(pt);
+            VertexInfo.Add(vInfo);
+            SegmentInfo.Add(sInfo);
         }
 
         public PointData GetPoint(int i, bool reverse)
@@ -70,12 +103,27 @@ namespace gs
             }
         }
 
-        public TSegmentInfo GetSegmentAfterVertex(int vertexIndex)
+        public TVertexInfo GetVertexData(int vertexIndex)
+        {
+            return VertexInfo[vertexIndex];
+        }
+
+        public Segment2d GetSegment2dAfterVertex(int vertexIndex)
+        {
+            return Polyline.Segment(vertexIndex);
+        }
+
+        public Segment2d GetSegment2dBeforeVertex(int vertexIndex)
+        {
+            return Polyline.Segment(vertexIndex - 1);
+        }
+
+        public TSegmentInfo GetSegmentDataAfterVertex(int vertexIndex)
         {
             return SegmentInfo[vertexIndex];
         }
         
-        public TSegmentInfo GetSegmentBeforeVertex(int vertexIndex)
+        public TSegmentInfo GetSegmentDataBeforeVertex(int vertexIndex)
         {
             return SegmentInfo[vertexIndex - 1];
         }
@@ -102,9 +150,10 @@ namespace gs
             VertexInfo[vertexIndex] = vertexInfo;
         }
 
-        public Segment2d Segment(int i)
+        public void TrimEnd(double d)
         {
-            return Polyline.Segment(i);
+            throw new NotImplementedException();
         }
+
     }
 }

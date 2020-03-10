@@ -802,7 +802,7 @@ namespace gs
 
         protected virtual void fill_solid_region(PrintLayerData layer_data, GeneralPolygon2d fillPoly, IFillPathScheduler2d scheduler)
         {
-            ICurvesFillPolygon solid_gen = new ParallelLinesFillPolygon(fillPoly, new SolidFillType())
+            ICurvesFillPolygon solid_gen = new ParallelLinesFillPolygon(fillPoly, new SolidFillType(Settings.SolidFillSpeedX))
             {
                 InsetFromInputPolygon = false,
                 PathSpacing = Settings.SolidFillPathSpacingMM(),

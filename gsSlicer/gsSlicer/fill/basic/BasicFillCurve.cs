@@ -10,8 +10,12 @@ namespace gs
 
         public BasicFillCurve(IEnumerable<Vector2d> vertices)
         {
-            foreach (var v in vertices)
-                AppendVertex(v);
+            var vertexEnumerator = vertices.GetEnumerator();
+            vertexEnumerator.MoveNext();
+            BeginOrAppendCurve(vertexEnumerator.Current);
+
+            while (vertexEnumerator.MoveNext())
+                BeginOrAppendCurve(vertexEnumerator.Current);
         }
 
         public void Trim(double v)

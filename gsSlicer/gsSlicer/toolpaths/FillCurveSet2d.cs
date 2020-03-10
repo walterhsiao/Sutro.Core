@@ -13,10 +13,6 @@ namespace gs
         public List<IFillLoop> Loops = new List<IFillLoop>();
         public List<IFillCurve> Curves = new List<IFillCurve>();
 
-        public FillCurveSet2d()
-        {
-        }
-
         public void Append(GeneralPolygon2d poly, IFillType fillType)
         {
             Loops.Add(new BasicFillLoop(poly.Outer.VerticesItr(false)) { FillType = fillType });

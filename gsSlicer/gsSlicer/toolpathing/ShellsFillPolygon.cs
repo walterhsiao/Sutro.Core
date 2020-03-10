@@ -318,7 +318,7 @@ namespace gs
                 if (nShell == 0)
                     fillType = new OuterPerimeterFillType(settings);
                 else
-                    fillType = new InnerPerimeterFillType();
+                    fillType = new InnerPerimeterFillType(settings);
             }
             else if (ShellType == ShellTypes.InternalShell)
             {
@@ -477,7 +477,7 @@ namespace gs
             if (nClipped == 0)
             {
                 BasicFillCurve all = new BasicFillCurve(midline);
-                all.AppendVertex(all.Start);
+                all.BeginOrAppendCurve(all.Start);
                 return new List<BasicFillCurve>() { all };
             }
 
@@ -510,7 +510,7 @@ namespace gs
                 BasicFillCurve cur = new BasicFillCurve();
                 do
                 {
-                    cur.AppendVertex(poly[iCur]);
+                    cur.BeginOrAppendCurve(poly[iCur]);
                     iCur = (iCur + 1) % poly.Length;
                 } while (clipped[iCur] == false && iCur != iStart);
 

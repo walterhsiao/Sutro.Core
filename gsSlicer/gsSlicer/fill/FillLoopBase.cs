@@ -32,6 +32,22 @@ namespace gs
         private bool loopStarted = false;
         private bool loopFinished = false;
 
+
+        public void BeginOrAppendCurve(Vector2d pt, TVertexInfo vInfo = null)
+        {
+            Polygon.AppendVertex(pt);
+            VertexInfo.Add(vInfo);
+            if (loopStarted)
+            {
+                SegmentInfo.Add(null);
+            }
+            else
+            {
+                loopStarted = true;
+            }
+        }
+
+
         public void BeginLoop(Vector2d pt, TVertexInfo vInfo = null)
         {
             if (loopStarted)
@@ -74,6 +90,11 @@ namespace gs
             return Polygon.DistanceSquared(pt, out iNearSeg, out fNearSegT);
         }
 
+        public void Roll(int i)
+        {
+            throw new NotImplementedException();
+        }
+
         public PointData GetPoint(int i, bool reverse)
         {
             if (reverse)
@@ -98,22 +119,35 @@ namespace gs
             }
         }
 
-        public TVertexInfo GetDataAtVertex(int vertexIndex)
+        public TVertexInfo GetVertexData(int vertexIndex)
         {
             return VertexInfo[vertexIndex];
         }
 
-        public TSegmentInfo GetSegmentInfoAfterVertex(int vertexIndex)
+        public TSegmentInfo GetSegmentDataAfterVertex(int vertexIndex)
         {
             return SegmentInfo[vertexIndex];
         }
 
-        public TSegmentInfo GetSegmentInfoBeforeVertex(int vertexIndex)
+        public TSegmentInfo GetSegmentDataBeforeVertex(int vertexIndex)
         {
             if (vertexIndex == 0)
                 return SegmentInfo[VertexCount - 1];
             else
                 return SegmentInfo[vertexIndex - 1];
+        }
+
+        public Segment2d GetSegment2dAfterVertex(int vertexIndex)
+        {
+            return Polygon.Segment(vertexIndex);
+        }
+
+        public Segment2d GetSegment2dBeforeVertex(int vertexIndex)
+        {
+            if (vertexIndex == 0)
+                return Polygon.Segment(VertexCount - 1);
+            else
+                return Polygon.Segment(vertexIndex - 1);
         }
 
         public void SetSegmentInfoAfterVertex(int vertexIndex, TSegmentInfo segInfo)
@@ -140,6 +174,20 @@ namespace gs
         public Segment2d SegmentAfterIndex(int i)
         {
             return Polygon.Segment(i);
+        }
+
+        public void TrimEnd(double d)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Reverse()
+        {
+            Polygon.Reverse();
+            VertexInfo.Reverse();
+            SegmentInfo.Reverse();
+            foreach (var segmentInfo in SegmentInfo)
+                segmentInfo.Reverse();
         }
     }
 }

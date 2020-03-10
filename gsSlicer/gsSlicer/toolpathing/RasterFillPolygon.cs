@@ -16,6 +16,7 @@ namespace gs
         public double PathSpacing = 0.4;
         public double AngleDeg = 45.0;
         public double PathShift = 0;
+        public double SpeedModifierX = 1;
 
         // [RMS] improve this...
         public double OverlapFactor = 0.0f;
@@ -83,10 +84,10 @@ namespace gs
                 {
                     BasicFillCurve fill_seg = new BasicFillCurve()
                     {
-                        FillType = new SolidFillType()
+                        FillType = new SolidFillType(SpeedModifierX)
                     };
-                    fill_seg.AppendVertex(seg.P0);
-                    fill_seg.AppendVertex(seg.P1);
+                    fill_seg.BeginCurve(seg.P0);
+                    fill_seg.AddToCurve(seg.P1);
                     paths.Append(fill_seg);
                 }
             }
