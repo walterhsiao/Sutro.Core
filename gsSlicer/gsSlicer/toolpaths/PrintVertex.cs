@@ -5,8 +5,7 @@ using System.Linq;
 
 namespace gs
 {
-
-    public class PrintVertex : IToolpathVertex
+    public class PrintVertex : IExtrusionVertex
     {
         public Vector3d Position { get; set; }
         public double FeedRate { get; set; }

@@ -8,8 +8,8 @@ namespace gs
 {
     public class LinearToolpath3<T> : IBuildLinearToolpath<T> where T : IToolpathVertex
     {
-        private List<T> Path;
-        private ToolpathTypes _pathtype;	// access via Type property
+        protected List<T> Path;
+        protected ToolpathTypes _pathtype;	// access via Type property
         public IFillType FillType { get; set; } = new DefaultFillType();
 
         public bool IsHole { get; set; } = false;
@@ -127,29 +127,30 @@ namespace gs
 
         public void AppendVertex(T v, TPVertexFlags flags)
         {
-            if (Path.Count == 0 || ((flags & TPVertexFlags.IsPathStart) != 0))
-            {
-                Path.Add(v);
-                return;
-            }
-            bool is_end = ((flags & TPVertexFlags.IsPathEnd) != 0);
-            if (is_end && Path.Count == 1)
-            {
-                Path.Add(v);
-                return;
-            }
+            Path.Add(v);
+            //if (Path.Count == 0 || ((flags & TPVertexFlags.IsPathStart) != 0))
+            //{
+            //    Path.Add(v);
+            //    return;
+            //}
+            //bool is_end = ((flags & TPVertexFlags.IsPathEnd) != 0);
+            //if (is_end && Path.Count == 1)
+            //{
+            //    Path.Add(v);
+            //    return;
+            //}
 
-            double distSqr = End.Position.DistanceSquared(v.Position);
-            if (distSqr < MathUtil.Epsilonf)
-            {
-                if (is_end)
-                    Path[Path.Count - 1] = v;
-                // otherwise just discard
-            }
-            else
-            {
-                Path.Add(v);
-            }
+            //double distSqr = End.Position.DistanceSquared(v.Position);
+            //if (distSqr < MathUtil.Epsilonf)
+            //{
+            //    if (is_end)
+            //        Path[Path.Count - 1] = v;
+            //    // otherwise just discard
+            //}
+            //else
+            //{
+            //    Path.Add(v);
+            //}
 
             //if ( Path.Count == 0 || End.Position.DistanceSquared(v.Position) > MathUtil.Epsilon )
             //	Path.Add(v);

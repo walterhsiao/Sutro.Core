@@ -34,7 +34,7 @@ namespace gs
 
         protected class PathLoop : PathItem
         {
-            public BasicFillLoop curve;
+            public IFillLoop curve;
             public bool reverse = false;
         }
 
@@ -42,7 +42,7 @@ namespace gs
 
         protected class PathSpan : PathItem
         {
-            public BasicFillCurve curve;
+            public IFillCurve curve;
             public bool reverse = false;
         }
 
@@ -52,10 +52,10 @@ namespace gs
         {
             foreach (FillCurveSet2d polySet in paths)
             {
-                foreach (BasicFillLoop loop in polySet.Loops)
+                foreach (IFillLoop loop in polySet.Loops)
                     Loops.Add(new PathLoop() { curve = loop, speedHint = SpeedHint });
 
-                foreach (BasicFillCurve curve in polySet.Curves)
+                foreach (IFillCurve curve in polySet.Curves)
                     Spans.Add(new PathSpan() { curve = curve, speedHint = SpeedHint });
             }
         }
@@ -77,18 +77,9 @@ namespace gs
                     pathHint = loop.speedHint;
                     if (idx.c != 0)
                     {
-                        int iStart = idx.c;
-                        BasicFillLoop o = new BasicFillLoop();
-                        int N = loop.curve.VertexCount;
-                        o.BeginLoop(loop.curve[iStart]);
-                        for (int i = 1; i < N; ++i)
-                        {
-                            o.AddToLoop(loop.curve[(i + iStart) % N]);
-                        }
-                        o.CloseLoop();
-                        o.FillType = loop.curve.FillType;
-                        paths.Append(o);
-                        OutPoint = o[0];
+                        loop.curve.Roll(idx.c);
+                        paths.Append(loop.curve);
+                        OutPoint = loop.curve.EntryExitPoint;
                     }
                     else
                     {
@@ -245,7 +236,7 @@ namespace gs
             if (idx.a == 0)
             { // loop
                 PathLoop loop = Loops[idx.b];
-                return loop.curve.SegmentAfterIndex(idx.c).Center;
+                return loop.curve.GetSegment2dAfterVertex(idx.c).Center;
             }
             else
             {  // span

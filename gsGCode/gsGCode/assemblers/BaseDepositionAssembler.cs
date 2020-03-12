@@ -74,9 +74,10 @@ namespace gs
         public bool OmitDuplicateZ { get; set; } = false;
         public bool OmitDuplicateF { get; set; } = false;
         public bool OmitDuplicateE { get; set; } = false;
+        public bool RelativeE { get; set; } = false;
 
         // threshold for omitting "duplicate" Z/F/E parameters
-        public double MoveEpsilon = 0.00001;
+        public static readonly double MoveEpsilon = 0.00001;
 
         public bool UseFirmwareRetraction = false;
 
@@ -425,7 +426,7 @@ namespace gs
         {
             if (!OmitDuplicateE || MathUtil.EpsilonEqual(extrude, extruderA, MoveEpsilon) == false)
             {
-                Builder.AppendF(ExtrudeParamString, extrude);
+                Builder.AppendF(ExtrudeParamString, RelativeE ? extrude - extruderA : extrude);
             }
         }
 

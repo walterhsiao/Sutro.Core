@@ -72,7 +72,7 @@ namespace gsCore.FunctionalTests.Utility
             VertexPrevious = new PrintVertex(VertexCurrent);
         }
 
-        public void Initialize()
+        public virtual void Initialize()
         {
             VertexPrevious = new PrintVertex(Vector3d.Zero, 0, Vector2d.Zero);
             VertexCurrent = new PrintVertex(VertexPrevious);

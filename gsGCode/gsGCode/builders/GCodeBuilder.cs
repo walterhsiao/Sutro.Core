@@ -52,6 +52,16 @@ namespace gs
         }
 
         /// <summary>
+        /// Add empty line to output.
+        /// </summary>
+        public virtual GCodeBuilder AddBlankLine()
+        {
+            AddLine(
+                new GCodeLine(next_line_number(), GCodeLine.LType.Blank));
+            return this;
+        }
+
+        /// <summary>
         /// Open a G code line. Use AppendXParameter to add more info
         /// </summary>
         public virtual GCodeBuilder BeginGLine(int Gcode, string comment = null)

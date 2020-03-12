@@ -27,6 +27,8 @@ namespace gs
         public IEnumerable<Vector2d> Vertices { get => Polygon.VerticesItr(false); }
         public bool IsHoleShell { get; set; }
 
+        public Vector2d EntryExitPoint => Polygon.Vertices[0];
+
         public Vector2d this[int i] { get => Polygon[i]; }
 
         private bool loopStarted = false;
@@ -90,9 +92,24 @@ namespace gs
             return Polygon.DistanceSquared(pt, out iNearSeg, out fNearSegT);
         }
 
-        public void Roll(int i)
+        public void Roll(int k)
         {
-            throw new NotImplementedException();
+            // Make copies of current lists
+            var rolledVertices = new List<Vector2d>(VertexCount);
+            var rolledVertexInfo = new List<TVertexInfo>(VertexCount);
+            var rolledSegmentInfo = new List<TSegmentInfo>(VertexCount);
+
+            for (int i = 0; i < VertexCount; i++)
+            {
+                int j = (i + k) % VertexCount;
+                rolledVertices.Add(Polygon.Vertices[j]);
+                rolledVertexInfo.Add(VertexInfo[j]);
+                rolledSegmentInfo.Add(SegmentInfo[j]);
+            }
+
+            Polygon = new Polygon2d(rolledVertices);
+            VertexInfo = rolledVertexInfo;
+            SegmentInfo = rolledSegmentInfo;
         }
 
         public PointData GetPoint(int i, bool reverse)

@@ -51,7 +51,7 @@ namespace gs
             }
             else
             {
-                if (!currentPos.EpsilonEqual(p.StartPosition, MathUtil.Epsilon))
+                if (!currentPos.EpsilonEqual(p.StartPosition, BaseDepositionAssembler.MoveEpsilon))
                     throw new Exception("PathSetBuilder.AppendPath: disconnected path");
                 Paths.Append(p);
                 currentPos = p.EndPosition;

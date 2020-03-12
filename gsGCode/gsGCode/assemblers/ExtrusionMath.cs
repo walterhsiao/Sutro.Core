@@ -48,5 +48,10 @@ namespace gs
         {
             return targetVolume / (pathWidth * layerHeight);
         }
+
+        public static double PathLengthToFilamentLength(double segment_height, double segment_width, object filamentDiamMM, double dist, double vol_scale)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

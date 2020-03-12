@@ -52,6 +52,7 @@ namespace gs
             }
             else if (line.type == GCodeLine.LType.Blank)
             {
+                outStream.WriteLine();
                 return;
             }
 

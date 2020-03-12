@@ -27,6 +27,8 @@ namespace gs
 
         void End();
 
+        void AppendBlankLine();
+
         IEnumerable<string> GenerateTotalExtrusionReport(SingleMaterialFFFSettings settings);
     }
 
@@ -131,7 +133,7 @@ namespace gs
 
             SingleMaterialFFFSettings useSettings = (pathSettings == null) ? Settings : pathSettings;
 
-            CalculateExtrusion calc = new CalculateExtrusion(paths, useSettings);
+            var calc = new CalculateExtrusion<PrintVertex>(paths, useSettings);
             calc.Calculate(Assembler.NozzlePosition, Assembler.ExtruderA, Assembler.InRetract);
 
             int path_index = 0;
@@ -203,6 +205,11 @@ namespace gs
         {
             Builder.AddExplicitLine("");
             Builder.AddCommentLine(" feature " + featureLabel);
+        }
+
+        public virtual void AppendBlankLine()
+        {
+            Builder.AddBlankLine();
         }
 
         private void AppendDimensions(Vector2d dimensions)

@@ -13,7 +13,7 @@ namespace gs
     /// such that the actual accumulated extrusion amount is not modified.
     ///
     /// </summary>
-	public class CalculateExtrusion
+	public class CalculateExtrusion<T> where T : IExtrusionVertex
     {
         public ToolpathSet Paths;
         public SingleMaterialFFFSettings Settings;
@@ -60,7 +60,7 @@ namespace gs
             {
                 ToolpathUtil.ApplyToLeafPaths(ipath, (p) =>
                 {
-                    if (p is LinearToolpath3<PrintVertex> || p is ResetExtruderPathHack)
+                    if (p is LinearToolpath3<T> || p is ResetExtruderPathHack)
                     {
                         allPaths.Add(p);
                     }
@@ -68,7 +68,7 @@ namespace gs
             }
             int N = allPaths.Count;
 
-            LinearToolpath3<PrintVertex> prev_path = null;
+            LinearToolpath3<T> prev_path = null;
             for (int pi = 0; pi < N; ++pi)
             {
                 if (allPaths[pi] is ResetExtruderPathHack)
@@ -76,7 +76,7 @@ namespace gs
                     curA = 0;
                     continue;
                 }
-                LinearToolpath3<PrintVertex> path = allPaths[pi] as LinearToolpath3<PrintVertex>;
+                var path = allPaths[pi] as LinearToolpath3<T>;
 
                 if (path == null)
                     throw new Exception("Invalid path type!");
@@ -91,7 +91,7 @@ namespace gs
                 {
                     bool prev_is_model_deposition =
                         (prev_path != null) && (prev_path.Type == ToolpathTypes.Deposition) && prev_path.FillType.IsPart();
-                    LinearToolpath3<PrintVertex> next_path = (pi < N - 1) ? (allPaths[pi + 1] as LinearToolpath3<PrintVertex>) : null;
+                    var next_path = (pi < N - 1) ? (allPaths[pi + 1] as LinearToolpath3<T>) : null;
                     bool next_is_model_deposition =
                         (next_path != null) && (next_path.Type == ToolpathTypes.Deposition) && next_path.FillType.IsPart();
                     skip_retract = prev_is_model_deposition && next_is_model_deposition;
@@ -182,7 +182,7 @@ namespace gs
                         }
                     }
 
-                    PrintVertex v = path[i];
+                    T v = path[i];
                     v.Extrusion = GCodeUtil.Extrude(curA);
                     path.UpdateVertex(i, v);
                 }
