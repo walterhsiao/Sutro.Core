@@ -59,17 +59,6 @@ namespace gs
         // otherwise InnerPolygons lies on that Shell
         public bool InsetInnerPolygons = true;
 
-        // [RMS] hack that lets us know this is an 'internal' shell which may be processed differently
-        public enum ShellTypes
-        {
-            ExternalPerimeters,
-            InternalShell,
-            BridgeShell,
-            SkirtBrimShell
-        }
-
-        public ShellTypes ShellType = ShellTypes.ExternalPerimeters;
-
         // if true, we try to filter out self-overlaps (is expensive)
         public bool FilterSelfOverlaps = false;
 
@@ -77,7 +66,9 @@ namespace gs
         public double SelfOverlapTolerance = 0.3;
 
         public bool OuterShellLast = false;             // if true, outer shell is scheduled last
-        private readonly SingleMaterialFFFSettings settings;
+
+        private readonly IFillType fillType;
+        private readonly IFillType firstShellFillType;
 
         // Outputs
 
@@ -107,15 +98,12 @@ namespace gs
 
         // remaining interior polygons (to fill w/ other strategy, etc)
         public List<GeneralPolygon2d> InnerPolygons { get; set; }
-
-        public SupportFillType FillType { get; internal set; }
-
         public List<GeneralPolygon2d> GetInnerPolygons()
         {
             return InnerPolygons;
         }
 
-        public ShellsFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings)
+        public ShellsFillPolygon(GeneralPolygon2d poly, IFillType fillType, IFillType firstShellFillType = null)
         {
             Polygon = poly;
             Shells = new List<FillCurveSet2d>();
@@ -128,7 +116,8 @@ namespace gs
                     return PathSpacing;
             };
 
-            this.settings = settings;
+            this.fillType = fillType;
+            this.firstShellFillType = firstShellFillType;
         }
 
         public bool Compute()
@@ -311,36 +300,16 @@ namespace gs
         {
             FillCurveSet2d paths = new FillCurveSet2d();
 
-            IFillType fillType = new DefaultFillType();
-
-            if (ShellType == ShellTypes.ExternalPerimeters)
-            {
-                if (nShell == 0)
-                    fillType = new OuterPerimeterFillType(settings);
-                else
-                    fillType = new InnerPerimeterFillType(settings);
-            }
-            else if (ShellType == ShellTypes.InternalShell)
-            {
-                fillType = new InteriorShellFillType();
-            }
-            else if (ShellType == ShellTypes.BridgeShell)
-            {
-                fillType = new BridgeFillType(settings);
-            }
-            else if (ShellType == ShellTypes.SkirtBrimShell)
-            {
-                fillType = new SkirtBrimFillType();
-            }
+            IFillType currentFillType = nShell == 0 ? firstShellFillType ?? fillType : fillType;
 
             if (FilterSelfOverlaps == false)
             {
                 foreach (var shell in shell_polys)
                 {
-                    paths.Append(new BasicFillLoop(shell.Outer.Vertices) { FillType = fillType });
+                    paths.Append(new BasicFillLoop(shell.Outer.Vertices) { FillType = currentFillType });
                     foreach (var hole in shell.Holes)
                     {
-                        paths.Append(new BasicFillLoop(hole.Vertices) { FillType = fillType, IsHoleShell = true }); ;
+                        paths.Append(new BasicFillLoop(hole.Vertices) { FillType = currentFillType, IsHoleShell = true }); ;
                     }
                 }
                 return paths;
@@ -357,7 +326,7 @@ namespace gs
                 // However in many cases internal holes are 'too close' to outer border.
                 // So we will still apply to those, but use edge filter to preserve outermost loop.
                 // [TODO] could we be smarter about this somehow?
-                if (PreserveOuterShells && nShell == 0 && ShellType == ShellTypes.ExternalPerimeters)
+                if (PreserveOuterShells && nShell == 0)
                     repair.PreserveEdgeFilterF = (eid) => { return repair.Graph.GetEdgeGroup(eid) == outer_shell_edgegroup; };
 
                 repair.Compute();
@@ -381,7 +350,7 @@ namespace gs
                 foreach (var polygon in solids.Polygons)
                 {
                     polygon.EnforceCounterClockwise();
-                    paths.Append(polygon, fillType);
+                    paths.Append(polygon, currentFillType);
                 }
 
                 #endregion Borrow nesting calculations from PlanarSlice to enforce winding direction
@@ -392,7 +361,7 @@ namespace gs
                         continue;
                     if (polyline.Bounds.MaxDim < DiscardTinyPerimeterLengthMM)
                         continue;
-                    paths.Append(new BasicFillCurve(polyline));
+                    paths.Append(new BasicFillCurve(polyline) { FillType = currentFillType });
                 }
             }
             return paths;

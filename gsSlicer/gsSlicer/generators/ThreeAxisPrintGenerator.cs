@@ -655,14 +655,14 @@ namespace gs
 
             if (nShells > 0)
             {
-                ShellsFillPolygon shells_gen = new ShellsFillPolygon(support_poly, Settings);
+                ShellsFillPolygon shells_gen = new ShellsFillPolygon(support_poly, new SupportFillType(Settings));
                 shells_gen.PathSpacing = shell_spacing;
                 shells_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
                 shells_gen.Layers = nShells;
                 shells_gen.FilterSelfOverlaps = false;
                 shells_gen.PreserveInputInsetTopology = true;
                 //shells_gen.FilterSelfOverlaps = true;
-                //shells_gen.PreserveOuterShells = false;
+                shells_gen.PreserveOuterShells = false;
                 //shells_gen.SelfOverlapTolerance = Settings.SelfOverlapToleranceX * Settings.Machine.NozzleDiamMM;
                 shells_gen.DiscardTinyPolygonAreaMM2 = 0.1;
                 shells_gen.DiscardTinyPerimeterLengthMM = 0.0;
@@ -774,13 +774,13 @@ namespace gs
             //   came from where. Would need to do loop above per-polygon
             if (bIsInfillAdjacent && Settings.InteriorSolidRegionShells > 0)
             {
-                ShellsFillPolygon interior_shells = new ShellsFillPolygon(solid_poly, Settings);
+                ShellsFillPolygon interior_shells = new ShellsFillPolygon(solid_poly, new InteriorShellFillType());
                 interior_shells.PathSpacing = Settings.ShellsFillPathSpacingMM();
                 interior_shells.ToolWidth = Settings.Machine.NozzleDiamMM;
                 interior_shells.Layers = Settings.InteriorSolidRegionShells;
                 interior_shells.InsetFromInputPolygonX = 0;
-                interior_shells.ShellType = ShellsFillPolygon.ShellTypes.InternalShell;
                 interior_shells.FilterSelfOverlaps = Settings.ClipSelfOverlaps;
+                interior_shells.PreserveOuterShells = false;
                 interior_shells.SelfOverlapTolerance = Settings.SelfOverlapToleranceX * Settings.Machine.NozzleDiamMM;
                 interior_shells.Compute();
                 scheduler.AppendCurveSets(interior_shells.GetFillCurves());
@@ -867,13 +867,13 @@ namespace gs
 
                 GeneralPolygon2d gp = new GeneralPolygon2d(polypart);
 
-                ShellsFillPolygon shells_fill = new ShellsFillPolygon(gp, Settings);
+                ShellsFillPolygon shells_fill = new ShellsFillPolygon(gp, new BridgeFillType(Settings));
                 shells_fill.PathSpacing = Settings.SolidFillPathSpacingMM();
                 shells_fill.ToolWidth = Settings.Machine.NozzleDiamMM;
                 shells_fill.Layers = 1;
                 shells_fill.InsetFromInputPolygonX = 0.25;
-                shells_fill.ShellType = ShellsFillPolygon.ShellTypes.BridgeShell;
                 shells_fill.FilterSelfOverlaps = false;
+                shells_fill.PreserveOuterShells = false;
                 shells_fill.Compute();
                 scheduler.AppendCurveSets(shells_fill.GetFillCurves());
                 var fillPolys = shells_fill.InnerPolygons;
@@ -1112,11 +1112,12 @@ namespace gs
         /// </summary>
         protected virtual IShellsFillPolygon compute_shells_for_shape(GeneralPolygon2d shape, int layer_i)
         {
-            ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape, Settings);
+            ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape, new InnerPerimeterFillType(Settings), new OuterPerimeterFillType(Settings));
             shells_gen.PathSpacing = Settings.ShellsFillPathSpacingMM();
             shells_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
             shells_gen.Layers = Settings.Shells;
             shells_gen.FilterSelfOverlaps = Settings.ClipSelfOverlaps;
+            shells_gen.PreserveOuterShells = true;
             shells_gen.SelfOverlapTolerance = Settings.SelfOverlapToleranceX * Settings.Machine.NozzleDiamMM;
             shells_gen.DiscardTinyPerimeterLengthMM = Settings.Machine.NozzleDiamMM * 2.5;
             shells_gen.DiscardTinyPolygonAreaMM2 = Settings.Machine.NozzleDiamMM * Settings.Machine.NozzleDiamMM * 6.25;
@@ -1178,12 +1179,12 @@ namespace gs
         /// </summary>
         protected virtual IShellsFillPolygon compute_skirts_for_shape(GeneralPolygon2d shape, int layer_i)
         {
-            ShellsFillPolygon skirt_gen = new ShellsFillPolygon(shape, Settings);
-            skirt_gen.ShellType = ShellsFillPolygon.ShellTypes.SkirtBrimShell;
+            ShellsFillPolygon skirt_gen = new ShellsFillPolygon(shape, new SkirtBrimFillType());
             skirt_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
             skirt_gen.PathSpacing = Settings.Machine.NozzleDiamMM * Settings.SkirtSpacingStepX;
             skirt_gen.Layers = 1; // the path is computed indepedently for each distance.
             skirt_gen.FilterSelfOverlaps = Settings.ClipSelfOverlaps;
+            skirt_gen.PreserveOuterShells = false;
             skirt_gen.SelfOverlapTolerance = Settings.SelfOverlapToleranceX * Settings.Machine.NozzleDiamMM;
             skirt_gen.OuterShellLast = false;
 

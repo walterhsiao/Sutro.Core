@@ -86,8 +86,28 @@ namespace gs
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;
 
-            AssertValidLoop(poly, "AppendBasicFillLoop");
+            AssertValidLoop(poly, "AppendFillLoop");
 
+            int startIndex = FindLoopEntryPoint(poly, currentPos2);
+
+            Vector2d startPt = poly[startIndex];
+
+            AppendTravel(currentPos2, startPt);
+
+            List<Vector2d> loopV = new List<Vector2d>(poly.VertexCount + 1);
+            for (int i = 0; i <= poly.VertexCount; i++)
+            {
+                int k = (startIndex + i) % poly.VertexCount;
+                loopV.Add(poly[k]);
+            }
+
+            double useSpeed = select_speed(poly);
+
+            Builder.AppendExtrude(loopV, useSpeed, poly.FillType, null);
+        }
+
+        private int FindLoopEntryPoint(IFillLoop poly, Vector2d currentPos2)
+        {
             int startIndex;
             if (Settings.ZipperAlignedToPoint && poly.FillType.IsEntryLocationSpecified())
             {
@@ -107,20 +127,7 @@ namespace gs
                 startIndex = CurveUtils2.FindNearestVertex(currentPos2, poly.Vertices);
             }
 
-            Vector2d startPt = poly[startIndex];
-
-            AppendTravel(currentPos2, startPt);
-
-            List<Vector2d> loopV = new List<Vector2d>(poly.VertexCount + 1);
-            for (int i = 0; i <= poly.VertexCount; i++)
-            {
-                int k = (startIndex + i) % poly.VertexCount;
-                loopV.Add(poly[k]);
-            }
-
-            double useSpeed = select_speed(poly);
-
-            Builder.AppendExtrude(loopV, useSpeed, poly.FillType, null);
+            return startIndex;
         }
 
         protected void AppendTravel(Vector2d startPt, Vector2d endPt)

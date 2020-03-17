@@ -203,7 +203,8 @@ namespace gs
                 { // loop
                     PathLoop loop = Loops[idx.b];
                     int iNearSeg; double nearSegT;
-                    double d_sqr = loop.curve.DistanceSquared(pt, out iNearSeg, out nearSegT);
+                    double d_sqr = GetLoopEntryPoint(pt, loop, out iNearSeg, out nearSegT);
+
                     if (d_sqr < nearest_sqr)
                     {
                         nearest_sqr = d_sqr;
@@ -229,6 +230,21 @@ namespace gs
             }
 
             return nearest_idx;
+        }
+
+        private static double GetLoopEntryPoint(Vector2d startPoint, PathLoop loop,
+            out int entryPointSegmentI, out double entryPointSegmentT)
+        {
+            if (loop.curve.FillType.IsEntryLocationSpecified())
+            {
+                entryPointSegmentI = 0;
+                entryPointSegmentT = 0;
+                return loop.curve.EntryExitPoint.Distance(startPoint);
+            }
+            else
+            {
+                return loop.curve.DistanceSquared(startPoint, out entryPointSegmentI, out entryPointSegmentT);
+            }
         }
 
         protected virtual Vector2d get_point(Index3i idx)
