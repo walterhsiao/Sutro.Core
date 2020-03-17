@@ -8,7 +8,7 @@ namespace gs
     /// </summary>
     public class SparseLinesFillPolygon : ParallelLinesFillPolygon
     {
-        public SparseLinesFillPolygon(GeneralPolygon2d poly) : base(poly, new SparseFillType())
+        public SparseLinesFillPolygon(GeneralPolygon2d poly, IFillType fillType) : base(poly, fillType)
         {
             SimplifyAmount = SimplificationLevel.Moderate;
         }

@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 
@@ -202,7 +203,7 @@ namespace gs
                 tiled_fill.TileFillGeneratorF = (tilePoly, index) =>
                 {
                     int odd = ((index.x + index.y) % 2 == 0) ? 1 : 0;
-                    RasterFillPolygon solid_gen = new RasterFillPolygon(tilePoly)
+                    RasterFillPolygon solid_gen = new RasterFillPolygon(tilePoly, new SolidFillType(Settings.SolidFillSpeedX))
                     {
                         InsetFromInputPolygon = false,
                         PathSpacing = Settings.SolidFillPathSpacingMM(),

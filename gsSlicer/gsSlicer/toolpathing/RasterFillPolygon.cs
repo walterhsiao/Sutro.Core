@@ -24,8 +24,10 @@ namespace gs
         // if true, we inset half of tool-width from Polygon
         public bool InsetFromInputPolygon = true;
 
+        public IFillType FillType { get; }
+
         // fill paths
-        public List<FillCurveSet2d> FillCurves { get; set; }
+        public List<FillCurveSet2d> FillCurves { get; }
 
         public List<FillCurveSet2d> GetFillCurves()
         {
@@ -34,10 +36,11 @@ namespace gs
 
         //SegmentSet2d BoundaryPolygonCache;
 
-        public RasterFillPolygon(GeneralPolygon2d poly)
+        public RasterFillPolygon(GeneralPolygon2d poly, IFillType fillType)
         {
             Polygon = poly;
             FillCurves = new List<FillCurveSet2d>();
+            FillType = fillType;
         }
 
         public bool Compute()
@@ -84,7 +87,7 @@ namespace gs
                 {
                     BasicFillCurve fill_seg = new BasicFillCurve()
                     {
-                        FillType = new SolidFillType(SpeedModifierX)
+                        FillType = FillType,
                     };
                     fill_seg.BeginCurve(seg.P0);
                     fill_seg.AddToCurve(seg.P1);

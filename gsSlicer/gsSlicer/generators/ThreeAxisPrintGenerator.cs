@@ -607,7 +607,7 @@ namespace gs
         /// </summary>
 		protected virtual void fill_infill_region(GeneralPolygon2d infill_poly, IFillPathScheduler2d scheduler, PrintLayerData layer_data)
         {
-            ICurvesFillPolygon infill_gen = new SparseLinesFillPolygon(infill_poly)
+            ICurvesFillPolygon infill_gen = new SparseLinesFillPolygon(infill_poly, new SparseFillType())
             {
                 InsetFromInputPolygon = false,
                 PathSpacing = Settings.SparseLinearInfillStepX * Settings.SolidFillPathSpacingMM(),
@@ -1020,7 +1020,7 @@ namespace gs
                 };
 
                 // leave space for end-blobs (input paths are extent we want to hit)
-                pline.Trim(Settings.Machine.NozzleDiamMM / 2);
+                pline.TrimBothEnds(Settings.Machine.NozzleDiamMM / 2);
 
                 // ignore tiny paths
                 if (PathFilterF != null && PathFilterF(pline) == true)
