@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.utility;
 using System;
 using System.Collections.Generic;
 
@@ -127,12 +128,13 @@ namespace gs
         /// Compile this set of toolpaths and pass to assembler.
         /// Settings are optional, pass null to ignore
         /// </summary>
-		public virtual void AppendPaths(ToolpathSet paths, SingleMaterialFFFSettings pathSettings)
+		public virtual void AppendPaths(ToolpathSet toolpathSet, SingleMaterialFFFSettings pathSettings)
         {
             Assembler.FlushQueues();
 
             SingleMaterialFFFSettings useSettings = (pathSettings == null) ? Settings : pathSettings;
 
+            var paths = toolpathSet.GetPaths<PrintVertex>();
             var calc = new CalculateExtrusion<PrintVertex>(paths, useSettings);
             calc.Calculate(Assembler.NozzlePosition, Assembler.ExtruderA, Assembler.InRetract);
 

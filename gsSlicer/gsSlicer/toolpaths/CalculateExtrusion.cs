@@ -15,7 +15,7 @@ namespace gs
     /// </summary>
 	public class CalculateExtrusion<T> where T : IExtrusionVertex
     {
-        public ToolpathSet Paths;
+        public IEnumerable<LinearToolpath3<T>> Paths;
         public SingleMaterialFFFSettings Settings;
 
         public bool EnableRetraction = true;
@@ -33,7 +33,7 @@ namespace gs
 
         public double ExtrusionLength = 0;
 
-        public CalculateExtrusion(ToolpathSet paths, SingleMaterialFFFSettings settings)
+        public CalculateExtrusion(IEnumerable<LinearToolpath3<T>> paths, SingleMaterialFFFSettings settings)
         {
             Paths = paths;
             Settings = settings;
@@ -56,16 +56,14 @@ namespace gs
 
             // filter paths
             List<IToolpath> allPaths = new List<IToolpath>();
-            foreach (IToolpath ipath in Paths)
+            foreach (IToolpath p in Paths)
             {
-                ToolpathUtil.ApplyToLeafPaths(ipath, (p) =>
+                if (p is LinearToolpath3<T> || p is ResetExtruderPathHack)
                 {
-                    if (p is LinearToolpath3<T> || p is ResetExtruderPathHack)
-                    {
-                        allPaths.Add(p);
-                    }
-                });
+                    allPaths.Add(p);
+                }
             }
+
             int N = allPaths.Count;
 
             LinearToolpath3<T> prev_path = null;
