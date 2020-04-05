@@ -13,10 +13,10 @@ namespace gsSlicer.FunctionalTests.Utility
             return new PrintTestRunner(caseName, resultGenerator, resultAnalyzer);
         }
 
-        public static ResultGenerator<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings> CreateResultGenerator(SingleMaterialFFFSettings settings)
+        public static PrintGeneratorManager<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings> CreateResultGenerator(SingleMaterialFFFSettings settings)
         {
-            return new ResultGenerator<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>(
-                new SinglePartGenerator<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>(), settings, new ConsoleLogger());
+            return new PrintGeneratorManager<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>()
+                new PrintGeneratorManager<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>(), settings, new ConsoleLogger());
         }
     }
 }

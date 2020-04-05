@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace gsCore.UnitTests
 {
-    internal class SubSettingsGood : Settings
+    internal class SubSettingsGood : SettingsPrototype
     {
         public int SubFieldX = 0;
         public int SubFieldY = 0;
@@ -16,7 +16,7 @@ namespace gsCore.UnitTests
         public int SubFieldY = 0;
     }
 
-    internal class SettingsA : Settings
+    internal class SettingsA : SettingsPrototype
     {
         public int IntegerFieldA = 0;
         public int IntegerPropertyA { get; set; } = 0;
@@ -33,22 +33,22 @@ namespace gsCore.UnitTests
         public int IntegerFieldC = 0;
     }
 
-    internal class SettingsD : Settings
+    internal class SettingsD : SettingsPrototype
     {
         public SubSettingsGood SubSettings = new SubSettingsGood();
     }
 
-    internal class SettingsE : Settings
+    internal class SettingsE : SettingsPrototype
     {
         public SubSettingsBad SubSettings = new SubSettingsBad();
     }
 
-    internal class SettingsWithListOfDouble : Settings
+    internal class SettingsWithListOfDouble : SettingsPrototype
     {
         public List<double> ListOfDouble = new List<double>() { 0, 1 };
     }
 
-    internal class SettingsWithListOfSubsetting : Settings
+    internal class SettingsWithListOfSubsetting : SettingsPrototype
     {
         public List<SubSettingsGood> ListOfSubsetting = new List<SubSettingsGood>()
         { new SubSettingsGood() };
@@ -56,19 +56,19 @@ namespace gsCore.UnitTests
 
     internal enum EnumNumbers { Zero = 0, One = 1, Two = 2 };
 
-    internal class SettingsF : Settings
+    internal class SettingsF : SettingsPrototype
     {
         public EnumNumbers Enum;
     }
 
     internal enum EnumColors { Blue = 0, Green = 1, Red = 2 };
 
-    internal class SettingsG : Settings
+    internal class SettingsG : SettingsPrototype
     {
         public EnumColors Enum;
     }
 
-    internal class SettingsH : Settings
+    internal class SettingsH : SettingsPrototype
     {
         public float[,] FloatArray = new float[2, 3] { { 0, 1, 2 }, { 3, 4, 5 } };
     }

@@ -26,9 +26,9 @@ namespace gs
     /// <remarks>
     /// Allows bi-directional copying and cloning between parent and child classes, as well as sibling classes. This facilitates working with settings instances, but should be used with caution. The CopyValuesFrom and CloneAs methods use reflection to copy any public properties or fields that are present in both types. Reference types (except for string) must derive from Settings also, to allow recursive deep copying.
     /// </remarks>
-    public abstract class Settings
+    public abstract class SettingsPrototype
     {
-        public virtual void CopyValuesFrom<T>(T other) where T : Settings
+        public virtual void CopyValuesFrom<T>(T other) where T : SettingsPrototype
         {
             foreach (PropertyInfo prop_this in GetType().GetProperties())
             {
@@ -119,10 +119,10 @@ namespace gs
                     }
                     return instance;
                 }
-                else if (v is Settings v_typed)
+                else if (v is SettingsPrototype v_typed)
                 {
                     var instance = Activator.CreateInstance(type);
-                    ((Settings)instance).CopyValuesFrom(v_typed);
+                    ((SettingsPrototype)instance).CopyValuesFrom(v_typed);
                     return instance;
                 }
                 else
@@ -135,7 +135,7 @@ namespace gs
             }
         }
 
-        public virtual T CloneAs<T>() where T : Settings, new()
+        public virtual T CloneAs<T>() where T : SettingsPrototype, new()
         {
             var clone = new T();
             clone.CopyValuesFrom(this);

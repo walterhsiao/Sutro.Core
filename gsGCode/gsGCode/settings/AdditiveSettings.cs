@@ -12,7 +12,7 @@ namespace gs
         MetalSLSPrinter
     }
 
-    public abstract class MachineInfo : Settings
+    public abstract class MachineInfo : SettingsPrototype
     {
         protected static string UnknownUUID = "00000000-0000-0000-0000-000000000000";
 
@@ -97,7 +97,7 @@ namespace gs
         AssemblerFactoryF AssemblerType();
     }
 
-    public abstract class PlanarAdditiveSettings : Settings, IPlanarAdditiveSettings
+    public abstract class PlanarAdditiveSettings : SettingsPrototype, IPlanarAdditiveSettings
     {
         /// <summary>
         /// This is the "name" of this settings (eg user identifier)
