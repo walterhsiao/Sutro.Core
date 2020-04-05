@@ -11,16 +11,16 @@ namespace gs
             where TPrintSettings : SettingsPrototype, IPlanarAdditiveSettings, new()
     {
         private ISettingsBuilder<TPrintSettings> settingsBuilder;
-        private ConsoleLogger logger;
-        private GenericRepRapSettings genericRepRapSettings;
+        private readonly ILogger logger;
 
         public ISettingsBuilder SettingsBuilder => settingsBuilder;
         private TPrintSettings settings => settingsBuilder.Settings;
 
-        public PrintGeneratorManager(ILogger logger, TPrintSettings settings, bool acceptsParts = true)
+        public PrintGeneratorManager(TPrintSettings settings, ILogger logger = null, bool acceptsParts = true)
         {
             AcceptsParts = acceptsParts;
             settingsBuilder = new SettingsBuilder<TPrintSettings>(settings, logger);
+            this.logger = logger ?? new NullLogger();
         }
 
         public bool AcceptsParts { get; } = true;
@@ -43,7 +43,7 @@ namespace gs
             }
         }
 
-        public GCodeFile GCodeFromMesh(DMesh3 mesh, out IEnumerable<string> generationReport, ILogger logger = null)
+        public GCodeFile GCodeFromMesh(DMesh3 mesh, out IEnumerable<string> generationReport)
         {
             if (!AcceptsParts && mesh != null)
                 throw new Exception("Must pass null or empty list of parts to generator that does not accept parts.");

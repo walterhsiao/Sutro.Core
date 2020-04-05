@@ -73,7 +73,7 @@ namespace gs
             logger.WriteLine($"GENERATION");
             logger.WriteLine();
 
-            gcode = printGeneratorManager.GCodeFromMesh(mesh, out generationReport, logger);
+            gcode = printGeneratorManager.GCodeFromMesh(mesh, out generationReport);
         }
 
         protected virtual void LoadMesh(CommandLineOptions o, out DMesh3 mesh)

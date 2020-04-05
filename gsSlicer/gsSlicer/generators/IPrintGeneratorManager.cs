@@ -12,7 +12,7 @@ namespace gs
         bool AcceptsParts { get; }
         ISettingsBuilder SettingsBuilder { get; }
 
-        GCodeFile GCodeFromMesh(DMesh3 mesh, out IEnumerable<string> generationReport, ILogger logger = null);
+        GCodeFile GCodeFromMesh(DMesh3 mesh, out IEnumerable<string> generationReport);
 
         void SaveGCodeToFile(TextWriter output, GCodeFile file);
     }
