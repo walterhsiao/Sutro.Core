@@ -10,20 +10,11 @@ namespace gs
             where TPrintGenerator : IPrintGenerator<TPrintSettings>, new()
             where TPrintSettings : SettingsPrototype, IPlanarAdditiveSettings, new()
     {
-        private ISettingsBuilder<TPrintSettings> settingsBuilder;
         private readonly ILogger logger;
-
-        public ISettingsBuilder SettingsBuilder => settingsBuilder;
-        private TPrintSettings settings => settingsBuilder.Settings;
-
-        public PrintGeneratorManager(TPrintSettings settings, ILogger logger = null, bool acceptsParts = true)
-        {
-            AcceptsParts = acceptsParts;
-            settingsBuilder = new SettingsBuilder<TPrintSettings>(settings, logger);
-            this.logger = logger ?? new NullLogger();
-        }
+        private ISettingsBuilder<TPrintSettings> settingsBuilder;
 
         public bool AcceptsParts { get; } = true;
+
         public bool AcceptsPartSettings { get; } = false;
 
         public Version PrintGeneratorAssemblyVersion
@@ -43,6 +34,17 @@ namespace gs
             }
         }
 
+        public ISettingsBuilder SettingsBuilder => settingsBuilder;
+
+        public TPrintSettings Settings => settingsBuilder.Settings;
+
+        public PrintGeneratorManager(TPrintSettings settings, ILogger logger = null, bool acceptsParts = true)
+        {
+            AcceptsParts = acceptsParts;
+            settingsBuilder = new SettingsBuilder<TPrintSettings>(settings, logger);
+            this.logger = logger ?? new NullLogger();
+        }
+
         public GCodeFile GCodeFromMesh(DMesh3 mesh, out IEnumerable<string> generationReport)
         {
             if (!AcceptsParts && mesh != null)
@@ -57,7 +59,7 @@ namespace gs
             // Do slicing
             MeshPlanarSlicer slicer = new MeshPlanarSlicer()
             {
-                LayerHeightMM = settings.LayerHeightMM
+                LayerHeightMM = Settings.LayerHeightMM
             };
 
             slicer.Add(meshes);
@@ -66,8 +68,8 @@ namespace gs
             // Run the print generator
             logger.WriteLine("Running print generator...");
             var printGenerator = new TPrintGenerator();
-            AssemblerFactoryF overrideAssemblerF = settings.AssemblerType();
-            printGenerator.Initialize(meshes, slices, settings, overrideAssemblerF);
+            AssemblerFactoryF overrideAssemblerF = Settings.AssemblerType();
+            printGenerator.Initialize(meshes, slices, Settings, overrideAssemblerF);
 
             if (printGenerator.Generate())
             {
