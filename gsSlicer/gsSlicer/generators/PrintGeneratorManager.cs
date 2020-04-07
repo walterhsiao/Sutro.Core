@@ -17,22 +17,9 @@ namespace gs
 
         public bool AcceptsPartSettings { get; } = false;
 
-        public Version PrintGeneratorAssemblyVersion
-        {
-            get
-            {
-                var assembly = Assembly.GetAssembly(typeof(TPrintGenerator));
-                return assembly.GetName().Version;
-            }
-        }
-
-        public string PrintGeneratorName
-        {
-            get
-            {
-                return typeof(TPrintGenerator).Name;
-            }
-        }
+        public Version PrintGeneratorAssemblyVersion => Assembly.GetAssembly(typeof(TPrintGenerator)).GetName().Version;
+        public string PrintGeneratorAssemblyName => Assembly.GetAssembly(typeof(TPrintGenerator)).GetName().Name;
+        public string PrintGeneratorName => typeof(TPrintGenerator).Name;
 
         public ISettingsBuilder SettingsBuilder => settingsBuilder;
 

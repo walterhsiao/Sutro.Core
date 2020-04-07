@@ -123,8 +123,8 @@ namespace gs
         {
             ConsoleWriteSeparator();
             var version = printGeneratorManager.PrintGeneratorAssemblyVersion;
-            logger.WriteLine($"{printGeneratorManager.PrintGeneratorName} v{version.Major}.{version.Minor}.{version.Revision}");
-            logger.WriteLine("");
+            logger.WriteLine($"Using {printGeneratorManager.PrintGeneratorName} from {printGeneratorManager.PrintGeneratorAssemblyName} v{version.Major}.{version.Minor}.{version.Revision}");
+            logger.WriteLine();
         }
 
         protected void ParsingSuccessful(CommandLineOptions o)
