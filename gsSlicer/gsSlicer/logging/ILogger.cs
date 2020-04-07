@@ -2,9 +2,9 @@
 {
     public interface ILogger
     {
-        void Write(string s);
+        void Write(string s, System.ConsoleColor? color = null);
 
-        void WriteLine(string s);
+        void WriteLine(string s, System.ConsoleColor? color = null);
 
         void WriteLine();
 

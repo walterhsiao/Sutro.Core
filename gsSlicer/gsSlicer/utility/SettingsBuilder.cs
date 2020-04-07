@@ -42,18 +42,9 @@ namespace gs
             }
             else
             {
-                try
-                {
-                    logger.WriteLine($"Loading file {Path.GetFullPath(settingFile)}");
-                    string json = File.ReadAllText(settingFile);
-                    JsonConvert.PopulateObject(json, Settings, jsonSerializerSettings);
-                }
-                catch (Exception e)
-                {
-                    logger.WriteLine("Error processing settings file: ");
-                    logger.WriteLine(Path.GetFullPath(settingFile));
-                    logger.WriteLine(e.Message);
-                }
+                logger.WriteLine($"Loading file {Path.GetFullPath(settingFile)}");
+                string json = File.ReadAllText(settingFile);
+                JsonConvert.PopulateObject(json, Settings, jsonSerializerSettings);
             }
         }
 

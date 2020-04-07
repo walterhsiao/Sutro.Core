@@ -54,17 +54,34 @@ namespace gs
             logger.WriteLine("".PadRight(79, '-'));
         }
 
-        protected virtual void ConstructSettings(CommandLineOptions o)
+        protected virtual bool ConstructSettings(CommandLineOptions o)
         {
             foreach (var file in o.SettingsFiles)
             {
-                printGeneratorManager.SettingsBuilder.ApplyJSONFile(file);
+                try
+                {
+                    printGeneratorManager.SettingsBuilder.ApplyJSONFile(file);
+                }
+                catch (Exception e)
+                {
+                    logger.WriteLine(e.Message);
+                    return false;
+                }
             }
 
             foreach (var snippet in o.SettingsOverride)
             {
-                printGeneratorManager.SettingsBuilder.ApplyJSONSnippet(snippet);
+                try
+                {
+                    printGeneratorManager.SettingsBuilder.ApplyJSONSnippet(snippet);
+                }
+                catch (Exception e)
+                {
+                    logger.WriteLine(e.Message);
+                    return false;
+                }
             }
+            return true;
         }
 
         protected virtual void DropMeshToBuildPlate(DMesh3 mesh)
@@ -144,6 +161,7 @@ namespace gs
             if (!printGeneratorDict.TryGetValue(o.Generator, out printGeneratorManager))
             {
                 HandleInvalidGeneratorId(o.Generator);
+                return;
             }
 
             OutputVersionInfo();
@@ -152,7 +170,7 @@ namespace gs
 
             if (!OutputFilePathIsValid(o)) return;
 
-            ConstructSettings(o);
+            if (!ConstructSettings(o)) return;
 
             LoadMesh(o, out var mesh);
 
@@ -170,13 +188,17 @@ namespace gs
 
             logger.WriteLine("Available generators:");
             ListAvailableGenerators();
+            logger.WriteLine();
         }
 
         private void ListAvailableGenerators()
         {
             foreach (var g in printGeneratorDict.Values)
             {
-                logger.WriteLine($"{g.Id}: {g.PrintGeneratorName} - {g.Description}");
+                logger.Write($"{g.Id} ", ConsoleColor.Green);
+                logger.Write($"{g.PrintGeneratorName} ", ConsoleColor.Yellow);
+                logger.Write($"{g.Description}", ConsoleColor.Gray);
+                logger.WriteLine();
             }
         }
 
