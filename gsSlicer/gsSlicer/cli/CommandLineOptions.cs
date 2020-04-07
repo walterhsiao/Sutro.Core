@@ -5,10 +5,13 @@ namespace gs
 {
     public class CommandLineOptions
     {
-        [Value(0, MetaName = "gcode", Required = true, HelpText = "Path to output gcode file.")]
+        [Value(0, MetaName = "generator", Required = true, HelpText = "Generator to use.")]
+        public string Generator { get; set; }
+
+        [Value(1, MetaName = "gcode", Required = true, HelpText = "Path to output gcode file.")]
         public string GCodeFilePath { get; set; }
 
-        [Value(1, MetaName = "mesh", Required = false, HelpText = "Path to input mesh file.")]
+        [Value(2, MetaName = "mesh", Required = false, HelpText = "Path to input mesh file.")]
         public string MeshFilePath { get; set; }
 
         [Option('c', "center_xy", Required = false, Default = false, HelpText = "Center the part on the print bed in XY.")]

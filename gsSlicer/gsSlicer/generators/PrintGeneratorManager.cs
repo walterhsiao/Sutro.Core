@@ -25,32 +25,28 @@ namespace gs
 
         public TPrintSettings Settings => settingsBuilder.Settings;
 
-        public PrintGeneratorManager(TPrintSettings settings, ILogger logger = null, bool acceptsParts = true)
+        public string Id { get; }
+        public string Name { get; }
+        public string Description { get; }
+
+        public PrintGeneratorManager(TPrintSettings settings, string id, string description, ILogger logger = null, bool acceptsParts = true)
         {
             AcceptsParts = acceptsParts;
+
+            Id = id;
+            Description = description;
+
             settingsBuilder = new SettingsBuilder<TPrintSettings>(settings, logger);
             this.logger = logger ?? new NullLogger();
         }
 
         public GCodeFile GCodeFromMesh(DMesh3 mesh, out IEnumerable<string> generationReport)
         {
-            if (!AcceptsParts && mesh != null)
-                throw new Exception("Must pass null or empty list of parts to generator that does not accept parts.");
+            PrintMeshAssembly meshes = null;
+            PlanarSliceStack slices = null;
 
-            // Create print mesh set
-            PrintMeshAssembly meshes = new PrintMeshAssembly();
-            meshes.AddMesh(mesh, PrintMeshOptions.Default());
-
-            logger?.WriteLine("Slicing...");
-
-            // Do slicing
-            MeshPlanarSlicer slicer = new MeshPlanarSlicer()
-            {
-                LayerHeightMM = Settings.LayerHeightMM
-            };
-
-            slicer.Add(meshes);
-            PlanarSliceStack slices = slicer.Compute();
+            if (AcceptsParts)
+                SliceMesh(mesh, out meshes, out slices);
 
             // Run the print generator
             logger.WriteLine("Running print generator...");
@@ -67,6 +63,24 @@ namespace gs
             {
                 throw new Exception("PrintGenerator failed to generate gcode!");
             }
+        }
+
+        private void SliceMesh(DMesh3 mesh, out PrintMeshAssembly meshes, out PlanarSliceStack slices)
+        {
+            // Create print mesh set
+            meshes = new PrintMeshAssembly();
+            meshes.AddMesh(mesh, PrintMeshOptions.Default());
+
+            logger?.WriteLine("Slicing...");
+
+            // Do slicing
+            MeshPlanarSlicer slicer = new MeshPlanarSlicer()
+            {
+                LayerHeightMM = Settings.LayerHeightMM
+            };
+
+            slicer.Add(meshes);
+            slices = slicer.Compute();
         }
 
         public GCodeFile LoadGCode(TextReader input)

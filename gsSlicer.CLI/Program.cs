@@ -17,7 +17,10 @@ namespace gsSlicer.CLI
 
             var cli = new CommandLineInterface(
                 logger: logger,
-                printGeneratorManager: new PrintGeneratorManager<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>(new GenericRepRapSettings(), logger));
+                printGenerators: new List<IPrintGeneratorManager> {
+                    new PrintGeneratorManager<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>(
+                        new GenericRepRapSettings(), "fff", "Basic FFF prints", logger)
+                });
 
             cli.Execute(args);
         }

@@ -7,6 +7,9 @@ namespace gs
 {
     public interface IPrintGeneratorManager
     {
+        string Id { get; }
+        string Description { get; }
+
         Version PrintGeneratorAssemblyVersion { get; }
         string PrintGeneratorAssemblyName { get; }
         string PrintGeneratorName { get; }

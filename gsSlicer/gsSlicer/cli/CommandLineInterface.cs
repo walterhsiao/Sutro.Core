@@ -10,12 +10,17 @@ namespace gs
     public class CommandLineInterface
     {
         private readonly ILogger logger;
-        private readonly IPrintGeneratorManager printGeneratorManager;
+        private readonly Dictionary<string, IPrintGeneratorManager> printGeneratorDict;
 
-        public CommandLineInterface(ILogger logger, IPrintGeneratorManager printGeneratorManager)
+        private IPrintGeneratorManager printGeneratorManager;
+
+        public CommandLineInterface(ILogger logger, IEnumerable<IPrintGeneratorManager> printGenerators)
         {
             this.logger = logger;
-            this.printGeneratorManager = printGeneratorManager;
+
+            printGeneratorDict = new Dictionary<string, IPrintGeneratorManager>();
+            foreach (var printGenerator in printGenerators)
+                printGeneratorDict.Add(printGenerator.Id, printGenerator);
         }
 
         public void Execute(string[] args)
@@ -78,21 +83,28 @@ namespace gs
 
         protected virtual void LoadMesh(CommandLineOptions o, out DMesh3 mesh)
         {
-            string fMeshFilePath = Path.GetFullPath(o.MeshFilePath);
-            ConsoleWriteSeparator();
-            logger.WriteLine($"PARTS");
-            logger.WriteLine();
+            if (printGeneratorManager.AcceptsParts)
+            {
+                string fMeshFilePath = Path.GetFullPath(o.MeshFilePath);
+                ConsoleWriteSeparator();
+                logger.WriteLine($"PARTS");
+                logger.WriteLine();
 
-            logger.Write("Loading mesh " + fMeshFilePath + "...");
-            mesh = StandardMeshReader.ReadMesh(fMeshFilePath);
-            logger.WriteLine(" done.");
+                logger.Write("Loading mesh " + fMeshFilePath + "...");
+                mesh = StandardMeshReader.ReadMesh(fMeshFilePath);
+                logger.WriteLine(" done.");
 
-            logger.Write("Repairing mesh... ");
-            bool repaired = new MeshAutoRepair(mesh).Apply();
-            logger.WriteLine(repaired ? "repaired." : "not repaired.");
+                logger.Write("Repairing mesh... ");
+                bool repaired = new MeshAutoRepair(mesh).Apply();
+                logger.WriteLine(repaired ? "repaired." : "not repaired.");
 
-            if (o.CenterXY) CenterMeshAboveOrigin(mesh);
-            if (o.DropZ) DropMeshToBuildPlate(mesh);
+                if (o.CenterXY) CenterMeshAboveOrigin(mesh);
+                if (o.DropZ) DropMeshToBuildPlate(mesh);
+            }
+            else
+            {
+                mesh = null;
+            }
         }
 
         protected virtual bool MeshFilePathIsValid(CommandLineOptions o)
@@ -129,6 +141,11 @@ namespace gs
 
         protected void ParsingSuccessful(CommandLineOptions o)
         {
+            if (!printGeneratorDict.TryGetValue(o.Generator, out printGeneratorManager))
+            {
+                HandleInvalidGeneratorId(o.Generator);
+            }
+
             OutputVersionInfo();
 
             if (!MeshFilePathIsValid(o)) return;
@@ -146,17 +163,38 @@ namespace gs
             OutputGenerationReport(generationReport);
         }
 
+        protected virtual void HandleInvalidGeneratorId(string id)
+        {
+            logger.WriteLine($"Invalid generator id: {id}");
+            logger.WriteLine();
+
+            logger.WriteLine("Available generators:");
+            ListAvailableGenerators();
+        }
+
+        private void ListAvailableGenerators()
+        {
+            foreach (var g in printGeneratorDict.Values)
+            {
+                logger.WriteLine($"{g.Id}: {g.PrintGeneratorName} - {g.Description}");
+            }
+        }
+
         protected virtual void ParsingUnsuccessful(IEnumerable<Error> errs, ParserResult<CommandLineOptions> parserResult)
         {
             logger.WriteLine("ERRORS:");
             foreach (var err in errs)
                 logger.WriteLine(err);
-            logger.WriteLine("");
+            logger.WriteLine();
 
             logger.WriteLine("HELP:");
             var helpText = HelpText.AutoBuild(parserResult, h => h, e => e);
             logger.WriteLine(helpText.ToString());
-            logger.WriteLine("");
+            logger.WriteLine();
+
+            logger.WriteLine("GENERATORS:");
+            ListAvailableGenerators();
+            logger.WriteLine();
         }
 
         protected virtual string VersionToString(Version v)
