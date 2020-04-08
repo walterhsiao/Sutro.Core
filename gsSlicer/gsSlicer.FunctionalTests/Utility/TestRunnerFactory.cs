@@ -17,7 +17,7 @@ namespace gsSlicer.FunctionalTests.Utility
         {
             var logger = new ConsoleLogger();
             return new ResultGenerator<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>(
-                new PrintGeneratorManager<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>(settings, logger), logger);
+                new PrintGeneratorManager<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>(settings, "", "", logger), logger);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using g3;
-using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 
@@ -13,6 +12,8 @@ namespace gs
         where TVertexInfo : BasicVertexInfo, new()
         where TSegmentInfo : BasicSegmentInfo, new()
     {
+        public abstract FillLoopBase<TVertexInfo, TSegmentInfo> CloneBare();
+
         public Polygon2d Polygon { get; protected set; } = new Polygon2d();
         protected List<TSegmentInfo> SegmentInfo = new List<TSegmentInfo>();
         protected List<TVertexInfo> VertexInfo = new List<TVertexInfo>();
@@ -34,7 +35,6 @@ namespace gs
         private bool loopStarted = false;
         private bool loopFinished = false;
 
-
         public void BeginOrAppendCurve(Vector2d pt, TVertexInfo vInfo = null)
         {
             Polygon.AppendVertex(pt);
@@ -49,7 +49,6 @@ namespace gs
             }
         }
 
-
         public void BeginLoop(Vector2d pt, TVertexInfo vInfo = null)
         {
             if (loopStarted)
@@ -59,7 +58,6 @@ namespace gs
 
             Polygon.AppendVertex(pt);
             VertexInfo.Add(vInfo);
-
         }
 
         public void AddToLoop(Vector2d pt, TVertexInfo vInfo = null, TSegmentInfo sInfo = null)
@@ -84,13 +82,21 @@ namespace gs
             loopFinished = true;
 
             SegmentInfo.Add(sInfo);
-
         }
 
         public double DistanceSquared(Vector2d pt, out int iNearSeg, out double fNearSegT)
         {
             return Polygon.DistanceSquared(pt, out iNearSeg, out fNearSegT);
         }
+
+        protected Vector2d InterpolateVertex(Vector2d vertexA, Vector2d vertexB, double param)
+        {
+            return vertexA * (1 - param) + vertexB * param;
+        }
+
+        protected abstract TVertexInfo InterpolateVertexInfo(TVertexInfo vertexInfoA, TVertexInfo vertexInfoB, double param);
+
+        protected abstract Tuple<TSegmentInfo, TSegmentInfo> SplitSegmentInfo(TSegmentInfo segmentInfo, double param);
 
         public void Roll(int k)
         {
@@ -205,6 +211,41 @@ namespace gs
             SegmentInfo.Reverse();
             foreach (var segmentInfo in SegmentInfo)
                 segmentInfo.Reverse();
+        }
+
+        public void RollMidSegment(int iSegment, double fNearSeg, FillLoopBase<TVertexInfo, TSegmentInfo> rolled, double tolerance = 0.001)
+        {
+            double splitParam = fNearSeg / Polygon.Segment(iSegment).Extent / 2d + 0.5d;
+
+            if (Math.Abs(fNearSeg) < GetSegment2dAfterVertex(iSegment).Extent - tolerance)
+            {
+                var interpolatedVertex = InterpolateVertex(Polygon[iSegment], Polygon[iSegment + 1], splitParam);
+                var interpolatedVertexData = InterpolateVertexInfo(GetVertexData(iSegment), GetVertexData(iSegment + 1), splitParam);
+                var splitSegmentData = SplitSegmentInfo(GetSegmentDataAfterVertex(iSegment), splitParam);
+
+                rolled.BeginLoop(interpolatedVertex, interpolatedVertexData);
+                rolled.AddToLoop(Polygon[iSegment + 1], GetVertexData(iSegment), splitSegmentData.Item2);
+
+                for (int i = iSegment + 2; i < VertexCount; ++i)
+                    rolled.AddToLoop(Polygon[i], VertexInfo[i], GetSegmentDataBeforeVertex(i));
+
+                for (int i = 0; i <= iSegment; ++i)
+                    rolled.AddToLoop(Polygon[i], VertexInfo[i], GetSegmentDataBeforeVertex(i));
+
+                rolled.CloseLoop(splitSegmentData.Item1);
+            }
+            else
+            {
+                if (fNearSeg > 0)
+                    ++iSegment;
+
+                rolled.BeginLoop(Polygon[iSegment], GetVertexData(iSegment));
+                for (int i = iSegment + 1; i < VertexCount; ++i)
+                    rolled.AddToLoop(Polygon[i], GetVertexData(i), GetSegmentDataBeforeVertex(i));
+                for (int i = 0; i < iSegment; ++i)
+                    rolled.AddToLoop(Polygon[i], GetVertexData(i), GetSegmentDataBeforeVertex(i));
+                rolled.CloseLoop(GetSegmentDataBeforeVertex(iSegment));
+            }
         }
     }
 }

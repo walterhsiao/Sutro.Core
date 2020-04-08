@@ -1,4 +1,5 @@
 ﻿using g3;
+using System;
 using System.Collections.Generic;
 
 namespace gs
@@ -18,6 +19,32 @@ namespace gs
                 AddToLoop(vertexEnumerator.Current);
 
             CloseLoop();
+        }
+
+        public override FillLoopBase<BasicVertexInfo, BasicSegmentInfo> CloneBare()
+        {
+            return new BasicFillLoop()
+            {
+                CustomThickness = CustomThickness,
+                FillType = FillType,
+                IsHoleShell = IsHoleShell,
+            };
+        }
+
+        protected override BasicVertexInfo InterpolateVertexInfo(BasicVertexInfo vertexInfoA, BasicVertexInfo vertexInfoB, double param)
+        {
+            if (vertexInfoA != null && vertexInfoB != null)
+                return vertexInfoA.Interpolate(vertexInfoB, param);
+            else
+                return null;
+        }
+
+        protected override Tuple<BasicSegmentInfo, BasicSegmentInfo> SplitSegmentInfo(BasicSegmentInfo segmentInfo, double param)
+        {
+            if (segmentInfo != null)
+                return segmentInfo.Split(param);
+            else
+                return new Tuple<BasicSegmentInfo, BasicSegmentInfo>(null, null);
         }
     }
 }
