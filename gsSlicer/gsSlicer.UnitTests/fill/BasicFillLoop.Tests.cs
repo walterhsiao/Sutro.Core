@@ -304,5 +304,157 @@ namespace gsSlicer.UnitTests.fill
             Assert.AreEqual(4, result[2].x, delta);
             Assert.AreEqual(0, result[2].y, delta);
         }
+
+        [TestMethod]
+        public void ConvertToCurve()
+        {
+            // Act
+            var result = new BasicFillCurve();
+            CreateTriangleCCW().ConvertToCurve(result);
+
+            // Assert
+            Assert.AreEqual(4, result.VertexCount);
+
+            Assert.AreEqual(0, result[0].x, delta);
+            Assert.AreEqual(0, result[0].y, delta);
+
+            Assert.AreEqual(4, result[1].x, delta);
+            Assert.AreEqual(0, result[1].y, delta);
+
+            Assert.AreEqual(4, result[2].x, delta);
+            Assert.AreEqual(3, result[2].y, delta);
+
+            Assert.AreEqual(0, result[3].x, delta);
+            Assert.AreEqual(0, result[3].y, delta);
+        }
+
+        [TestMethod]
+        public void SplitOnceFirstSegment()
+        {
+            // Act
+            var result = new List<BasicFillCurve>();
+            Func<BasicFillCurve> createFillCurveF = () => new BasicFillCurve();
+            CreateTriangleCCW().SplitAtDistances(new double[] { 3 }, result, createFillCurveF);
+
+            // Assert
+            Assert.AreEqual(2, result.Count);
+
+            var curve0 = result[0];
+            Assert.AreEqual(2, curve0.VertexCount);
+            Assert.AreEqual(0, curve0[0].x, delta);
+            Assert.AreEqual(0, curve0[0].y, delta);
+            Assert.AreEqual(3, curve0[1].x, delta);
+            Assert.AreEqual(0, curve0[1].y, delta);
+
+            var curve1 = result[1];
+            Assert.AreEqual(4, curve1.VertexCount);
+            Assert.AreEqual(3, curve1[0].x, delta);
+            Assert.AreEqual(0, curve1[0].y, delta);
+            Assert.AreEqual(4, curve1[1].x, delta);
+            Assert.AreEqual(0, curve1[1].y, delta);
+            Assert.AreEqual(4, curve1[2].x, delta);
+            Assert.AreEqual(3, curve1[2].y, delta);
+            Assert.AreEqual(0, curve1[3].x, delta);
+            Assert.AreEqual(0, curve1[3].y, delta);
+        }
+
+        [TestMethod]
+        public void SplitOnceSecondSegment()
+        {
+            // Act
+            var result = new List<BasicFillCurve>();
+            Func<BasicFillCurve> createFillCurveF = () => new BasicFillCurve();
+            CreateTriangleCCW().SplitAtDistances(new double[] { 5 }, result, createFillCurveF);
+
+            // Assert
+            Assert.AreEqual(2, result.Count);
+
+            var curve0 = result[0];
+            Assert.AreEqual(3, curve0.VertexCount);
+            Assert.AreEqual(0, curve0[0].x, delta);
+            Assert.AreEqual(0, curve0[0].y, delta);
+            Assert.AreEqual(4, curve0[1].x, delta);
+            Assert.AreEqual(0, curve0[1].y, delta);
+            Assert.AreEqual(4, curve0[2].x, delta);
+            Assert.AreEqual(1, curve0[2].y, delta);
+
+            var curve1 = result[1];
+            Assert.AreEqual(3, curve1.VertexCount);
+            Assert.AreEqual(4, curve1[0].x, delta);
+            Assert.AreEqual(1, curve1[0].y, delta);
+            Assert.AreEqual(4, curve1[1].x, delta);
+            Assert.AreEqual(3, curve1[1].y, delta);
+            Assert.AreEqual(0, curve1[2].x, delta);
+            Assert.AreEqual(0, curve1[2].y, delta);
+        }
+
+        [TestMethod]
+        public void SplitTwiceFirstSegment()
+        {
+            // Act
+            var result = new List<BasicFillCurve>();
+            Func<BasicFillCurve> createFillCurveF = () => new BasicFillCurve();
+            CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, result, createFillCurveF);
+
+            // Assert
+            Assert.AreEqual(3, result.Count);
+
+            var curve0 = result[0];
+            Assert.AreEqual(2, curve0.VertexCount);
+            Assert.AreEqual(0, curve0[0].x, delta);
+            Assert.AreEqual(0, curve0[0].y, delta);
+            Assert.AreEqual(1, curve0[1].x, delta);
+            Assert.AreEqual(0, curve0[1].y, delta);
+
+            var curve1 = result[1];
+            Assert.AreEqual(2, curve1.VertexCount);
+            Assert.AreEqual(1, curve1[0].x, delta);
+            Assert.AreEqual(0, curve1[0].y, delta);
+            Assert.AreEqual(3, curve1[1].x, delta);
+            Assert.AreEqual(0, curve1[1].y, delta);
+
+            var curve2 = result[2];
+            Assert.AreEqual(4, curve2.VertexCount);
+            Assert.AreEqual(3, curve2[0].x, delta);
+            Assert.AreEqual(0, curve2[0].y, delta);
+            Assert.AreEqual(4, curve2[1].x, delta);
+            Assert.AreEqual(0, curve2[1].y, delta);
+            Assert.AreEqual(4, curve2[2].x, delta);
+            Assert.AreEqual(3, curve2[2].y, delta);
+            Assert.AreEqual(0, curve2[3].x, delta);
+            Assert.AreEqual(0, curve2[3].y, delta);
+        }
+
+        [TestMethod]
+        public void SplitTwiceFirstSegmentConnect()
+        {
+            // Act
+            var result = new List<BasicFillCurve>();
+            Func<BasicFillCurve> createFillCurveF = () => new BasicFillCurve();
+            CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, result, createFillCurveF, true);
+
+            // Assert
+            Assert.AreEqual(2, result.Count);
+
+            var curve0 = result[0];
+            Assert.AreEqual(2, curve0.VertexCount);
+            Assert.AreEqual(1, curve0[0].x, delta);
+            Assert.AreEqual(0, curve0[0].y, delta);
+            Assert.AreEqual(3, curve0[1].x, delta);
+            Assert.AreEqual(0, curve0[1].y, delta);
+
+            var curve1 = result[1];
+            Assert.AreEqual(5, curve1.VertexCount);
+            Assert.AreEqual(3, curve1[0].x, delta);
+            Assert.AreEqual(0, curve1[0].y, delta);
+            Assert.AreEqual(4, curve1[1].x, delta);
+            Assert.AreEqual(0, curve1[1].y, delta);
+            Assert.AreEqual(4, curve1[2].x, delta);
+            Assert.AreEqual(3, curve1[2].y, delta);
+            Assert.AreEqual(0, curve1[3].x, delta);
+            Assert.AreEqual(0, curve1[3].y, delta);
+            Assert.AreEqual(1, curve1[4].x, delta);
+            Assert.AreEqual(0, curve1[4].y, delta);
+        }
     }
 }

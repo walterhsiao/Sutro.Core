@@ -21,7 +21,7 @@ namespace gs
     {
         private readonly ILogger logger;
 
-        private static JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings
+        private readonly static JsonSerializerSettings jsonSerializerSettings = new JsonSerializerSettings
         {
             MissingMemberHandling = MissingMemberHandling.Error,
         };

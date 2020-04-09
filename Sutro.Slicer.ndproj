@@ -2,15 +2,15 @@
 <NDepend AppName="Sutro.Slicer" Platform="DotNet" FileWrittenByProductVersion="2019.3.0.9290">
   <OutputDir KeepXmlFiles="False">.\NDependOut</OutputDir>
   <IDEFiles>
-    <IDEFile FilePath=".\Sutro.Slicer.sln" Filters="-test" Configuration="DEBUG|AnyCPU" />
+    <IDEFile FilePath=".\Sutro.Slicer.sln" Filters="-test -gsSlicer.CLI" Configuration="DEBUG|AnyCPU" />
   </IDEFiles>
   <Assemblies />
   <FrameworkAssemblies>
     <Name>netstandard</Name>
     <Name>geometry3Sharp</Name>
-    <Name>Sutro.PathWorks.Plugins.API</Name>
     <Name>clipper_library</Name>
     <Name>Newtonsoft.Json</Name>
+    <Name>CommandLine</Name>
   </FrameworkAssemblies>
   <Dirs>
     <Dir>C:\windows\Microsoft.NET\Framework\v4.0.30319</Dir>

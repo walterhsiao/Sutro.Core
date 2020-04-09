@@ -5,17 +5,17 @@ using System.Reflection;
 
 namespace gs
 {
-    public class SettingsContainsReferenceType : Exception
+    public class SettingsContainsReferenceTypeException : Exception
     {
-        public SettingsContainsReferenceType() : base()
+        public SettingsContainsReferenceTypeException() : base()
         {
         }
 
-        public SettingsContainsReferenceType(string message) : base(message)
+        public SettingsContainsReferenceTypeException(string message) : base(message)
         {
         }
 
-        public SettingsContainsReferenceType(string message, Exception innerException) : base(message, innerException)
+        public SettingsContainsReferenceTypeException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }
@@ -127,7 +127,7 @@ namespace gs
                 }
                 else
                 {
-                    throw new SettingsContainsReferenceType(
+                    throw new SettingsContainsReferenceTypeException(
                         $"All reference types in classes derived from Settings should also inherit from Settings to " +
                         $"allow recursive deep copying. Type {type} was found on a public property or field; " +
                         $"to resolve, make {type} inherit from abstract base class Settings");

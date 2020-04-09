@@ -14,7 +14,7 @@ namespace gs
 
     public abstract class MachineInfo : SettingsPrototype
     {
-        protected static string UnknownUUID = "00000000-0000-0000-0000-000000000000";
+        protected readonly static string UnknownUUID = "00000000-0000-0000-0000-000000000000";
 
         public string ManufacturerName = "Unknown";
         public string ManufacturerUUID = UnknownUUID;

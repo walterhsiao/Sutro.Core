@@ -12,6 +12,8 @@ namespace gs
         where TVertexInfo : BasicVertexInfo, new()
         where TSegmentInfo : BasicSegmentInfo, new()
     {
+        public abstract FillCurveBase<TVertexInfo, TSegmentInfo> CloneBare();
+
         protected PolyLine2d Polyline = new PolyLine2d();
         protected List<TSegmentInfo> SegmentInfo = new List<TSegmentInfo>();
         protected List<TVertexInfo> VertexInfo = new List<TVertexInfo>();
@@ -33,7 +35,6 @@ namespace gs
 
         protected FillCurveBase()
         {
-
         }
 
         protected FillCurveBase(FillCurveBase<TVertexInfo, TSegmentInfo> other)
@@ -65,7 +66,6 @@ namespace gs
 
             Polyline.AppendVertex(pt);
             VertexInfo.Add(vInfo);
-
         }
 
         public void AddToCurve(Vector2d pt, TVertexInfo vInfo = null, TSegmentInfo sInfo = null)
@@ -77,6 +77,15 @@ namespace gs
             VertexInfo.Add(vInfo);
             SegmentInfo.Add(sInfo);
         }
+
+        protected Vector2d InterpolateVertex(Vector2d vertexA, Vector2d vertexB, double param)
+        {
+            return vertexA * (1 - param) + vertexB * param;
+        }
+
+        protected abstract TVertexInfo InterpolateVertexInfo(TVertexInfo vertexInfoA, TVertexInfo vertexInfoB, double param);
+
+        protected abstract Tuple<TSegmentInfo, TSegmentInfo> SplitSegmentInfo(TSegmentInfo segmentInfo, double param);
 
         public PointData GetPoint(int i, bool reverse)
         {
@@ -121,7 +130,7 @@ namespace gs
         {
             return SegmentInfo[vertexIndex];
         }
-        
+
         public TSegmentInfo GetSegmentDataBeforeVertex(int vertexIndex)
         {
             return SegmentInfo[vertexIndex - 1];
@@ -149,10 +158,127 @@ namespace gs
             VertexInfo[vertexIndex] = vertexInfo;
         }
 
-        public void TrimEnd(double d)
+        public void TrimFront(double trimDistance)
         {
-            throw new NotImplementedException();
+            // TODO: Check distance
+            var split = new List<FillCurveBase<TVertexInfo, TSegmentInfo>>();
+            SplitAtDistances(new double[] { trimDistance }, split, CloneBare);
+
+            if (split.Count > 1)
+            {
+                Polyline = split[1].Polyline;
+                VertexInfo = split[1].VertexInfo;
+                SegmentInfo = split[1].SegmentInfo;
+            }
         }
 
+        public void TrimBack(double trimDistance)
+        {
+            // TODO: Check distance
+            var split = new List<FillCurveBase<TVertexInfo, TSegmentInfo>>();
+            SplitAtDistances(new double[] { ArcLength - trimDistance }, split, CloneBare);
+
+            if (split.Count > 1)
+            {
+                Polyline = split[0].Polyline;
+                VertexInfo = split[0].VertexInfo;
+                SegmentInfo = split[0].SegmentInfo;
+            }
+        }
+
+        public void TrimFrontAndBack(double trimDistanceFront, double? trimDistanceBack = null)
+        {
+            // TODO: Check distance
+            var split = new List<FillCurveBase<TVertexInfo, TSegmentInfo>>();
+            var trimDistances = new double[] { trimDistanceFront, ArcLength - trimDistanceBack ?? trimDistanceFront };
+            SplitAtDistances(trimDistances, split, CloneBare);
+
+            if (split.Count > 1)
+            {
+                Polyline = split[1].Polyline;
+                VertexInfo = split[1].VertexInfo;
+                SegmentInfo = split[1].SegmentInfo;
+            }
+        }
+
+        public void SplitAtDistances<TCurve>(IEnumerable<double> splitDistances, IList<TCurve> splitFillCurves, Func<TCurve> createFillCurveF)
+            where TCurve : FillCurveBase<TVertexInfo, TSegmentInfo>
+        {
+            // TODO: Decide what happens when split distance greater than length.
+            // TODO: Check for split distances monotonically increasing and > 0.
+
+            double cumulativeDistance = 0;
+            var splitsQueue = new Queue<double>(splitDistances);
+
+            // Initialize the first curve
+            var curve = createFillCurveF();
+            curve.BeginCurve(Polyline[0], GetVertexData(0));
+
+            // If splits are empty, just return the full copy of this curve
+            if (splitsQueue.Count == 0)
+            {
+                curve.Extend(this);
+                splitFillCurves.Add(curve);
+            }
+
+            // If there is a split location on the first vertex, remove first split
+            if (splitsQueue.Peek() == 0)
+                splitsQueue.Dequeue();
+
+            // Iterate through the fill elements in the polygon.
+            for (int i = 1; i < VertexCount; i++)
+            {
+                // If no splits are left, just add the current point
+                if (splitsQueue.Count == 0)
+                {
+                    curve.AddToCurve(Polyline[i], GetVertexData(i), GetSegmentDataBeforeVertex(i));
+                    continue;
+                }
+
+                // Calculate how much distance the current segment adds
+                double nextDistance = GetSegment2dBeforeVertex(i).Length;
+
+                var segmentInfo = GetSegmentDataBeforeVertex(i);
+
+                // For each split distance within the current segment
+                while (splitsQueue.Count > 0 && splitsQueue.Peek() < cumulativeDistance + nextDistance)
+                {
+                    // Create normalized split distance (0,1)
+                    double splitDistance = splitsQueue.Dequeue() - cumulativeDistance;
+                    double t = splitDistance / nextDistance;
+
+                    var splitVertex = InterpolateVertex(curve.Polyline[curve.VertexCount - 1], Polyline[i], t);
+                    var splitVertexData = InterpolateVertexInfo(curve.GetVertexData(curve.VertexCount - 1), GetVertexData(i), t);
+                    var splitSegmentData = SplitSegmentInfo(segmentInfo, t);
+
+                    curve.AddToCurve(splitVertex, splitVertexData, splitSegmentData.Item1);
+                    splitFillCurves.Add(curve);
+                    curve = createFillCurveF();
+                    curve.BeginCurve(splitVertex, splitVertexData);
+
+                    segmentInfo = splitSegmentData.Item2;
+                    cumulativeDistance += splitDistance;
+                    nextDistance -= splitDistance;
+                }
+
+                curve.AddToCurve(Polyline[i], GetVertexData(i), segmentInfo);
+
+                cumulativeDistance += nextDistance;
+            }
+            splitFillCurves.Add(curve);
+        }
+
+        public void Extend(FillCurveBase<TVertexInfo, TSegmentInfo> other, double stitchTolerance = 1e-6)
+        {
+            if (!other.Polyline[0].EpsilonEqual(Polyline[VertexCount - 1], stitchTolerance))
+            {
+                throw new ArgumentException("Can only extend with a FillCurve that starts where this FillCurve ends.");
+            }
+
+            for (int i = 1; i < other.VertexCount; i++)
+            {
+                AddToCurve(other.Polyline[i], other.GetVertexData(i), other.GetSegmentDataBeforeVertex(i));
+            }
+        }
     }
 }

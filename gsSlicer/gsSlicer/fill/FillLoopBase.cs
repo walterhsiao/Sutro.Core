@@ -213,6 +213,16 @@ namespace gs
                 segmentInfo.Reverse();
         }
 
+        public virtual void ConvertToCurve(FillCurveBase<TVertexInfo, TSegmentInfo> curve)
+        {
+            curve.BeginCurve(Polygon[0], GetVertexData(0));
+            for (int i = 1; i < VertexCount; ++i)
+            {
+                curve.AddToCurve(Polygon[i % VertexCount], GetVertexData(i), GetSegmentDataBeforeVertex(i));
+            }
+            curve.AddToCurve(Polygon[0], GetVertexData(0), GetSegmentDataBeforeVertex(0));
+        }
+
         public void RollMidSegment(int iSegment, double fNearSeg, FillLoopBase<TVertexInfo, TSegmentInfo> rolled, double tolerance = 0.001)
         {
             double splitParam = fNearSeg / Polygon.Segment(iSegment).Extent / 2d + 0.5d;
@@ -245,6 +255,29 @@ namespace gs
                 for (int i = 0; i < iSegment; ++i)
                     rolled.AddToLoop(Polygon[i], GetVertexData(i), GetSegmentDataBeforeVertex(i));
                 rolled.CloseLoop(GetSegmentDataBeforeVertex(iSegment));
+            }
+        }
+
+        public void SplitAtDistances<TFillCurve>(
+                IEnumerable<double> splits,
+                IList<TFillCurve> splitFillCurves,
+                Func<TFillCurve> createFillCurveF,
+                bool connectEnds = false)
+            where TFillCurve : FillCurveBase<TVertexInfo, TSegmentInfo>
+        {
+            // TODO: Decide what happens when split distance greater than perimeter.
+            // TODO: Check for split distances monotonically increasing and > 0.
+            // TODO: Check for split distance count more than 0.
+            var curve = createFillCurveF();
+            ConvertToCurve(curve);
+            curve.SplitAtDistances(splits, splitFillCurves, createFillCurveF);
+
+            if (connectEnds)
+            {
+                var lastCurve = splitFillCurves[splitFillCurves.Count - 1];
+                var firstCurve = splitFillCurves[0];
+                splitFillCurves.RemoveAt(0);
+                lastCurve.Extend(firstCurve);
             }
         }
     }

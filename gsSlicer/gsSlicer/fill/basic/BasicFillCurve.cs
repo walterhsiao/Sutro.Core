@@ -19,23 +19,23 @@ namespace gs
                 BeginOrAppendCurve(vertexEnumerator.Current);
         }
 
-        [Obsolete("This method currently is jury-rigged; logic needs to be improved for non-trivial cases")]
-        public void TrimBothEnds(double v)
+        public override FillCurveBase<BasicVertexInfo, BasicSegmentInfo> CloneBare()
         {
-            // TODO: This method needs big improvements. The segment and vertex information needs
-            // to be appropriately interpolated when removing points.
+            return new BasicFillCurve()
+            {
+                CustomThickness = CustomThickness,
+                FillType = FillType,
+            };
+        }
 
-            Polyline.Trim(v);
+        protected override BasicVertexInfo InterpolateVertexInfo(BasicVertexInfo vertexInfoA, BasicVertexInfo vertexInfoB, double param)
+        {
+            return vertexInfoA?.Interpolate(vertexInfoB, param) ?? null;
+        }
 
-            // Exit early if no points were actually removed
-            if (Polyline.VertexCount == VertexInfo.Count)
-                return;
-
-            // Remove any vertex info that was trimmed away.
-            VertexInfo.RemoveRange(Polyline.VertexCount, VertexInfo.Count - Polyline.VertexCount);
-
-            // Remove any segment info that was trimmed away.
-            VertexInfo.RemoveRange(Polyline.VertexCount - 1, SegmentInfo.Count - 1 - Polyline.VertexCount);
+        protected override Tuple<BasicSegmentInfo, BasicSegmentInfo> SplitSegmentInfo(BasicSegmentInfo segmentInfo, double param)
+        {
+            return segmentInfo?.Split(param) ?? new Tuple<BasicSegmentInfo, BasicSegmentInfo>(null, null);
         }
     }
 }

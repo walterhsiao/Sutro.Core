@@ -1024,7 +1024,7 @@ namespace gs
                 };
 
                 // leave space for end-blobs (input paths are extent we want to hit)
-                pline.TrimBothEnds(Settings.Machine.NozzleDiamMM / 2);
+                pline.TrimFrontAndBack(Settings.Machine.NozzleDiamMM / 2);
 
                 // ignore tiny paths
                 if (PathFilterF != null && PathFilterF(pline) == true)

@@ -190,7 +190,7 @@ namespace gsCore.UnitTests
             var orig = new SettingsE();
             orig.SubSettings.SubFieldX = 1;
 
-            Assert.ThrowsException<SettingsContainsReferenceType>(() =>
+            Assert.ThrowsException<SettingsContainsReferenceTypeException>(() =>
             {
                 var copy = orig.CloneAs<SettingsE>();
             });
