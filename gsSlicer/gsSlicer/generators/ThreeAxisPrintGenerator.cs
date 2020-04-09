@@ -122,6 +122,9 @@ namespace gs
         // Replace this to use a different path builder
         public Func<PrintLayerData, ToolpathSetBuilder> PathBuilderFactoryF;
 
+        // Replace this to use a different group scheduler
+        public Func<PrintLayerData, IFillPathScheduler2d, Vector2d, GroupScheduler2d> GroupSchedulerFactoryF;
+
         // Replace this to use a different scheduler
         public Func<PrintLayerData, IFillPathScheduler2d> SchedulerFactoryF;
 
@@ -194,6 +197,8 @@ namespace gs
             };
 
             SchedulerFactoryF = get_layer_scheduler;
+
+            GroupSchedulerFactoryF = (layer_data, target, start) => new GroupScheduler2d(target, start);
 
             ShellSelectorFactoryF = (layer_data) =>
                 new NextNearestLayerShellsSelector(layer_data.ShellFills);
@@ -339,8 +344,7 @@ namespace gs
                 // rest of code does not directly access path builder, instead it
                 // sends paths to scheduler.
                 IFillPathScheduler2d layerScheduler = SchedulerFactoryF(layerdata);
-                GroupScheduler2d groupScheduler = new GroupScheduler2d(layerScheduler, Compiler.NozzlePosition.xy);
-                //GroupScheduler groupScheduler = new PassThroughGroupScheduler(layerScheduler, Compiler.NozzlePosition.xy);
+                var groupScheduler = GroupSchedulerFactoryF(layerdata, layerScheduler, layerScheduler.CurrentPosition);
                 layerdata.Scheduler = groupScheduler;
 
                 BeginLayerF(layerdata);

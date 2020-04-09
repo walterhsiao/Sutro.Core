@@ -25,7 +25,7 @@ namespace gs
         /// <summary>
         /// Final point in the output paths, computed by SortAndAppendTo()
         /// </summary>
-        public Vector2d OutPoint;
+        public Vector2d CurrentPosition { get; private set; }
 
         protected class PathItem
         {
@@ -63,7 +63,7 @@ namespace gs
         public virtual void SortAndAppendTo(Vector2d startPoint, IFillPathScheduler2d scheduler)
         {
             var saveHint = scheduler.SpeedHint;
-            OutPoint = startPoint;
+            CurrentPosition = startPoint;
 
             List<Index3i> sorted = find_short_path_v1(startPoint);
             foreach (Index3i idx in sorted)
@@ -79,12 +79,12 @@ namespace gs
                     {
                         loop.curve.Roll(idx.c);
                         paths.Append(loop.curve);
-                        OutPoint = loop.curve.EntryExitPoint;
+                        CurrentPosition = loop.curve.EntryExitPoint;
                     }
                     else
                     {
                         paths.Append(loop.curve);
-                        OutPoint = loop.curve[0];
+                        CurrentPosition = loop.curve[0];
                     }
                 }
                 else
@@ -93,7 +93,7 @@ namespace gs
                     if (idx.c == 1)
                         span.curve.Reverse();
                     paths.Append(span.curve);
-                    OutPoint = span.curve.End;
+                    CurrentPosition = span.curve.End;
                     pathHint = span.speedHint;
                 }
 

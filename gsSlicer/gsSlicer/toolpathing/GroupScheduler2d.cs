@@ -54,7 +54,7 @@ namespace gs
             if (CurrentSorter != null)
             {
                 CurrentSorter.SortAndAppendTo(lastPoint, TargetScheduler);
-                lastPoint = CurrentSorter.OutPoint;
+                lastPoint = CurrentSorter.CurrentPosition;
                 CurrentSorter = null;
             }
         }

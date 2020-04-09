@@ -15,6 +15,9 @@ namespace gs
         void AppendCurveSets(List<FillCurveSet2d> paths);
 
         SchedulerSpeedHint SpeedHint { get; set; }
+
+        Vector2d CurrentPosition { get; }
+
     }
 
     // dumbest possible scheduler...
@@ -42,6 +45,8 @@ namespace gs
             get { return speed_hint; }
             set { speed_hint = value; }
         }
+
+        public Vector2d CurrentPosition => Builder.Position.xy;
 
         protected virtual void AppendFill(IFillElement fill)
         {
