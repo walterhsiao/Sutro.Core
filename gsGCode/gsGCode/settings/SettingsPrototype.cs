@@ -39,11 +39,11 @@ namespace gs
                     {
                         prop_other = other.GetType().GetProperty(prop_this.Name);
                     }
-                    catch (AmbiguousMatchException e)
+                    catch (AmbiguousMatchException _)
                     {
                         prop_other = other.GetType().GetProperty(prop_this.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
                     }
-                    if (prop_other != null)
+                    if (prop_other != null && prop_other.GetValue(other) != null)
                     {
                         if (prop_this.PropertyType.IsEnum)
                         {
@@ -54,6 +54,12 @@ namespace gs
                         }
                         else
                         {
+                            if (prop_this.GetValue(this) == null)
+                            {
+                                var a = Activator.CreateInstance(prop_this.PropertyType);
+                                prop_this.SetValue(this, a);
+
+                            }
                             prop_this.SetValue(this, CopyValue(prop_other.GetValue(other)));
                         }
                     }

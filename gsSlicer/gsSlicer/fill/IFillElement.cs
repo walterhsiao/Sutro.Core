@@ -15,5 +15,7 @@ namespace gs
         IFillType FillType { get; set; }
 
         IEnumerable<Vector2d> Vertices { get; }
+        bool IsHoleShell { get; }
+        int PerimOrder { get; }
     }
 }

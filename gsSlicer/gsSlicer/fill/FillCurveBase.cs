@@ -29,6 +29,11 @@ namespace gs
         public int SegmentCount { get => SegmentInfo.Count; }
 
         public IEnumerable<Vector2d> Vertices { get => Polyline.Vertices; }
+
+        public bool IsHoleShell { get; set; } = false;
+
+        public int PerimOrder { get; set; } = -1;
+
         public Vector2d this[int i] { get => Polyline[i]; }
 
         private bool curveStarted = false;
@@ -280,5 +285,18 @@ namespace gs
                 AddToCurve(other.Polyline[i], other.GetVertexData(i), other.GetSegmentDataBeforeVertex(i));
             }
         }
+
+        public void PopulateFromLoop(FillLoopBase<TVertexInfo, TSegmentInfo> loop)
+        {
+            CustomThickness = loop.CustomThickness;
+            FillType = loop.FillType;
+            BeginCurve(loop[0], loop.GetVertexData(0));
+            for (int i = 1; i < loop.VertexCount; i++)
+            {
+                AddToCurve(loop[i], loop.GetVertexData(i), loop.GetSegmentDataBeforeVertex(i));
+            }
+            AddToCurve(loop[0], loop.GetVertexData(0));
+        }
+
     }
 }

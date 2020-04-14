@@ -1,4 +1,5 @@
 ﻿using g3;
+using System;
 using System.Collections.Generic;
 
 namespace gs
@@ -37,9 +38,31 @@ namespace gs
                 Append(p, fillType);
         }
 
+        public IEnumerable<IFillElement> EnumerateAll()
+        {
+            foreach (var loop in Loops)
+                yield return loop;
+
+            foreach (var curve in Curves)
+                yield return curve;
+        }
+
         public void Append(IFillLoop loop)
         {
             Loops.Add(loop);
+        }
+
+        public void Append(IFillElement element)
+        {
+            switch (element)
+            {
+                case IFillLoop loop:
+                    Append(loop);
+                    break;
+                case IFillCurve curve:
+                    Append(curve);
+                    break;
+            }
         }
 
         public void Append(List<IFillLoop> loops)

@@ -31,6 +31,13 @@ namespace gs
             };
         }
 
+        public override IFillCurve ConvertToCurve()
+        {
+            var curve = new BasicFillCurve();
+            curve.PopulateFromLoop(this);
+            return curve;
+        }
+
         protected override BasicVertexInfo InterpolateVertexInfo(BasicVertexInfo vertexInfoA, BasicVertexInfo vertexInfoB, double param)
         {
             if (vertexInfoA != null && vertexInfoB != null)

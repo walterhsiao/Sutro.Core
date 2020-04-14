@@ -133,11 +133,15 @@ namespace gs
         public virtual Vector3d AppendExtrude(List<Vector2d> toPoints, double fSpeed,
             IFillType fillType, List<TPVertexFlags> perVertexFlags = null, bool isHole = false)
         {
-            return AppendExtrude(toPoints, fSpeed, currentDims, fillType, perVertexFlags, isHole);
+            return AppendExtrude(toPoints, fSpeed, currentDims, fillType, isHole, perVertexFlags);
         }
 
-        public virtual Vector3d AppendExtrude(List<Vector2d> toPoints, double fSpeed,
-            Vector2d dimensions, IFillType fillType, List<TPVertexFlags> perVertexFlags = null, bool isHole = false)
+        public virtual LinearToolpath CreateExtrude(
+                List<Vector2d> toPoints,
+                double fSpeed, Vector2d dimensions,
+                IFillType fillType,
+                bool isHole,
+                List<TPVertexFlags> perVertexFlags = null)
         {
             Vector2d useDims = currentDims;
             if (dimensions.x > 0 && dimensions.x != NO_DIM.x)
@@ -146,9 +150,8 @@ namespace gs
                 useDims.y = dimensions.y;
 
             LinearToolpath extrusion = new LinearToolpath(MoveType);
-            extrusion.FillType = fillType;
-            extrusion.IsHole = isHole;
 
+            extrusion.FillType = fillType;
             extrusion.AppendVertex(new PrintVertex(currentPos, NO_RATE, useDims), TPVertexFlags.IsPathStart);
 
             for (int k = 1; k < toPoints.Count; ++k)
@@ -159,6 +162,13 @@ namespace gs
             }
             if (perVertexFlags != null)
                 ToolpathUtil.AddPerVertexFlags(extrusion, perVertexFlags);
+            return extrusion;
+        }
+
+        public virtual Vector3d AppendExtrude(List<Vector2d> toPoints, double fSpeed,
+            Vector2d dimensions, IFillType fillType, bool isHole, List<TPVertexFlags> perVertexFlags = null)
+        {
+            var extrusion = CreateExtrude(toPoints, fSpeed, dimensions, fillType, isHole, perVertexFlags);
             AppendPath(extrusion);
             return currentPos;
         }

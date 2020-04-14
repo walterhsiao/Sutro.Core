@@ -2,6 +2,7 @@
 using gs.FillTypes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace gs
 {
@@ -91,7 +92,7 @@ namespace gs
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;
 
-            AssertValidLoop(poly, "AppendFillLoop");
+            AssertValidLoop(poly);
 
             int startIndex = FindLoopEntryPoint(poly, currentPos2);
 
@@ -165,7 +166,7 @@ namespace gs
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;
 
-            AssertValidCurve(curve, "AppendBasicFillCurve");
+            AssertValidCurve(curve);
 
             if (curve.Start.DistanceSquared(currentPos2) > curve.End.DistanceSquared(currentPos2))
             {
@@ -197,7 +198,7 @@ namespace gs
             Vector2d dimensions = GCodeUtil.UnspecifiedDimensions;
             if (curve.CustomThickness > 0)
                 dimensions.x = curve.CustomThickness;
-            Builder.AppendExtrude(vertices, useSpeed, dimensions, curve.FillType, flags);
+            Builder.AppendExtrude(vertices, useSpeed, dimensions, curve.FillType, curve.IsHoleShell, flags);
         }
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
@@ -210,18 +211,30 @@ namespace gs
             return pathCurve.FillType.ModifySpeed(speed, SpeedHint);
         }
 
-        protected void AssertValidCurve(IFillCurve curve, string methodName)
+        protected void AssertValidCurve(IFillCurve curve)
         {
             int N = curve.VertexCount;
             if (N < 2)
-                throw new Exception($"{GetType().AssemblyQualifiedName}.{methodName}: degenerate curve!");
+            {
+                StackFrame frame = new StackFrame(1);
+                var method = frame.GetMethod();
+                var type = method.DeclaringType;
+                var name = method.Name;
+                throw new ArgumentException($"{type}.{name}: degenerate curve; must have at least 2 points.");
+            }
         }
 
-        protected void AssertValidLoop(IFillLoop curve, string methodName)
+        protected void AssertValidLoop(IFillLoop curve)
         {
             int N = curve.VertexCount;
             if (N < 3)
-                throw new Exception($"{GetType().AssemblyQualifiedName}.{methodName}: degenerate loop!");
+            {
+                StackFrame frame = new StackFrame(1);
+                var method = frame.GetMethod();
+                var type = method.DeclaringType;
+                var name = method.Name;
+                throw new ArgumentException($"{type}.{name}: degenerate loop; must have at least 3 points");
+            }
         }
     }
 }

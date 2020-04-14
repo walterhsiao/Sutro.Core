@@ -30,6 +30,10 @@ namespace gs
 
         public Vector2d EntryExitPoint => Polygon.Vertices[0];
 
+        public AxisAlignedBox2d Bounds => Polygon.GetBounds();
+
+        public int PerimOrder { get; set; } = -1;
+
         public Vector2d this[int i] { get => Polygon[i]; }
 
         private bool loopStarted = false;
@@ -280,5 +284,7 @@ namespace gs
                 lastCurve.Extend(firstCurve);
             }
         }
+
+        public abstract IFillCurve ConvertToCurve();
     }
 }
