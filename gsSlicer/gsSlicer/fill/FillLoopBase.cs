@@ -214,7 +214,7 @@ namespace gs
             VertexInfo.Reverse();
             SegmentInfo.Reverse();
             foreach (var segmentInfo in SegmentInfo)
-                segmentInfo.Reverse();
+                segmentInfo?.Reverse();
         }
 
         public virtual void ConvertToCurve(FillCurveBase<TVertexInfo, TSegmentInfo> curve)
@@ -233,12 +233,13 @@ namespace gs
 
             if (Math.Abs(fNearSeg) < GetSegment2dAfterVertex(iSegment).Extent - tolerance)
             {
-                var interpolatedVertex = InterpolateVertex(Polygon[iSegment], Polygon[iSegment + 1], splitParam);
-                var interpolatedVertexData = InterpolateVertexInfo(GetVertexData(iSegment), GetVertexData(iSegment + 1), splitParam);
+                int iNextVertex = (iSegment + 1) % VertexCount;
+                var interpolatedVertex = InterpolateVertex(Polygon[iSegment], Polygon[iNextVertex], splitParam);
+                var interpolatedVertexData = InterpolateVertexInfo(GetVertexData(iSegment), GetVertexData(iNextVertex), splitParam);
                 var splitSegmentData = SplitSegmentInfo(GetSegmentDataAfterVertex(iSegment), splitParam);
 
                 rolled.BeginLoop(interpolatedVertex, interpolatedVertexData);
-                rolled.AddToLoop(Polygon[iSegment + 1], GetVertexData(iSegment), splitSegmentData.Item2);
+                rolled.AddToLoop(Polygon[iNextVertex], GetVertexData(iSegment), splitSegmentData.Item2);
 
                 for (int i = iSegment + 2; i < VertexCount; ++i)
                     rolled.AddToLoop(Polygon[i], VertexInfo[i], GetSegmentDataBeforeVertex(i));
@@ -252,6 +253,8 @@ namespace gs
             {
                 if (fNearSeg > 0)
                     ++iSegment;
+                if (iSegment >= VertexCount)
+                    iSegment = 0;
 
                 rolled.BeginLoop(Polygon[iSegment], GetVertexData(iSegment));
                 for (int i = iSegment + 1; i < VertexCount; ++i)

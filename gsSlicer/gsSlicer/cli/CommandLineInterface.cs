@@ -9,10 +9,10 @@ namespace gs
 {
     public class CommandLineInterface
     {
-        private readonly ILogger logger;
-        private readonly Dictionary<string, IPrintGeneratorManager> printGeneratorDict;
+        protected readonly ILogger logger;
+        protected readonly Dictionary<string, IPrintGeneratorManager> printGeneratorDict;
 
-        private IPrintGeneratorManager printGeneratorManager;
+        protected IPrintGeneratorManager printGeneratorManager;
 
         public CommandLineInterface(ILogger logger, IEnumerable<IPrintGeneratorManager> printGenerators)
         {

@@ -81,6 +81,9 @@ namespace gs
         // available after calling Generate()
         public GCodeFile Result { get; protected set; }
 
+        public List<string> LoggedErrors { get; private set; } = new List<string>();
+        public List<string> LoggedWarnings { get; private set; } = new List<string>();
+
         // Generally we discard the paths at each layer as we generate them. If you
         // would like to analyze, set this to true, and then AccumulatedPaths will
         // be available after calling Generate(). The list AccumulatedPaths.Paths will
@@ -91,11 +94,16 @@ namespace gs
 
         public PrintTimeStatistics TotalPrintTimeStatistics { get; private set; } = new PrintTimeStatistics();
 
-        public IEnumerable<string> GenerationReport
+        public virtual IEnumerable<string> GenerationReport
         {
             get
             {
                 foreach (var s in TotalPrintTimeStatistics.ToStringList())
+                    yield return s;
+
+                yield return "";
+
+                foreach (var s in TotalExtrusionReport)
                     yield return s;
             }
         }
