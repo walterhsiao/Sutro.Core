@@ -10,7 +10,7 @@ namespace gs
     public abstract class FillCurveBase<TVertexInfo, TSegmentInfo> :
         FillElementBase<TVertexInfo, TSegmentInfo>, IFillCurve
         where TVertexInfo : BasicVertexInfo, new()
-        where TSegmentInfo : BasicSegmentInfo, new()
+        where TSegmentInfo : BasicSegmentInfo, ICloneable, new()
     {
         public abstract FillCurveBase<TVertexInfo, TSegmentInfo> CloneBare();
 
@@ -298,5 +298,15 @@ namespace gs
             AddToCurve(loop[0], loop.GetVertexData(0));
         }
 
+        public List<IFillCurve> SplitAtDistances(List<double> splitDistances)
+        {
+            var curves = new List<FillCurveBase<TVertexInfo, TSegmentInfo>>();
+            SplitAtDistances(splitDistances, curves, () => CloneBare());
+            var iCurves = new List<IFillCurve>();
+
+            foreach (var curve in curves)
+                iCurves.Add(curve);
+            return iCurves;
+        }
     }
 }

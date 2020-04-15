@@ -28,12 +28,24 @@ namespace gs
                 CustomThickness = CustomThickness,
                 FillType = FillType,
                 IsHoleShell = IsHoleShell,
+                PerimOrder = PerimOrder
+            };
+        }
+
+        public override FillCurveBase<BasicVertexInfo, BasicSegmentInfo> CloneBareAsCurve()
+        {
+            return new BasicFillCurve()
+            {
+                CustomThickness = CustomThickness,
+                FillType = FillType,
+                IsHoleShell = IsHoleShell,
+                PerimOrder = PerimOrder
             };
         }
 
         public override IFillCurve ConvertToCurve()
         {
-            var curve = new BasicFillCurve();
+            var curve = CloneBareAsCurve();
             curve.PopulateFromLoop(this);
             return curve;
         }

@@ -10,9 +10,10 @@ namespace gs
     public abstract class FillLoopBase<TVertexInfo, TSegmentInfo> :
         FillElementBase<TVertexInfo, TSegmentInfo>, IFillLoop
         where TVertexInfo : BasicVertexInfo, new()
-        where TSegmentInfo : BasicSegmentInfo, new()
+        where TSegmentInfo : BasicSegmentInfo, ICloneable, new()
     {
         public abstract FillLoopBase<TVertexInfo, TSegmentInfo> CloneBare();
+        public abstract FillCurveBase<TVertexInfo, TSegmentInfo> CloneBareAsCurve();
 
         public Polygon2d Polygon { get; protected set; } = new Polygon2d();
         protected List<TSegmentInfo> SegmentInfo = new List<TSegmentInfo>();
@@ -269,7 +270,7 @@ namespace gs
                 IEnumerable<double> splits,
                 IList<TFillCurve> splitFillCurves,
                 Func<TFillCurve> createFillCurveF,
-                bool connectEnds = false)
+                bool joinFirstAndLast = false)
             where TFillCurve : FillCurveBase<TVertexInfo, TSegmentInfo>
         {
             // TODO: Decide what happens when split distance greater than perimeter.
@@ -279,7 +280,7 @@ namespace gs
             ConvertToCurve(curve);
             curve.SplitAtDistances(splits, splitFillCurves, createFillCurveF);
 
-            if (connectEnds)
+            if (joinFirstAndLast)
             {
                 var lastCurve = splitFillCurves[splitFillCurves.Count - 1];
                 var firstCurve = splitFillCurves[0];
@@ -289,5 +290,18 @@ namespace gs
         }
 
         public abstract IFillCurve ConvertToCurve();
+
+        public List<IFillCurve> SplitAtDistances(List<double> splitDistances, bool joinFirstAndLast = false)
+        {
+            var curves = new List<FillCurveBase<TVertexInfo, TSegmentInfo>>();
+            
+            SplitAtDistances<FillCurveBase<TVertexInfo, TSegmentInfo>>(splitDistances, curves, () => CloneBareAsCurve(), joinFirstAndLast);
+
+            var iCurves = new List<IFillCurve>();
+
+            foreach (var curve in curves)
+                iCurves.Add(curve);
+            return iCurves;
+        }
     }
 }

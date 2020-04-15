@@ -107,7 +107,7 @@ namespace gs
                 loopV.Add(poly[k]);
             }
 
-            double useSpeed = select_speed(poly);
+            double useSpeed = SelectSpeed(poly);
 
             Builder.AppendExtrude(loopV, useSpeed, poly.FillType, null);
         }
@@ -193,7 +193,7 @@ namespace gs
                 flags.Add(flag);
             }
 
-            double useSpeed = select_speed(curve);
+            double useSpeed = SelectSpeed(curve);
 
             Vector2d dimensions = GCodeUtil.UnspecifiedDimensions;
             if (curve.CustomThickness > 0)
@@ -203,7 +203,7 @@ namespace gs
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
         //       (currently this is only set on first layer)
-        protected virtual double select_speed(IFillElement pathCurve)
+        public virtual double SelectSpeed(IFillElement pathCurve)
         {
             double speed = SpeedHint == SchedulerSpeedHint.Careful ?
                 Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;

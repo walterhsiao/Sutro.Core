@@ -1,4 +1,5 @@
 ﻿using g3;
+using System.Collections.Generic;
 
 namespace gs
 {
@@ -11,5 +12,10 @@ namespace gs
         void Reverse();
 
         Vector2d this[int i] { get; }
+
+        void TrimBack(double trimDistance);
+        void TrimFront(double trimDistance);
+
+        List<IFillCurve> SplitAtDistances(List<double> splitDistances);
     }
 }

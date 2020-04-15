@@ -306,10 +306,10 @@ namespace gs
             {
                 foreach (var shell in shell_polys)
                 {
-                    paths.Append(new BasicFillLoop(shell.Outer.Vertices) { FillType = currentFillType });
+                    paths.Append(new BasicFillLoop(shell.Outer.Vertices) { FillType = currentFillType, PerimOrder = nShell });
                     foreach (var hole in shell.Holes)
                     {
-                        paths.Append(new BasicFillLoop(hole.Vertices) { FillType = currentFillType, IsHoleShell = true }); ;
+                        paths.Append(new BasicFillLoop(hole.Vertices) { FillType = currentFillType, PerimOrder = nShell, IsHoleShell = true }); ;
                     }
                 }
                 return paths;
@@ -361,7 +361,7 @@ namespace gs
                         continue;
                     if (polyline.Bounds.MaxDim < DiscardTinyPerimeterLengthMM)
                         continue;
-                    paths.Append(new BasicFillCurve(polyline) { FillType = currentFillType });
+                    paths.Append(new BasicFillCurve(polyline) { FillType = currentFillType, PerimOrder = nShell });
                 }
             }
             return paths;

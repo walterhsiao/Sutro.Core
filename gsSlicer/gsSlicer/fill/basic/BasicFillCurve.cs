@@ -25,6 +25,8 @@ namespace gs
             {
                 CustomThickness = CustomThickness,
                 FillType = FillType,
+                IsHoleShell = IsHoleShell,
+                PerimOrder = PerimOrder
             };
         }
 
@@ -36,6 +38,12 @@ namespace gs
         protected override Tuple<BasicSegmentInfo, BasicSegmentInfo> SplitSegmentInfo(BasicSegmentInfo segmentInfo, double param)
         {
             return segmentInfo?.Split(param) ?? new Tuple<BasicSegmentInfo, BasicSegmentInfo>(null, null);
+        }
+
+        public double TotalAreaXY(double defaultThickness)
+        {
+            double width = CustomThickness > 0 ? CustomThickness : defaultThickness;
+            return ArcLength * width;
         }
     }
 }

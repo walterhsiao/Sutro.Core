@@ -115,6 +115,12 @@ namespace gs
             return currentPos;
         }
 
+        public virtual Vector3d AppendMoveToZ(double ZAbs, double fSpeed, ToolpathTypes ttype = ToolpathTypes.PlaneChange)
+        {
+            double zDelta = ZAbs - currentPos.z;
+            return AppendZChange(zDelta, fSpeed, ttype);
+        }
+
         public virtual Vector3d AppendExtrude(Vector2d toPos, double fSpeed, IFillType fillType)
         {
             return AppendExtrude(new Vector3d(toPos.x, toPos.y, currentPos.z), fSpeed, fillType);

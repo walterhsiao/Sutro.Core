@@ -1,4 +1,5 @@
 ﻿using g3;
+using System.Collections.Generic;
 
 namespace gs
 {
@@ -21,8 +22,8 @@ namespace gs
 
         void Roll(int index);
 
-        void TrimEnd(double d);
-
         IFillCurve ConvertToCurve();
+
+        List<IFillCurve> SplitAtDistances(List<double> splitDistances, bool joinFirstAndLast);
     }
 }

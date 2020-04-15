@@ -2,14 +2,9 @@
 
 namespace gs
 {
-    public class BasicSegmentInfo
+    public class BasicSegmentInfo : ICloneable
     {
         public bool IsConnector { get; set; }
-
-        public object Clone()
-        {
-            return (BasicSegmentInfo)this.MemberwiseClone();
-        }
 
         public virtual void Reverse()
         {
@@ -27,6 +22,11 @@ namespace gs
         public Tuple<BasicSegmentInfo, BasicSegmentInfo> Split(double param)
         {
             return Tuple.Create(new BasicSegmentInfo(this), new BasicSegmentInfo(this));
+        }
+
+        object ICloneable.Clone()
+        {
+            return (BasicSegmentInfo)MemberwiseClone();
         }
     }
 }
