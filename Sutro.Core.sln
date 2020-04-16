@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gsGCode", "gsGCode\gsGCode\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gsGCode.Tests", "gsGCode\gsGCode.Tests\gsGCode.Tests.csproj", "{363A01F0-74C5-458C-A2FD-8CF5CD04A72B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gsSlicer.CLI", "gsSlicer.CLI\gsSlicer.CLI.csproj", "{069BC99C-E9CE-4E3B-BE00-BEFAB88F0B39}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gsSlicer.CLI", "gsSlicer\gsSlicer.CLI\gsSlicer.CLI.csproj", "{069BC99C-E9CE-4E3B-BE00-BEFAB88F0B39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +53,6 @@ Global
 		SolutionGuid = {CD398D96-A819-45DC-BF76-4132DFA051F4}
 	EndGlobalSection
 	GlobalSection(NDepend) = preSolution
-		Project = ".\Sutro.Slicer.ndproj"
+		Project = ".\Sutro.Core.ndproj"
 	EndGlobalSection
 EndGlobal

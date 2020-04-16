@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<NDepend AppName="Sutro.Slicer" Platform="DotNet" FileWrittenByProductVersion="2019.3.0.9290">
+<NDepend AppName="Sutro.Core" Platform="DotNet" FileWrittenByProductVersion="2019.3.0.9290">
   <OutputDir KeepXmlFiles="False">.\NDependOut</OutputDir>
   <IDEFiles>
-    <IDEFile FilePath=".\Sutro.Slicer.sln" Filters="-test -gsSlicer.CLI" Configuration="DEBUG|AnyCPU" />
+    <IDEFile FilePath=".\Sutro.Core.sln" Filters="-test -gsSlicer.CLI" Configuration="DEBUG|AnyCPU" />
   </IDEFiles>
   <Assemblies />
   <FrameworkAssemblies>
@@ -21,7 +21,7 @@
   <ZipSourceFiles>True</ZipSourceFiles>
   <Report Kind="0" SectionsEnabled="110591" XslPath="" Flags="261376" />
   <BuildComparisonSetting ProjectMode="CurrentProject" BuildMode="NDaysAgoAnalysisResult" ProjectFileToCompareWith="" BuildFileToCompareWith="" NDaysAgo="30" />
-  <BaselineInUISetting ProjectMode="CurrentProject" BuildMode="NDaysAgoAnalysisResult" ProjectFileToCompareWith=".\Sutro.Slicer.ndproj" BuildFileToCompareWith=".\NDependOut\NDependAnalysisResult_Sutro_Slicer_2020Mar02_21h26.ndar" NDaysAgo="90" />
+  <BaselineInUISetting ProjectMode="CurrentProject" BuildMode="NDaysAgoAnalysisResult" ProjectFileToCompareWith=".\Sutro.Core.ndproj" BuildFileToCompareWith=".\NDependOut\NDependAnalysisResult_Sutro_Slicer_2020Mar02_21h26.ndar" NDaysAgo="90" />
   <CoverageFiles CoverageDir="" UncoverableAttribute="">
     <CoverageFile>.\coverage\Coverage.xml</CoverageFile>
   </CoverageFiles>
