@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\gsGCode\gsGCode\gsGCode.csproj" />
+    <ProjectReference Include="..\gsGCode\gsGCode\gsGCode.csproj" />
     <ProjectReference Include="..\gsSlicer\gsSlicer.csproj" />
   </ItemGroup>
 </Project>
