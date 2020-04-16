@@ -19,7 +19,7 @@ namespace gs
             IsConnector = other.IsConnector;
         }
 
-        public Tuple<BasicSegmentInfo, BasicSegmentInfo> Split(double param)
+        public virtual Tuple<BasicSegmentInfo, BasicSegmentInfo> Split(double param)
         {
             return Tuple.Create(new BasicSegmentInfo(this), new BasicSegmentInfo(this));
         }

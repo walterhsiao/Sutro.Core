@@ -17,5 +17,7 @@ namespace gs
         IEnumerable<Vector2d> Vertices { get; }
         bool IsHoleShell { get; }
         int PerimOrder { get; }
+
+        void CopyProperties(IFillElement other);
     }
 }

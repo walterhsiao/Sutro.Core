@@ -23,24 +23,16 @@ namespace gs
 
         public override FillLoopBase<BasicVertexInfo, BasicSegmentInfo> CloneBare()
         {
-            return new BasicFillLoop()
-            {
-                CustomThickness = CustomThickness,
-                FillType = FillType,
-                IsHoleShell = IsHoleShell,
-                PerimOrder = PerimOrder
-            };
+            var loop = new BasicFillLoop();
+            loop.CopyProperties(this);
+            return loop;
         }
 
         public override FillCurveBase<BasicVertexInfo, BasicSegmentInfo> CloneBareAsCurve()
         {
-            return new BasicFillCurve()
-            {
-                CustomThickness = CustomThickness,
-                FillType = FillType,
-                IsHoleShell = IsHoleShell,
-                PerimOrder = PerimOrder
-            };
+            var curve = new BasicFillCurve();
+            curve.CopyProperties(this);
+            return curve;
         }
 
         public override IFillCurve ConvertToCurve()

@@ -21,13 +21,9 @@ namespace gs
 
         public override FillCurveBase<BasicVertexInfo, BasicSegmentInfo> CloneBare()
         {
-            return new BasicFillCurve()
-            {
-                CustomThickness = CustomThickness,
-                FillType = FillType,
-                IsHoleShell = IsHoleShell,
-                PerimOrder = PerimOrder
-            };
+            var curve = new BasicFillCurve();
+            curve.CopyProperties(this);
+            return curve;
         }
 
         protected override BasicVertexInfo InterpolateVertexInfo(BasicVertexInfo vertexInfoA, BasicVertexInfo vertexInfoB, double param)

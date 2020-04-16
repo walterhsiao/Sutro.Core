@@ -303,5 +303,13 @@ namespace gs
                 iCurves.Add(curve);
             return iCurves;
         }
+
+        public virtual void CopyProperties(IFillElement curve)
+        {
+            FillType = curve.FillType;
+            CustomThickness = curve.CustomThickness;
+            PerimOrder = curve.PerimOrder;
+            IsHoleShell = curve.IsHoleShell;
+        }
     }
 }

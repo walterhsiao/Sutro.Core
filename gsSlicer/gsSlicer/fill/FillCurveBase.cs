@@ -44,8 +44,7 @@ namespace gs
 
         protected FillCurveBase(FillCurveBase<TVertexInfo, TSegmentInfo> other)
         {
-            FillType = other.FillType;
-            CustomThickness = other.CustomThickness;
+            CopyProperties(other);
         }
 
         public void BeginOrAppendCurve(Vector2d pt, TVertexInfo vInfo = null)
@@ -288,8 +287,8 @@ namespace gs
 
         public void PopulateFromLoop(FillLoopBase<TVertexInfo, TSegmentInfo> loop)
         {
-            CustomThickness = loop.CustomThickness;
-            FillType = loop.FillType;
+            CopyProperties(loop);
+
             BeginCurve(loop[0], loop.GetVertexData(0));
             for (int i = 1; i < loop.VertexCount; i++)
             {
@@ -307,6 +306,14 @@ namespace gs
             foreach (var curve in curves)
                 iCurves.Add(curve);
             return iCurves;
+        }
+
+        public virtual void CopyProperties(IFillElement curve)
+        {
+            FillType = curve.FillType;
+            CustomThickness = curve.CustomThickness;
+            PerimOrder = curve.PerimOrder;
+            IsHoleShell = curve.IsHoleShell;
         }
     }
 }
