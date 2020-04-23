@@ -199,8 +199,8 @@ namespace gs
             double useSpeed = SelectSpeed(curve);
 
             Vector2d dimensions = GCodeUtil.UnspecifiedDimensions;
-            if (curve.CustomThickness > 0)
-                dimensions.x = curve.CustomThickness;
+            if (curve.FillThickness > 0)
+                dimensions.x = curve.FillThickness;
             Builder.AppendExtrude(vertices, useSpeed, dimensions, curve.FillType, curve.IsHoleShell, flags);
         }
 

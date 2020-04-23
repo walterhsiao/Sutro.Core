@@ -16,8 +16,6 @@ namespace gs
         protected PolyLine2d Polyline = new PolyLine2d();
         protected List<TSegmentInfo> SegmentInfo = new List<TSegmentInfo>();
 
-        public double CustomThickness { get; set; }
-
         // Pass through some properties & methods from wrapped Polyline
 
         public double ArcLength { get => Polyline.ArcLength; }
@@ -28,9 +26,6 @@ namespace gs
 
         public IEnumerable<Vector2d> Vertices { get => Polyline.Vertices; }
 
-        public bool IsHoleShell { get; set; } = false;
-
-        public int PerimOrder { get; set; } = -1;
 
         public Vector2d this[int i] { get => Polyline[i]; }
 
@@ -42,8 +37,7 @@ namespace gs
 
         protected FillCurveBase(FillCurveBase<TSegmentInfo> other)
         {
-            FillType = other.FillType;
-            CustomThickness = other.CustomThickness;
+            CopyProperties(other);
         }
 
         public void BeginOrAppendCurve(Vector2d pt)
@@ -242,8 +236,8 @@ namespace gs
 
         public void PopulateFromLoop(FillLoopBase<TSegmentInfo> loop)
         {
-            CustomThickness = loop.CustomThickness;
-            FillType = loop.FillType;
+            CopyProperties(loop);
+
             BeginCurve(loop[0]);
             for (int i = 1; i < loop.VertexCount; i++)
             {

@@ -16,7 +16,6 @@ namespace gs
 
         public Polygon2d Polygon { get; protected set; } = new Polygon2d();
         protected List<TSegmentInfo> SegmentInfo = new List<TSegmentInfo>();
-        public double CustomThickness { get; set; }
 
         // Pass through some properties & methods from wrapped Polygon
 
@@ -25,13 +24,10 @@ namespace gs
         public int VertexCount { get => Polygon.VertexCount; }
         public int SegmentCount { get => SegmentInfo.Count; }
         public IEnumerable<Vector2d> Vertices { get => Polygon.VerticesItr(false); }
-        public bool IsHoleShell { get; set; }
 
         public Vector2d EntryExitPoint => Polygon.Vertices[0];
 
         public AxisAlignedBox2d Bounds => Polygon.GetBounds();
-
-        public int PerimOrder { get; set; } = -1;
 
         public Vector2d this[int i] { get => Polygon[i]; }
 

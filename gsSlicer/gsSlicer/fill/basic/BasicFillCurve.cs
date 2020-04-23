@@ -23,7 +23,7 @@ namespace gs
         {
             return new BasicFillCurve()
             {
-                CustomThickness = CustomThickness,
+                FillThickness = FillThickness,
                 FillType = FillType,
                 IsHoleShell = IsHoleShell,
                 PerimOrder = PerimOrder
@@ -37,7 +37,7 @@ namespace gs
 
         public double TotalAreaXY(double defaultThickness)
         {
-            double width = CustomThickness > 0 ? CustomThickness : defaultThickness;
+            double width = FillThickness > 0 ? FillThickness : defaultThickness;
             return ArcLength * width;
         }
     }
