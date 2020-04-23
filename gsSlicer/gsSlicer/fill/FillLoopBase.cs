@@ -8,7 +8,7 @@ namespace gs
     /// Additive polygon fill curve
     /// </summary>
     public abstract class FillLoopBase<TVertexInfo, TSegmentInfo> :
-        FillElementBase<TVertexInfo, TSegmentInfo>, IFillLoop
+        FillElementBase<TVertexInfo, TSegmentInfo>
         where TVertexInfo : BasicVertexInfo, new()
         where TSegmentInfo : BasicSegmentInfo, ICloneable, new()
     {
@@ -121,30 +121,6 @@ namespace gs
             Polygon = new Polygon2d(rolledVertices);
             VertexInfo = rolledVertexInfo;
             SegmentInfo = rolledSegmentInfo;
-        }
-
-        public PointData GetPoint(int i, bool reverse)
-        {
-            if (reverse)
-            {
-                var segReversed = (TSegmentInfo)SegmentInfo[i].Clone();
-                segReversed?.Reverse();
-                return new PointData()
-                {
-                    Vertex = Polygon[i],
-                    VertexInfo = VertexInfo[i],
-                    SegmentInfo = segReversed,
-                };
-            }
-            else
-            {
-                return new PointData()
-                {
-                    Vertex = Polygon[i],
-                    VertexInfo = VertexInfo[i],
-                    SegmentInfo = SegmentInfo[(i + Polygon.VertexCount - 1) % Polygon.VertexCount]
-                };
-            }
         }
 
         public TVertexInfo GetVertexData(int vertexIndex)
@@ -266,16 +242,15 @@ namespace gs
             }
         }
 
-        public void SplitAtDistances<TFillCurve>(
+        public List<FillCurveBase<TVertexInfo, TSegmentInfo>> SplitAtDistances(
                 IEnumerable<double> splits,
-                IList<TFillCurve> splitFillCurves,
-                Func<TFillCurve> createFillCurveF,
+                Func<FillCurveBase<TVertexInfo, TSegmentInfo>> createFillCurveF,
                 bool joinFirstAndLast = false)
-            where TFillCurve : FillCurveBase<TVertexInfo, TSegmentInfo>
         {
             // TODO: Decide what happens when split distance greater than perimeter.
             // TODO: Check for split distances monotonically increasing and > 0.
             // TODO: Check for split distance count more than 0.
+            var splitFillCurves = new List<FillCurveBase<TVertexInfo, TSegmentInfo>>();
             var curve = createFillCurveF();
             ConvertToCurve(curve);
             curve.SplitAtDistances(splits, splitFillCurves, createFillCurveF);
@@ -287,21 +262,9 @@ namespace gs
                 splitFillCurves.RemoveAt(0);
                 lastCurve.Extend(firstCurve);
             }
+            return splitFillCurves;
         }
 
-        public abstract IFillCurve ConvertToCurve();
-
-        public List<IFillCurve> SplitAtDistances(List<double> splitDistances, bool joinFirstAndLast = false)
-        {
-            var curves = new List<FillCurveBase<TVertexInfo, TSegmentInfo>>();
-            
-            SplitAtDistances<FillCurveBase<TVertexInfo, TSegmentInfo>>(splitDistances, curves, () => CloneBareAsCurve(), joinFirstAndLast);
-
-            var iCurves = new List<IFillCurve>();
-
-            foreach (var curve in curves)
-                iCurves.Add(curve);
-            return iCurves;
-        }
+        public abstract FillCurveBase<TVertexInfo, TSegmentInfo> ConvertToCurve();
     }
 }

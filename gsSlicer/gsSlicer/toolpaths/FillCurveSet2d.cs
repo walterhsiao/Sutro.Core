@@ -11,8 +11,11 @@ namespace gs
     /// </summary>
 	public class FillCurveSet2d
     {
-        public List<IFillLoop> Loops = new List<IFillLoop>();
-        public List<IFillCurve> Curves = new List<IFillCurve>();
+        public List<FillLoopBase<BasicVertexInfo, BasicSegmentInfo>> Loops = 
+            new List<FillLoopBase<BasicVertexInfo, BasicSegmentInfo>>();
+        
+        public List<FillCurveBase<BasicVertexInfo, BasicSegmentInfo>> Curves = 
+            new List<FillCurveBase<BasicVertexInfo, BasicSegmentInfo>>();
 
         public void Append(GeneralPolygon2d poly, IFillType fillType)
         {
@@ -38,7 +41,7 @@ namespace gs
                 Append(p, fillType);
         }
 
-        public IEnumerable<IFillElement> EnumerateAll()
+        public IEnumerable<FillElementBase<BasicVertexInfo, BasicSegmentInfo>> EnumerateAll()
         {
             foreach (var loop in Loops)
                 yield return loop;
@@ -47,36 +50,36 @@ namespace gs
                 yield return curve;
         }
 
-        public void Append(IFillLoop loop)
+        public void Append(FillLoopBase<BasicVertexInfo, BasicSegmentInfo> loop)
         {
             Loops.Add(loop);
         }
 
-        public void Append(IFillElement element)
+        public void Append(FillElementBase<BasicVertexInfo, BasicSegmentInfo> element)
         {
             switch (element)
             {
-                case IFillLoop loop:
+                case FillLoopBase<BasicVertexInfo, BasicSegmentInfo> loop:
                     Append(loop);
                     break;
-                case IFillCurve curve:
+                case FillCurveBase<BasicVertexInfo, BasicSegmentInfo> curve:
                     Append(curve);
                     break;
             }
         }
 
-        public void Append(List<IFillLoop> loops)
+        public void Append(List<FillLoopBase<BasicVertexInfo, BasicSegmentInfo>> loops)
         {
             foreach (var l in loops)
                 Loops.Add(l);
         }
 
-        public void Append(IFillCurve curve)
+        public void Append(FillCurveBase<BasicVertexInfo, BasicSegmentInfo> curve)
         {
             Curves.Add(curve);
         }
 
-        public void Append(List<IFillCurve> curves)
+        public void Append(List<FillCurveBase<BasicVertexInfo, BasicSegmentInfo>> curves)
         {
             foreach (var p in curves)
                 Append(p);

@@ -49,7 +49,7 @@ namespace gs
 
         public Vector2d CurrentPosition => Builder.Position.xy;
 
-        protected virtual void AppendFill(IFillElement fill)
+        protected virtual void AppendFill(FillElementBase<BasicVertexInfo, BasicSegmentInfo> fill)
         {
             switch (fill)
             {
@@ -73,9 +73,9 @@ namespace gs
             }
         }
 
-        protected static List<IFillElement> FlattenFillCurveSets(List<FillCurveSet2d> fillSets)
+        protected static List<FillElementBase<BasicVertexInfo, BasicSegmentInfo>> FlattenFillCurveSets(List<FillCurveSet2d> fillSets)
         {
-            var fillElements = new List<IFillElement>();
+            var fillElements = new List<FillElementBase<BasicVertexInfo, BasicSegmentInfo>>();
 
             foreach (var fills in fillSets)
             {
@@ -112,7 +112,7 @@ namespace gs
             Builder.AppendExtrude(loopV, useSpeed, poly.FillType, null);
         }
 
-        private int FindLoopEntryPoint(IFillLoop poly, Vector2d currentPos2)
+        private int FindLoopEntryPoint(FillLoopBase<BasicVertexInfo, BasicSegmentInfo> poly, Vector2d currentPos2)
         {
             int startIndex;
             if (Settings.ZipperAlignedToPoint && poly.FillType.IsEntryLocationSpecified())
@@ -161,7 +161,7 @@ namespace gs
         }
 
         // [TODO] would it ever make sense to break polyline to avoid huge travel??
-        public virtual void AppendBasicFillCurve(BasicFillCurve curve)
+        public virtual void AppendBasicFillCurve(FillCurveBase<BasicVertexInfo, BasicSegmentInfo> curve)
         {
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;
@@ -181,15 +181,18 @@ namespace gs
             var vertices = new List<Vector2d>(curve.VertexCount);
             for (int i = 0; i < curve.VertexCount; i++)
             {
-                var p = curve.GetPoint(i, false);
                 var flag = TPVertexFlags.None;
 
                 if (i == 0)
                     flag = TPVertexFlags.IsPathStart;
-                else if (p.SegmentInfo != null && p.SegmentInfo.IsConnector)
-                    flag = TPVertexFlags.IsConnector;
+                else
+                {
+                    var segInfo = curve.GetSegmentDataBeforeVertex(i);
+                    if (segInfo != null && segInfo.IsConnector)
+                        flag = TPVertexFlags.IsConnector;
+                }
 
-                vertices.Add(p.Vertex);
+                vertices.Add(curve[i]);
                 flags.Add(flag);
             }
 
@@ -203,7 +206,7 @@ namespace gs
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
         //       (currently this is only set on first layer)
-        public virtual double SelectSpeed(IFillElement pathCurve)
+        public virtual double SelectSpeed(FillElementBase<BasicVertexInfo, BasicSegmentInfo> pathCurve)
         {
             double speed = SpeedHint == SchedulerSpeedHint.Careful ?
                 Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;
@@ -211,7 +214,7 @@ namespace gs
             return pathCurve.FillType.ModifySpeed(speed, SpeedHint);
         }
 
-        protected void AssertValidCurve(IFillCurve curve)
+        protected void AssertValidCurve(FillCurveBase<BasicVertexInfo, BasicSegmentInfo> curve)
         {
             int N = curve.VertexCount;
             if (N < 2)
@@ -224,7 +227,7 @@ namespace gs
             }
         }
 
-        protected void AssertValidLoop(IFillLoop curve)
+        protected void AssertValidLoop(FillLoopBase<BasicVertexInfo, BasicSegmentInfo> curve)
         {
             int N = curve.VertexCount;
             if (N < 3)

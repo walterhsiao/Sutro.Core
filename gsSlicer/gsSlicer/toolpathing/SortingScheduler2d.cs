@@ -34,7 +34,7 @@ namespace gs
 
         protected class PathLoop : PathItem
         {
-            public IFillLoop curve;
+            public FillLoopBase<BasicVertexInfo, BasicSegmentInfo> loop;
             public bool reverse = false;
         }
 
@@ -42,7 +42,7 @@ namespace gs
 
         protected class PathSpan : PathItem
         {
-            public IFillCurve curve;
+            public FillCurveBase<BasicVertexInfo, BasicSegmentInfo> curve;
             public bool reverse = false;
         }
 
@@ -52,10 +52,10 @@ namespace gs
         {
             foreach (FillCurveSet2d polySet in paths)
             {
-                foreach (IFillLoop loop in polySet.Loops)
-                    Loops.Add(new PathLoop() { curve = loop, speedHint = SpeedHint });
+                foreach (FillLoopBase<BasicVertexInfo, BasicSegmentInfo> loop in polySet.Loops)
+                    Loops.Add(new PathLoop() { loop = loop, speedHint = SpeedHint });
 
-                foreach (IFillCurve curve in polySet.Curves)
+                foreach (FillCurveBase<BasicVertexInfo, BasicSegmentInfo> curve in polySet.Curves)
                     Spans.Add(new PathSpan() { curve = curve, speedHint = SpeedHint });
             }
         }
@@ -77,14 +77,14 @@ namespace gs
                     pathHint = loop.speedHint;
                     if (idx.c != 0)
                     {
-                        loop.curve.Roll(idx.c);
-                        paths.Append(loop.curve);
-                        CurrentPosition = loop.curve.EntryExitPoint;
+                        loop.loop.Roll(idx.c);
+                        paths.Append(loop.loop);
+                        CurrentPosition = loop.loop.EntryExitPoint;
                     }
                     else
                     {
-                        paths.Append(loop.curve);
-                        CurrentPosition = loop.curve[0];
+                        paths.Append(loop.loop);
+                        CurrentPosition = loop.loop[0];
                     }
                 }
                 else
@@ -165,7 +165,7 @@ namespace gs
                 { // loop
                     PathLoop loop = Loops[idx.b];
                     int iNearSeg; double nearSegT;
-                    double d_sqr = loop.curve.DistanceSquared(pt, out iNearSeg, out nearSegT);
+                    double d_sqr = loop.loop.DistanceSquared(pt, out iNearSeg, out nearSegT);
                     if (d_sqr < nearest_sqr)
                     {
                         nearest_sqr = d_sqr;
@@ -235,15 +235,15 @@ namespace gs
         private static double GetLoopEntryPoint(Vector2d startPoint, PathLoop loop,
             out int entryPointSegmentI, out double entryPointSegmentT)
         {
-            if (loop.curve.FillType.IsEntryLocationSpecified())
+            if (loop.loop.FillType.IsEntryLocationSpecified())
             {
                 entryPointSegmentI = 0;
                 entryPointSegmentT = 0;
-                return loop.curve.EntryExitPoint.Distance(startPoint);
+                return loop.loop.EntryExitPoint.Distance(startPoint);
             }
             else
             {
-                return loop.curve.DistanceSquared(startPoint, out entryPointSegmentI, out entryPointSegmentT);
+                return loop.loop.DistanceSquared(startPoint, out entryPointSegmentI, out entryPointSegmentT);
             }
         }
 
@@ -252,7 +252,7 @@ namespace gs
             if (idx.a == 0)
             { // loop
                 PathLoop loop = Loops[idx.b];
-                return loop.curve.GetSegment2dAfterVertex(idx.c).Center;
+                return loop.loop.GetSegment2dAfterVertex(idx.c).Center;
             }
             else
             {  // span

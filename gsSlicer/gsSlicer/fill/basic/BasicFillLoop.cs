@@ -43,7 +43,7 @@ namespace gs
             };
         }
 
-        public override IFillCurve ConvertToCurve()
+        public override FillCurveBase<BasicVertexInfo, BasicSegmentInfo> ConvertToCurve()
         {
             var curve = CloneBareAsCurve();
             curve.PopulateFromLoop(this);

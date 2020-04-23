@@ -8,7 +8,7 @@ namespace gs
     /// Additive polyline fill curve
     /// </summary>
     public abstract class FillCurveBase<TVertexInfo, TSegmentInfo> :
-        FillElementBase<TVertexInfo, TSegmentInfo>, IFillCurve
+        FillElementBase<TVertexInfo, TSegmentInfo>
         where TVertexInfo : BasicVertexInfo, new()
         where TSegmentInfo : BasicSegmentInfo, ICloneable, new()
     {
@@ -91,30 +91,6 @@ namespace gs
         protected abstract TVertexInfo InterpolateVertexInfo(TVertexInfo vertexInfoA, TVertexInfo vertexInfoB, double param);
 
         protected abstract Tuple<TSegmentInfo, TSegmentInfo> SplitSegmentInfo(TSegmentInfo segmentInfo, double param);
-
-        public PointData GetPoint(int i, bool reverse)
-        {
-            if (reverse)
-            {
-                var segReversed = i >= SegmentInfo.Count - 1 ? null : (TSegmentInfo)SegmentInfo[i]?.Clone();
-                segReversed?.Reverse();
-                return new PointData()
-                {
-                    Vertex = Polyline[i],
-                    VertexInfo = VertexInfo[i],
-                    SegmentInfo = segReversed,
-                };
-            }
-            else
-            {
-                return new PointData()
-                {
-                    Vertex = Polyline[i],
-                    VertexInfo = VertexInfo[i],
-                    SegmentInfo = i == 0 ? null : SegmentInfo[i - 1]
-                };
-            }
-        }
 
         public TVertexInfo GetVertexData(int vertexIndex)
         {
@@ -206,8 +182,7 @@ namespace gs
             }
         }
 
-        public void SplitAtDistances<TCurve>(IEnumerable<double> splitDistances, IList<TCurve> splitFillCurves, Func<TCurve> createFillCurveF)
-            where TCurve : FillCurveBase<TVertexInfo, TSegmentInfo>
+        public void SplitAtDistances(IEnumerable<double> splitDistances, IList<FillCurveBase<TVertexInfo, TSegmentInfo>> splitFillCurves, Func<FillCurveBase<TVertexInfo, TSegmentInfo>> createFillCurveF)
         {
             // TODO: Decide what happens when split distance greater than length.
             // TODO: Check for split distances monotonically increasing and > 0.
@@ -296,17 +271,6 @@ namespace gs
                 AddToCurve(loop[i], loop.GetVertexData(i), loop.GetSegmentDataBeforeVertex(i));
             }
             AddToCurve(loop[0], loop.GetVertexData(0));
-        }
-
-        public List<IFillCurve> SplitAtDistances(List<double> splitDistances)
-        {
-            var curves = new List<FillCurveBase<TVertexInfo, TSegmentInfo>>();
-            SplitAtDistances(splitDistances, curves, () => CloneBare());
-            var iCurves = new List<IFillCurve>();
-
-            foreach (var curve in curves)
-                iCurves.Add(curve);
-            return iCurves;
         }
     }
 }

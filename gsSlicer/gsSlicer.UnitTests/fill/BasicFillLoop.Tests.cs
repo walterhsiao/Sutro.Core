@@ -332,9 +332,8 @@ namespace gsSlicer.UnitTests.fill
         public void SplitOnceFirstSegment()
         {
             // Act
-            var result = new List<BasicFillCurve>();
             Func<BasicFillCurve> createFillCurveF = () => new BasicFillCurve();
-            CreateTriangleCCW().SplitAtDistances(new double[] { 3 }, result, createFillCurveF);
+            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 3 }, createFillCurveF);
 
             // Assert
             Assert.AreEqual(2, result.Count);
@@ -362,9 +361,8 @@ namespace gsSlicer.UnitTests.fill
         public void SplitOnceSecondSegment()
         {
             // Act
-            var result = new List<BasicFillCurve>();
             Func<BasicFillCurve> createFillCurveF = () => new BasicFillCurve();
-            CreateTriangleCCW().SplitAtDistances(new double[] { 5 }, result, createFillCurveF);
+            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 5 }, createFillCurveF);
 
             // Assert
             Assert.AreEqual(2, result.Count);
@@ -392,9 +390,8 @@ namespace gsSlicer.UnitTests.fill
         public void SplitTwiceFirstSegment()
         {
             // Act
-            var result = new List<BasicFillCurve>();
             Func<BasicFillCurve> createFillCurveF = () => new BasicFillCurve();
-            CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, result, createFillCurveF);
+            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, createFillCurveF);
 
             // Assert
             Assert.AreEqual(3, result.Count);
@@ -429,9 +426,8 @@ namespace gsSlicer.UnitTests.fill
         public void SplitTwiceFirstSegmentConnect()
         {
             // Act
-            var result = new List<BasicFillCurve>();
             Func<BasicFillCurve> createFillCurveF = () => new BasicFillCurve();
-            CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, result, createFillCurveF, true);
+            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, createFillCurveF, true);
 
             // Assert
             Assert.AreEqual(2, result.Count);
