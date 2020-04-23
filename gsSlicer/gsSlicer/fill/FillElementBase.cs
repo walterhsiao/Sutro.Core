@@ -4,7 +4,7 @@ using gs.FillTypes;
 namespace gs
 {
     public abstract class FillElementBase<TSegmentInfo>
-        where TSegmentInfo : BasicSegmentInfo, new()
+        where TSegmentInfo : IFillSegment, new()
     {
         public IFillType FillType { get; set; } = new DefaultFillType();
         public double FillThickness { get; set; }

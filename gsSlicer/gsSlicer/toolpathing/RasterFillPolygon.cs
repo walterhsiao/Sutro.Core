@@ -85,12 +85,12 @@ namespace gs
             {
                 foreach (Segment2d seg in seglist)
                 {
-                    BasicFillCurve fill_seg = new BasicFillCurve()
+                    var fill_seg = new FillCurveBase<FillSegment>()
                     {
                         FillType = FillType,
                     };
                     fill_seg.BeginCurve(seg.P0);
-                    fill_seg.AddToCurve(seg.P1);
+                    fill_seg.AddToCurve(seg.P1, new FillSegment());
                     paths.Append(fill_seg);
                 }
             }

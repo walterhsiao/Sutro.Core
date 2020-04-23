@@ -1,18 +1,31 @@
 ﻿using g3;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace gs
 {
     /// <summary>
     /// Additive polygon fill curve
     /// </summary>
-    public abstract class FillLoopBase<TSegmentInfo> :
+    public class FillLoopBase<TSegmentInfo> :
         FillElementBase<TSegmentInfo>
-        where TSegmentInfo : BasicSegmentInfo, ICloneable, new()
+        where TSegmentInfo : IFillSegment, ICloneable, new()
     {
-        public abstract FillLoopBase<TSegmentInfo> CloneBare();
-        public abstract FillCurveBase<TSegmentInfo> CloneBareAsCurve();
+        public FillLoopBase<TSegmentInfo> CloneBare()
+        {
+            var loop = new FillLoopBase<TSegmentInfo>();
+            loop.CopyProperties(this);
+            return loop;
+        }
+
+        public FillCurveBase<TSegmentInfo> CloneBareAsCurve()
+        {
+            var curve = new FillCurveBase<TSegmentInfo>();
+            curve.CopyProperties(this);
+            return curve;
+        }
 
         public Polygon2d Polygon { get; protected set; } = new Polygon2d();
         protected List<TSegmentInfo> SegmentInfo = new List<TSegmentInfo>();
@@ -34,12 +47,28 @@ namespace gs
         private bool loopStarted = false;
         private bool loopFinished = false;
 
+        public FillLoopBase()
+        {
+        }
+
+        public FillLoopBase(ReadOnlyCollection<Vector2d> vertices)
+        {
+            Polygon = new Polygon2d(vertices);
+            SegmentInfo = new TSegmentInfo[Polygon.VertexCount].ToList();
+        }
+
+        public FillLoopBase(IEnumerable<Vector2d> vertices)
+        {
+            Polygon = new Polygon2d(vertices);
+            SegmentInfo = new TSegmentInfo[Polygon.VertexCount].ToList();
+        }
+
         public void BeginOrAppendCurve(Vector2d pt)
         {
             Polygon.AppendVertex(pt);
             if (loopStarted)
             {
-                SegmentInfo.Add(null);
+                SegmentInfo.Add(new TSegmentInfo());
             }
             else
             {
@@ -57,7 +86,7 @@ namespace gs
             Polygon.AppendVertex(pt);
         }
 
-        public void AddToLoop(Vector2d pt, TSegmentInfo sInfo = null)
+        public void AddToLoop(Vector2d pt, TSegmentInfo sInfo)
         {
             if (!loopStarted)
                 throw new MethodAccessException("AddToLoop called before BeginLoop.");
@@ -68,7 +97,7 @@ namespace gs
             SegmentInfo.Add(sInfo);
         }
 
-        public void CloseLoop(TSegmentInfo sInfo = null)
+        public void CloseLoop(TSegmentInfo sInfo)
         {
             if (!loopStarted)
                 throw new MethodAccessException("CloseLoop called before BeginLoop.");
@@ -89,8 +118,6 @@ namespace gs
         {
             return vertexA * (1 - param) + vertexB * param;
         }
-
-        protected abstract Tuple<TSegmentInfo, TSegmentInfo> SplitSegmentInfo(TSegmentInfo segmentInfo, double param);
 
         public void Roll(int k)
         {
@@ -192,10 +219,12 @@ namespace gs
             {
                 int iNextVertex = (iSegment + 1) % VertexCount;
                 var interpolatedVertex = InterpolateVertex(Polygon[iSegment], Polygon[iNextVertex], splitParam);
-                var splitSegmentData = SplitSegmentInfo(GetSegmentDataAfterVertex(iSegment), splitParam);
+
+                var segData = GetSegmentDataAfterVertex(iSegment);
+                var splitSegmentData = segData == null ? Tuple.Create((IFillSegment)new TSegmentInfo(), (IFillSegment)new TSegmentInfo()) : segData.Split(splitParam);
 
                 rolled.BeginLoop(interpolatedVertex);
-                rolled.AddToLoop(Polygon[iNextVertex], splitSegmentData.Item2);
+                rolled.AddToLoop(Polygon[iNextVertex], (TSegmentInfo)splitSegmentData.Item2);
 
                 for (int i = iSegment + 2; i < VertexCount; ++i)
                     rolled.AddToLoop(Polygon[i], GetSegmentDataBeforeVertex(i));
@@ -203,7 +232,7 @@ namespace gs
                 for (int i = 0; i <= iSegment; ++i)
                     rolled.AddToLoop(Polygon[i], GetSegmentDataBeforeVertex(i));
 
-                rolled.CloseLoop(splitSegmentData.Item1);
+                rolled.CloseLoop((TSegmentInfo)splitSegmentData.Item1);
             }
             else
             {
@@ -244,6 +273,11 @@ namespace gs
             return splitFillCurves;
         }
 
-        public abstract FillCurveBase<TSegmentInfo> ConvertToCurve();
+        public FillCurveBase<TSegmentInfo> ConvertToCurve()
+        {
+            var curve = CloneBareAsCurve();
+            curve.PopulateFromLoop(this);
+            return curve;
+        }
     }
 }

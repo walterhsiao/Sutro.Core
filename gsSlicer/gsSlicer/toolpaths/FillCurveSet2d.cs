@@ -11,17 +11,17 @@ namespace gs
     /// </summary>
 	public class FillCurveSet2d
     {
-        public List<FillLoopBase<BasicSegmentInfo>> Loops = 
-            new List<FillLoopBase<BasicSegmentInfo>>();
+        public List<FillLoopBase<FillSegment>> Loops = 
+            new List<FillLoopBase<FillSegment>>();
         
-        public List<FillCurveBase<BasicSegmentInfo>> Curves = 
-            new List<FillCurveBase<BasicSegmentInfo>>();
+        public List<FillCurveBase<FillSegment>> Curves = 
+            new List<FillCurveBase<FillSegment>>();
 
         public void Append(GeneralPolygon2d poly, IFillType fillType)
         {
-            Loops.Add(new BasicFillLoop(poly.Outer.VerticesItr(false)) { FillType = fillType });
+            Loops.Add(new FillLoopBase<FillSegment>(poly.Outer.VerticesItr(false)) { FillType = fillType });
             foreach (var h in poly.Holes)
-                Loops.Add(new BasicFillLoop(h.VerticesItr(false)) { FillType = fillType });
+                Loops.Add(new FillLoopBase<FillSegment>(h.VerticesItr(false)) { FillType = fillType });
         }
 
         public void Append(List<GeneralPolygon2d> polys, IFillType fillType)
@@ -32,7 +32,7 @@ namespace gs
 
         public void Append(Polygon2d poly, IFillType fillType)
         {
-            Loops.Add(new BasicFillLoop(poly.VerticesItr(false)) { FillType = fillType });
+            Loops.Add(new FillLoopBase<FillSegment>(poly.VerticesItr(false)) { FillType = fillType });
         }
 
         public void Append(List<Polygon2d> polys, IFillType fillType)
@@ -41,7 +41,7 @@ namespace gs
                 Append(p, fillType);
         }
 
-        public IEnumerable<FillElementBase<BasicSegmentInfo>> EnumerateAll()
+        public IEnumerable<FillElementBase<FillSegment>> EnumerateAll()
         {
             foreach (var loop in Loops)
                 yield return loop;
@@ -50,36 +50,36 @@ namespace gs
                 yield return curve;
         }
 
-        public void Append(FillLoopBase<BasicSegmentInfo> loop)
+        public void Append(FillLoopBase<FillSegment> loop)
         {
             Loops.Add(loop);
         }
 
-        public void Append(FillElementBase<BasicSegmentInfo> element)
+        public void Append(FillElementBase<FillSegment> element)
         {
             switch (element)
             {
-                case FillLoopBase<BasicSegmentInfo> loop:
+                case FillLoopBase<FillSegment> loop:
                     Append(loop);
                     break;
-                case FillCurveBase<BasicSegmentInfo> curve:
+                case FillCurveBase<FillSegment> curve:
                     Append(curve);
                     break;
             }
         }
 
-        public void Append(List<FillLoopBase<BasicSegmentInfo>> loops)
+        public void Append(List<FillLoopBase<FillSegment>> loops)
         {
             foreach (var l in loops)
                 Loops.Add(l);
         }
 
-        public void Append(FillCurveBase<BasicSegmentInfo> curve)
+        public void Append(FillCurveBase<FillSegment> curve)
         {
             Curves.Add(curve);
         }
 
-        public void Append(List<FillCurveBase<BasicSegmentInfo>> curves)
+        public void Append(List<FillCurveBase<FillSegment>> curves)
         {
             foreach (var p in curves)
                 Append(p);

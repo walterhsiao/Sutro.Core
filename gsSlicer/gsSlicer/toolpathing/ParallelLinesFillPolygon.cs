@@ -144,7 +144,7 @@ namespace gs
                 int vid = start_vid;
                 int eid = pathGraph.GetVtxEdges(vid)[0];
 
-                BasicFillCurve path = new BasicFillCurve() { FillType = this.FillType };
+                var path = new FillCurveBase<FillSegment>() { FillType = this.FillType };
 
                 path.BeginCurve(pathGraph.GetVertex(vid));
                 while (true)
@@ -155,7 +155,7 @@ namespace gs
                     int gid = pathGraph.GetEdgeGroup(eid);
                     if (gid < 0)
                     {
-                        path.AddToCurve(pathGraph.GetVertex(vid), new BasicSegmentInfo() { IsConnector = true });
+                        path.AddToCurve(pathGraph.GetVertex(vid), new FillSegment() { IsConnector = true });
                     }
                     else
                     {
@@ -191,7 +191,7 @@ namespace gs
                             simp.SimplifyDeviationThreshold = ToolWidth / 2; break;
                     }
                     simp.Simplify();
-                    path = new BasicFillCurve(simp.Result.ToArray()) { FillType = this.FillType };
+                    path = new FillCurveBase<FillSegment>(simp.Result.ToArray()) { FillType = this.FillType };
                 }
 
                 paths.Append(path);

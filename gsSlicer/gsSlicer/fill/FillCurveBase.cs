@@ -1,17 +1,23 @@
 ﻿using g3;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace gs
 {
     /// <summary>
     /// Additive polyline fill curve
     /// </summary>
-    public abstract class FillCurveBase<TSegmentInfo> :
+    public class FillCurveBase<TSegmentInfo> :
         FillElementBase<TSegmentInfo>
-        where TSegmentInfo : BasicSegmentInfo, ICloneable, new()
+        where TSegmentInfo : IFillSegment, ICloneable, new()
     {
-        public abstract FillCurveBase<TSegmentInfo> CloneBare();
+        public FillCurveBase<TSegmentInfo> CloneBare()
+        {
+            var curve = new FillCurveBase<TSegmentInfo>();
+            curve.CopyProperties(this);
+            return curve;
+        }
 
         protected PolyLine2d Polyline = new PolyLine2d();
         protected List<TSegmentInfo> SegmentInfo = new List<TSegmentInfo>();
@@ -31,7 +37,7 @@ namespace gs
 
         private bool curveStarted = false;
 
-        protected FillCurveBase()
+        public FillCurveBase()
         {
         }
 
@@ -40,12 +46,25 @@ namespace gs
             CopyProperties(other);
         }
 
+        public FillCurveBase(PolyLine2d polyline)
+        {
+            Polyline = new PolyLine2d(polyline);
+            SegmentInfo = new TSegmentInfo[Polyline.VertexCount - 1].ToList();
+
+        }
+
+        public FillCurveBase(Vector2d[] vertices)
+        {
+            Polyline = new PolyLine2d(vertices);
+            SegmentInfo = new TSegmentInfo[Polyline.VertexCount - 1].ToList();
+        }
+
         public void BeginOrAppendCurve(Vector2d pt)
         {
             Polyline.AppendVertex(pt);
             if (curveStarted)
             {
-                SegmentInfo.Add(null);
+                SegmentInfo.Add(new TSegmentInfo());
             }
             else
             {
@@ -63,22 +82,28 @@ namespace gs
             Polyline.AppendVertex(pt);
         }
 
-        public void AddToCurve(Vector2d pt, TSegmentInfo sInfo = null)
-        {
+        public void AddToCurve(Vector2d pt, TSegmentInfo sInfo)
+        {           
             if (!curveStarted)
                 throw new MethodAccessException("AddToCurve called before BeginCurve.");
 
             Polyline.AppendVertex(pt);
+
+            if (sInfo == null)
+                sInfo = new TSegmentInfo();
             SegmentInfo.Add(sInfo);
         }
+
+        public void AddToCurve(Vector2d pt)
+        {
+            AddToCurve(pt, new TSegmentInfo());
+        }
+
 
         protected Vector2d InterpolateVertex(Vector2d vertexA, Vector2d vertexB, double param)
         {
             return vertexA * (1 - param) + vertexB * param;
         }
-
-
-        protected abstract Tuple<TSegmentInfo, TSegmentInfo> SplitSegmentInfo(TSegmentInfo segmentInfo, double param);
 
         public Segment2d GetSegment2dAfterVertex(int vertexIndex)
         {
@@ -202,14 +227,15 @@ namespace gs
                     double t = splitDistance / nextDistance;
 
                     var splitVertex = InterpolateVertex(curve.Polyline[curve.VertexCount - 1], Polyline[i], t);
-                    var splitSegmentData = SplitSegmentInfo(segmentInfo, t);
 
-                    curve.AddToCurve(splitVertex, splitSegmentData.Item1);
+                    var splitSegmentData = segmentInfo.Split(t);
+
+                    curve.AddToCurve(splitVertex, (TSegmentInfo)splitSegmentData.Item1);
                     splitFillCurves.Add(curve);
                     curve = createFillCurveF();
                     curve.BeginCurve(splitVertex);
 
-                    segmentInfo = splitSegmentData.Item2;
+                    segmentInfo = (TSegmentInfo)splitSegmentData.Item2;
                     cumulativeDistance += splitDistance;
                     nextDistance -= splitDistance;
                 }
@@ -243,7 +269,7 @@ namespace gs
             {
                 AddToCurve(loop[i], loop.GetSegmentDataBeforeVertex(i));
             }
-            AddToCurve(loop[0]);
+            AddToCurve(loop[0], loop.GetSegmentDataBeforeVertex(0));
         }
     }
 }

@@ -34,7 +34,7 @@ namespace gs
 
         protected class PathLoop : PathItem
         {
-            public FillLoopBase<BasicSegmentInfo> loop;
+            public FillLoopBase<FillSegment> loop;
             public bool reverse = false;
         }
 
@@ -42,7 +42,7 @@ namespace gs
 
         protected class PathSpan : PathItem
         {
-            public FillCurveBase<BasicSegmentInfo> curve;
+            public FillCurveBase<FillSegment> curve;
             public bool reverse = false;
         }
 
@@ -52,10 +52,10 @@ namespace gs
         {
             foreach (FillCurveSet2d polySet in paths)
             {
-                foreach (FillLoopBase<BasicSegmentInfo> loop in polySet.Loops)
+                foreach (FillLoopBase<FillSegment> loop in polySet.Loops)
                     Loops.Add(new PathLoop() { loop = loop, speedHint = SpeedHint });
 
-                foreach (FillCurveBase<BasicSegmentInfo> curve in polySet.Curves)
+                foreach (FillCurveBase<FillSegment> curve in polySet.Curves)
                     Spans.Add(new PathSpan() { curve = curve, speedHint = SpeedHint });
             }
         }

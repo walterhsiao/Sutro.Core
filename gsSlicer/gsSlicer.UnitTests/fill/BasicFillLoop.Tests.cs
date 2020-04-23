@@ -12,18 +12,18 @@ namespace gsSlicer.UnitTests.fill
     {
         private static double delta = 1e-4;
 
-        private BasicFillLoop CreateTriangleCCW()
+        private FillLoopBase<FillSegment> CreateTriangleCCW()
         {
-            return new BasicFillLoop(new Vector2d[] {
+            return new FillLoopBase<FillSegment>(new Vector2d[] {
                 new Vector2d(0, 0),
                 new Vector2d(4, 0),
                 new Vector2d(4, 3),
             });
         }
 
-        private BasicFillLoop CreateTriangleCW()
+        private FillLoopBase<FillSegment> CreateTriangleCW()
         {
-            return new BasicFillLoop(new Vector2d[] {
+            return new FillLoopBase<FillSegment>(new Vector2d[] {
                 new Vector2d(4, 3),
                 new Vector2d(4, 0),
                 new Vector2d(0, 0),
@@ -34,7 +34,7 @@ namespace gsSlicer.UnitTests.fill
         [TestMethod]
         public void DefaultConstructor()
         {
-            var loop = new BasicFillLoop();
+            var loop = new FillLoopBase<FillSegment>();
         }
 
         [TestMethod]
@@ -49,7 +49,7 @@ namespace gsSlicer.UnitTests.fill
             };
 
             // Act
-            var loop = new BasicFillLoop(vertices);
+            var loop = new FillLoopBase<FillSegment>(vertices);
 
             // Assert
             Assert.AreEqual(3, loop.VertexCount);
@@ -62,7 +62,7 @@ namespace gsSlicer.UnitTests.fill
         {
             // Arrange
             var triangle = CreateTriangleCCW();
-            var result = new BasicFillLoop();
+            var result = new FillLoopBase<FillSegment>();
 
             // Act
             triangle.RollMidSegment(0, -triangle.GetSegment2dAfterVertex(0).Extent, result);
@@ -85,7 +85,7 @@ namespace gsSlicer.UnitTests.fill
         {
             // Arrange
             var triangle = CreateTriangleCW();
-            var result = new BasicFillLoop();
+            var result = new FillLoopBase<FillSegment>();
 
             // Act
             triangle.RollMidSegment(0, -triangle.GetSegment2dAfterVertex(0).Extent, result);
@@ -108,7 +108,7 @@ namespace gsSlicer.UnitTests.fill
         {
             // Arrange
             var triangle = CreateTriangleCCW();
-            var result = new BasicFillLoop();
+            var result = new FillLoopBase<FillSegment>();
 
             // Act
             triangle.RollMidSegment(0, 0, result);
@@ -135,7 +135,7 @@ namespace gsSlicer.UnitTests.fill
         {
             // Arrange
             var triangle = CreateTriangleCW();
-            var result = new BasicFillLoop();
+            var result = new FillLoopBase<FillSegment>();
 
             // Act
             triangle.RollMidSegment(0, 0, result);
@@ -162,7 +162,7 @@ namespace gsSlicer.UnitTests.fill
 
             // Arrange
             var triangle = CreateTriangleCCW();
-            var result = new BasicFillLoop();
+            var result = new FillLoopBase<FillSegment>();
 
             // Act
             triangle.RollMidSegment(1, -0.5, result);
@@ -189,7 +189,7 @@ namespace gsSlicer.UnitTests.fill
 
             // Arrange
             var triangle = CreateTriangleCW();
-            var result = new BasicFillLoop();
+            var result = new FillLoopBase<FillSegment>();
 
             // Act
             triangle.RollMidSegment(1, 0, result);
@@ -216,7 +216,7 @@ namespace gsSlicer.UnitTests.fill
 
             // Arrange
             var triangle = CreateTriangleCCW();
-            var result = new BasicFillLoop();
+            var result = new FillLoopBase<FillSegment>();
 
             // Act
             triangle.RollMidSegment(0, -1.999, result, 0.005);
@@ -240,7 +240,7 @@ namespace gsSlicer.UnitTests.fill
 
             // Arrange
             var triangle = CreateTriangleCW();
-            var result = new BasicFillLoop();
+            var result = new FillLoopBase<FillSegment>();
 
             // Act
             triangle.RollMidSegment(1, -1.999, result, 0.005);
@@ -264,7 +264,7 @@ namespace gsSlicer.UnitTests.fill
         {
             // Arrange
             var triangle = CreateTriangleCCW();
-            var result = new BasicFillLoop();
+            var result = new FillLoopBase<FillSegment>();
 
             // Act
             triangle.RollMidSegment(0, 1.999, result, 0.005);
@@ -287,7 +287,7 @@ namespace gsSlicer.UnitTests.fill
         {
             // Arrange
             var triangle = CreateTriangleCW();
-            var result = new BasicFillLoop();
+            var result = new FillLoopBase<FillSegment>();
 
             // Act
             triangle.RollMidSegment(1, 1.999, result, 0.005);
@@ -309,7 +309,7 @@ namespace gsSlicer.UnitTests.fill
         public void ConvertToCurve()
         {
             // Act
-            var result = new BasicFillCurve();
+            var result = new FillCurveBase<FillSegment>();
             CreateTriangleCCW().ConvertToCurve(result);
 
             // Assert
@@ -332,7 +332,7 @@ namespace gsSlicer.UnitTests.fill
         public void SplitOnceFirstSegment()
         {
             // Act
-            Func<BasicFillCurve> createFillCurveF = () => new BasicFillCurve();
+            Func<FillCurveBase<FillSegment>> createFillCurveF = () => new FillCurveBase<FillSegment>();
             var result = CreateTriangleCCW().SplitAtDistances(new double[] { 3 }, createFillCurveF);
 
             // Assert
@@ -361,7 +361,7 @@ namespace gsSlicer.UnitTests.fill
         public void SplitOnceSecondSegment()
         {
             // Act
-            Func<BasicFillCurve> createFillCurveF = () => new BasicFillCurve();
+            Func<FillCurveBase<FillSegment>> createFillCurveF = () => new FillCurveBase<FillSegment>();
             var result = CreateTriangleCCW().SplitAtDistances(new double[] { 5 }, createFillCurveF);
 
             // Assert
@@ -390,7 +390,7 @@ namespace gsSlicer.UnitTests.fill
         public void SplitTwiceFirstSegment()
         {
             // Act
-            Func<BasicFillCurve> createFillCurveF = () => new BasicFillCurve();
+            Func<FillCurveBase<FillSegment>> createFillCurveF = () => new FillCurveBase<FillSegment>();
             var result = CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, createFillCurveF);
 
             // Assert
@@ -426,7 +426,7 @@ namespace gsSlicer.UnitTests.fill
         public void SplitTwiceFirstSegmentConnect()
         {
             // Act
-            Func<BasicFillCurve> createFillCurveF = () => new BasicFillCurve();
+            Func<FillCurveBase<FillSegment>> createFillCurveF = () => new FillCurveBase<FillSegment>();
             var result = CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, createFillCurveF, true);
 
             // Assert

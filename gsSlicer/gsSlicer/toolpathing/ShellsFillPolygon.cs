@@ -306,10 +306,10 @@ namespace gs
             {
                 foreach (var shell in shell_polys)
                 {
-                    paths.Append(new BasicFillLoop(shell.Outer.Vertices) { FillType = currentFillType, PerimOrder = nShell });
+                    paths.Append(new FillLoopBase<FillSegment>(shell.Outer.Vertices) { FillType = currentFillType, PerimOrder = nShell });
                     foreach (var hole in shell.Holes)
                     {
-                        paths.Append(new BasicFillLoop(hole.Vertices) { FillType = currentFillType, PerimOrder = nShell, IsHoleShell = true }); ;
+                        paths.Append(new FillLoopBase<FillSegment>(hole.Vertices) { FillType = currentFillType, PerimOrder = nShell, IsHoleShell = true }); ;
                     }
                 }
                 return paths;
@@ -361,15 +361,15 @@ namespace gs
                         continue;
                     if (polyline.Bounds.MaxDim < DiscardTinyPerimeterLengthMM)
                         continue;
-                    paths.Append(new BasicFillCurve(polyline) { FillType = currentFillType, PerimOrder = nShell });
+                    paths.Append(new FillCurveBase<FillSegment>(polyline) { FillType = currentFillType, PerimOrder = nShell });
                 }
             }
             return paths;
         }
 
-        public List<BasicFillCurve> thin_offset(GeneralPolygon2d p)
+        public List<FillCurveBase<FillSegment>> thin_offset(GeneralPolygon2d p)
         {
-            List<BasicFillCurve> result = new List<BasicFillCurve>();
+            List<FillCurveBase<FillSegment>> result = new List<FillCurveBase<FillSegment>>();
 
             // to support non-hole thin offsets we need to return polylines
             if (p.Holes.Count == 0)
@@ -385,7 +385,7 @@ namespace gs
             double clip_dist = ToolWidth * ToolWidthClipMultiplier;
             foreach (GeneralPolygon2d offset_poly in offsets)
             {
-                List<BasicFillCurve> clipped = clip_to_band(offset_poly.Outer, p, clip_dist);
+                List<FillCurveBase<FillSegment>> clipped = clip_to_band(offset_poly.Outer, p, clip_dist);
                 result.AddRange(clipped);
             }
 
@@ -411,7 +411,7 @@ namespace gs
         // vertices are discarded if outside clipPoly, or within clip_dist
         // remaining polylines are returned
         // In all-pass case currently returns polyline w/ explicit first==last vertices
-        public List<BasicFillCurve> clip_to_band(Polygon2d insetpoly, GeneralPolygon2d clipPoly, double clip_dist)
+        public List<FillCurveBase<FillSegment>> clip_to_band(Polygon2d insetpoly, GeneralPolygon2d clipPoly, double clip_dist)
         {
             double clipSqr = clip_dist * clip_dist;
 
@@ -442,19 +442,19 @@ namespace gs
                 midline[i] = po;
             }
             if (nClipped == N)
-                return new List<BasicFillCurve>();
+                return new List<FillCurveBase<FillSegment>>();
             if (nClipped == 0)
             {
-                BasicFillCurve all = new BasicFillCurve(midline);
+                FillCurveBase<FillSegment> all = new FillCurveBase<FillSegment>(midline);
                 all.BeginOrAppendCurve(all.Start);
-                return new List<BasicFillCurve>() { all };
+                return new List<FillCurveBase<FillSegment>>() { all };
             }
 
             return find_polygon_spans(midline, clipped);
         }
 
         // extract set of spans from poly where clipped=false
-        private List<BasicFillCurve> find_polygon_spans(Vector2d[] poly, bool[] clipped)
+        private List<FillCurveBase<FillSegment>> find_polygon_spans(Vector2d[] poly, bool[] clipped)
         {
             // assumption: at least one vtx is clipped
             int iStart = 0;
@@ -470,13 +470,13 @@ namespace gs
                     iStart++;
             }
 
-            List<BasicFillCurve> result = new List<BasicFillCurve>();
+            List<FillCurveBase<FillSegment>> result = new List<FillCurveBase<FillSegment>>();
             int iCur = iStart;
             bool done = false;
 
             while (done == false)
             {
-                BasicFillCurve cur = new BasicFillCurve();
+                FillCurveBase<FillSegment> cur = new FillCurveBase<FillSegment>();
                 do
                 {
                     cur.BeginOrAppendCurve(poly[iCur]);
