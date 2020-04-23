@@ -49,7 +49,7 @@ namespace gs
 
         public Vector2d CurrentPosition => Builder.Position.xy;
 
-        protected virtual void AppendFill(FillElementBase<BasicVertexInfo, BasicSegmentInfo> fill)
+        protected virtual void AppendFill(FillElementBase<BasicSegmentInfo> fill)
         {
             switch (fill)
             {
@@ -73,9 +73,9 @@ namespace gs
             }
         }
 
-        protected static List<FillElementBase<BasicVertexInfo, BasicSegmentInfo>> FlattenFillCurveSets(List<FillCurveSet2d> fillSets)
+        protected static List<FillElementBase<BasicSegmentInfo>> FlattenFillCurveSets(List<FillCurveSet2d> fillSets)
         {
-            var fillElements = new List<FillElementBase<BasicVertexInfo, BasicSegmentInfo>>();
+            var fillElements = new List<FillElementBase<BasicSegmentInfo>>();
 
             foreach (var fills in fillSets)
             {
@@ -112,7 +112,7 @@ namespace gs
             Builder.AppendExtrude(loopV, useSpeed, poly.FillType, null);
         }
 
-        private int FindLoopEntryPoint(FillLoopBase<BasicVertexInfo, BasicSegmentInfo> poly, Vector2d currentPos2)
+        private int FindLoopEntryPoint(FillLoopBase<BasicSegmentInfo> poly, Vector2d currentPos2)
         {
             int startIndex;
             if (Settings.ZipperAlignedToPoint && poly.FillType.IsEntryLocationSpecified())
@@ -161,7 +161,7 @@ namespace gs
         }
 
         // [TODO] would it ever make sense to break polyline to avoid huge travel??
-        public virtual void AppendBasicFillCurve(FillCurveBase<BasicVertexInfo, BasicSegmentInfo> curve)
+        public virtual void AppendBasicFillCurve(FillCurveBase<BasicSegmentInfo> curve)
         {
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;
@@ -206,7 +206,7 @@ namespace gs
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
         //       (currently this is only set on first layer)
-        public virtual double SelectSpeed(FillElementBase<BasicVertexInfo, BasicSegmentInfo> pathCurve)
+        public virtual double SelectSpeed(FillElementBase<BasicSegmentInfo> pathCurve)
         {
             double speed = SpeedHint == SchedulerSpeedHint.Careful ?
                 Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;
@@ -214,7 +214,7 @@ namespace gs
             return pathCurve.FillType.ModifySpeed(speed, SpeedHint);
         }
 
-        protected void AssertValidCurve(FillCurveBase<BasicVertexInfo, BasicSegmentInfo> curve)
+        protected void AssertValidCurve(FillCurveBase<BasicSegmentInfo> curve)
         {
             int N = curve.VertexCount;
             if (N < 2)
@@ -227,7 +227,7 @@ namespace gs
             }
         }
 
-        protected void AssertValidLoop(FillLoopBase<BasicVertexInfo, BasicSegmentInfo> curve)
+        protected void AssertValidLoop(FillLoopBase<BasicSegmentInfo> curve)
         {
             int N = curve.VertexCount;
             if (N < 3)

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace gs
 {
-    public class BasicFillCurve : FillCurveBase<BasicVertexInfo, BasicSegmentInfo>
+    public class BasicFillCurve : FillCurveBase<BasicSegmentInfo>
     {
         public BasicFillCurve()
         { }
@@ -19,7 +19,7 @@ namespace gs
                 BeginOrAppendCurve(vertexEnumerator.Current);
         }
 
-        public override FillCurveBase<BasicVertexInfo, BasicSegmentInfo> CloneBare()
+        public override FillCurveBase<BasicSegmentInfo> CloneBare()
         {
             return new BasicFillCurve()
             {
@@ -28,11 +28,6 @@ namespace gs
                 IsHoleShell = IsHoleShell,
                 PerimOrder = PerimOrder
             };
-        }
-
-        protected override BasicVertexInfo InterpolateVertexInfo(BasicVertexInfo vertexInfoA, BasicVertexInfo vertexInfoB, double param)
-        {
-            return vertexInfoA?.Interpolate(vertexInfoB, param) ?? null;
         }
 
         protected override Tuple<BasicSegmentInfo, BasicSegmentInfo> SplitSegmentInfo(BasicSegmentInfo segmentInfo, double param)

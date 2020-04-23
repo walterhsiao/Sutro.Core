@@ -155,7 +155,7 @@ namespace gs
                     int gid = pathGraph.GetEdgeGroup(eid);
                     if (gid < 0)
                     {
-                        path.AddToCurve(pathGraph.GetVertex(vid), null, new BasicSegmentInfo() { IsConnector = true });
+                        path.AddToCurve(pathGraph.GetVertex(vid), new BasicSegmentInfo() { IsConnector = true });
                     }
                     else
                     {

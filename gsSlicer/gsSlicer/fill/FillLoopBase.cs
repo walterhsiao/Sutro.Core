@@ -7,17 +7,15 @@ namespace gs
     /// <summary>
     /// Additive polygon fill curve
     /// </summary>
-    public abstract class FillLoopBase<TVertexInfo, TSegmentInfo> :
-        FillElementBase<TVertexInfo, TSegmentInfo>
-        where TVertexInfo : BasicVertexInfo, new()
+    public abstract class FillLoopBase<TSegmentInfo> :
+        FillElementBase<TSegmentInfo>
         where TSegmentInfo : BasicSegmentInfo, ICloneable, new()
     {
-        public abstract FillLoopBase<TVertexInfo, TSegmentInfo> CloneBare();
-        public abstract FillCurveBase<TVertexInfo, TSegmentInfo> CloneBareAsCurve();
+        public abstract FillLoopBase<TSegmentInfo> CloneBare();
+        public abstract FillCurveBase<TSegmentInfo> CloneBareAsCurve();
 
         public Polygon2d Polygon { get; protected set; } = new Polygon2d();
         protected List<TSegmentInfo> SegmentInfo = new List<TSegmentInfo>();
-        protected List<TVertexInfo> VertexInfo = new List<TVertexInfo>();
         public double CustomThickness { get; set; }
 
         // Pass through some properties & methods from wrapped Polygon
@@ -40,10 +38,9 @@ namespace gs
         private bool loopStarted = false;
         private bool loopFinished = false;
 
-        public void BeginOrAppendCurve(Vector2d pt, TVertexInfo vInfo = null)
+        public void BeginOrAppendCurve(Vector2d pt)
         {
             Polygon.AppendVertex(pt);
-            VertexInfo.Add(vInfo);
             if (loopStarted)
             {
                 SegmentInfo.Add(null);
@@ -54,7 +51,7 @@ namespace gs
             }
         }
 
-        public void BeginLoop(Vector2d pt, TVertexInfo vInfo = null)
+        public void BeginLoop(Vector2d pt)
         {
             if (loopStarted)
                 throw new MethodAccessException("BeginLoop called more than once.");
@@ -62,10 +59,9 @@ namespace gs
             loopStarted = true;
 
             Polygon.AppendVertex(pt);
-            VertexInfo.Add(vInfo);
         }
 
-        public void AddToLoop(Vector2d pt, TVertexInfo vInfo = null, TSegmentInfo sInfo = null)
+        public void AddToLoop(Vector2d pt, TSegmentInfo sInfo = null)
         {
             if (!loopStarted)
                 throw new MethodAccessException("AddToLoop called before BeginLoop.");
@@ -73,7 +69,6 @@ namespace gs
                 throw new MethodAccessException("AddToLoop called after CloseLoop");
 
             Polygon.AppendVertex(pt);
-            VertexInfo.Add(vInfo);
             SegmentInfo.Add(sInfo);
         }
 
@@ -99,33 +94,23 @@ namespace gs
             return vertexA * (1 - param) + vertexB * param;
         }
 
-        protected abstract TVertexInfo InterpolateVertexInfo(TVertexInfo vertexInfoA, TVertexInfo vertexInfoB, double param);
-
         protected abstract Tuple<TSegmentInfo, TSegmentInfo> SplitSegmentInfo(TSegmentInfo segmentInfo, double param);
 
         public void Roll(int k)
         {
             // Make copies of current lists
             var rolledVertices = new List<Vector2d>(VertexCount);
-            var rolledVertexInfo = new List<TVertexInfo>(VertexCount);
             var rolledSegmentInfo = new List<TSegmentInfo>(VertexCount);
 
             for (int i = 0; i < VertexCount; i++)
             {
                 int j = (i + k) % VertexCount;
                 rolledVertices.Add(Polygon.Vertices[j]);
-                rolledVertexInfo.Add(VertexInfo[j]);
                 rolledSegmentInfo.Add(SegmentInfo[j]);
             }
 
             Polygon = new Polygon2d(rolledVertices);
-            VertexInfo = rolledVertexInfo;
             SegmentInfo = rolledSegmentInfo;
-        }
-
-        public TVertexInfo GetVertexData(int vertexIndex)
-        {
-            return VertexInfo[vertexIndex];
         }
 
         public TSegmentInfo GetSegmentDataAfterVertex(int vertexIndex)
@@ -188,23 +173,22 @@ namespace gs
         public void Reverse()
         {
             Polygon.Reverse();
-            VertexInfo.Reverse();
             SegmentInfo.Reverse();
             foreach (var segmentInfo in SegmentInfo)
                 segmentInfo?.Reverse();
         }
 
-        public virtual void ConvertToCurve(FillCurveBase<TVertexInfo, TSegmentInfo> curve)
+        public virtual void ConvertToCurve(FillCurveBase<TSegmentInfo> curve)
         {
-            curve.BeginCurve(Polygon[0], GetVertexData(0));
+            curve.BeginCurve(Polygon[0]);
             for (int i = 1; i < VertexCount; ++i)
             {
-                curve.AddToCurve(Polygon[i % VertexCount], GetVertexData(i), GetSegmentDataBeforeVertex(i));
+                curve.AddToCurve(Polygon[i % VertexCount], GetSegmentDataBeforeVertex(i));
             }
-            curve.AddToCurve(Polygon[0], GetVertexData(0), GetSegmentDataBeforeVertex(0));
+            curve.AddToCurve(Polygon[0], GetSegmentDataBeforeVertex(0));
         }
 
-        public void RollMidSegment(int iSegment, double fNearSeg, FillLoopBase<TVertexInfo, TSegmentInfo> rolled, double tolerance = 0.001)
+        public void RollMidSegment(int iSegment, double fNearSeg, FillLoopBase<TSegmentInfo> rolled, double tolerance = 0.001)
         {
             double splitParam = fNearSeg / Polygon.Segment(iSegment).Extent / 2d + 0.5d;
 
@@ -212,17 +196,16 @@ namespace gs
             {
                 int iNextVertex = (iSegment + 1) % VertexCount;
                 var interpolatedVertex = InterpolateVertex(Polygon[iSegment], Polygon[iNextVertex], splitParam);
-                var interpolatedVertexData = InterpolateVertexInfo(GetVertexData(iSegment), GetVertexData(iNextVertex), splitParam);
                 var splitSegmentData = SplitSegmentInfo(GetSegmentDataAfterVertex(iSegment), splitParam);
 
-                rolled.BeginLoop(interpolatedVertex, interpolatedVertexData);
-                rolled.AddToLoop(Polygon[iNextVertex], GetVertexData(iSegment), splitSegmentData.Item2);
+                rolled.BeginLoop(interpolatedVertex);
+                rolled.AddToLoop(Polygon[iNextVertex], splitSegmentData.Item2);
 
                 for (int i = iSegment + 2; i < VertexCount; ++i)
-                    rolled.AddToLoop(Polygon[i], VertexInfo[i], GetSegmentDataBeforeVertex(i));
+                    rolled.AddToLoop(Polygon[i], GetSegmentDataBeforeVertex(i));
 
                 for (int i = 0; i <= iSegment; ++i)
-                    rolled.AddToLoop(Polygon[i], VertexInfo[i], GetSegmentDataBeforeVertex(i));
+                    rolled.AddToLoop(Polygon[i], GetSegmentDataBeforeVertex(i));
 
                 rolled.CloseLoop(splitSegmentData.Item1);
             }
@@ -233,24 +216,24 @@ namespace gs
                 if (iSegment >= VertexCount)
                     iSegment = 0;
 
-                rolled.BeginLoop(Polygon[iSegment], GetVertexData(iSegment));
+                rolled.BeginLoop(Polygon[iSegment]);
                 for (int i = iSegment + 1; i < VertexCount; ++i)
-                    rolled.AddToLoop(Polygon[i], GetVertexData(i), GetSegmentDataBeforeVertex(i));
+                    rolled.AddToLoop(Polygon[i], GetSegmentDataBeforeVertex(i));
                 for (int i = 0; i < iSegment; ++i)
-                    rolled.AddToLoop(Polygon[i], GetVertexData(i), GetSegmentDataBeforeVertex(i));
+                    rolled.AddToLoop(Polygon[i], GetSegmentDataBeforeVertex(i));
                 rolled.CloseLoop(GetSegmentDataBeforeVertex(iSegment));
             }
         }
 
-        public List<FillCurveBase<TVertexInfo, TSegmentInfo>> SplitAtDistances(
+        public List<FillCurveBase<TSegmentInfo>> SplitAtDistances(
                 IEnumerable<double> splits,
-                Func<FillCurveBase<TVertexInfo, TSegmentInfo>> createFillCurveF,
+                Func<FillCurveBase<TSegmentInfo>> createFillCurveF,
                 bool joinFirstAndLast = false)
         {
             // TODO: Decide what happens when split distance greater than perimeter.
             // TODO: Check for split distances monotonically increasing and > 0.
             // TODO: Check for split distance count more than 0.
-            var splitFillCurves = new List<FillCurveBase<TVertexInfo, TSegmentInfo>>();
+            var splitFillCurves = new List<FillCurveBase<TSegmentInfo>>();
             var curve = createFillCurveF();
             ConvertToCurve(curve);
             curve.SplitAtDistances(splits, splitFillCurves, createFillCurveF);
@@ -265,6 +248,6 @@ namespace gs
             return splitFillCurves;
         }
 
-        public abstract FillCurveBase<TVertexInfo, TSegmentInfo> ConvertToCurve();
+        public abstract FillCurveBase<TSegmentInfo> ConvertToCurve();
     }
 }

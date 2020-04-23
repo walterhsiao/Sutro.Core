@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace gs
 {
-    public class BasicFillLoop : FillLoopBase<BasicVertexInfo, BasicSegmentInfo>
+    public class BasicFillLoop : FillLoopBase<BasicSegmentInfo>
     {
         public BasicFillLoop()
         { }
@@ -21,7 +21,7 @@ namespace gs
             CloseLoop();
         }
 
-        public override FillLoopBase<BasicVertexInfo, BasicSegmentInfo> CloneBare()
+        public override FillLoopBase<BasicSegmentInfo> CloneBare()
         {
             return new BasicFillLoop()
             {
@@ -32,7 +32,7 @@ namespace gs
             };
         }
 
-        public override FillCurveBase<BasicVertexInfo, BasicSegmentInfo> CloneBareAsCurve()
+        public override FillCurveBase<BasicSegmentInfo> CloneBareAsCurve()
         {
             return new BasicFillCurve()
             {
@@ -43,19 +43,11 @@ namespace gs
             };
         }
 
-        public override FillCurveBase<BasicVertexInfo, BasicSegmentInfo> ConvertToCurve()
+        public override FillCurveBase<BasicSegmentInfo> ConvertToCurve()
         {
             var curve = CloneBareAsCurve();
             curve.PopulateFromLoop(this);
             return curve;
-        }
-
-        protected override BasicVertexInfo InterpolateVertexInfo(BasicVertexInfo vertexInfoA, BasicVertexInfo vertexInfoB, double param)
-        {
-            if (vertexInfoA != null && vertexInfoB != null)
-                return vertexInfoA.Interpolate(vertexInfoB, param);
-            else
-                return null;
         }
 
         protected override Tuple<BasicSegmentInfo, BasicSegmentInfo> SplitSegmentInfo(BasicSegmentInfo segmentInfo, double param)
