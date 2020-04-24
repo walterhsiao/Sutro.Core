@@ -5,11 +5,6 @@ namespace gs
 {
     public static class FillSplitter<TSegmentInfo> where TSegmentInfo : IFillSegment
     {
-        public static Vector3d InterpolateVertex(Vector3d vertexA, Vector3d vertexB, double param)
-        {
-            return vertexA * (1 - param) + vertexB * param;
-        }
-
         public static List<List<FillElement<TSegmentInfo>>> SplitAtDistances(
             IEnumerable<double> splitDistances,
             IEnumerable<FillElement<TSegmentInfo>> elements)
@@ -59,7 +54,7 @@ namespace gs
                     double splitDistance = splitsQueue.Dequeue() - cumulativeDistance;
                     double t = splitDistance / nextDistance;
 
-                    var splitVertex = InterpolateVertex(curve[^1].NodeEnd, element.NodeEnd, t);
+                    var splitVertex = Vector3d.Lerp(curve[^1].NodeEnd, element.NodeEnd, t);
 
                     var splitSegmentData = element.Edge.Split(t);
 

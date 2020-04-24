@@ -1,6 +1,7 @@
 ﻿using g3;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace gs
 {
@@ -19,9 +20,9 @@ namespace gs
 
         public void Append(GeneralPolygon2d poly, IFillType fillType)
         {
-            Loops.Add(new FillLoop<FillSegment>(poly.Outer.VerticesItr(false)) { FillType = fillType });
+            Loops.Add(new FillLoop<FillSegment>(poly.Outer.VerticesItr(false).ToList()) { FillType = fillType });
             foreach (var h in poly.Holes)
-                Loops.Add(new FillLoop<FillSegment>(h.VerticesItr(false)) { FillType = fillType });
+                Loops.Add(new FillLoop<FillSegment>(h.VerticesItr(false).ToList()) { FillType = fillType });
         }
 
         public void Append(List<GeneralPolygon2d> polys, IFillType fillType)
@@ -32,7 +33,7 @@ namespace gs
 
         public void Append(Polygon2d poly, IFillType fillType)
         {
-            Loops.Add(new FillLoop<FillSegment>(poly.VerticesItr(false)) { FillType = fillType });
+            Loops.Add(new FillLoop<FillSegment>(poly.VerticesItr(false).ToList()) { FillType = fillType });
         }
 
         public void Append(List<Polygon2d> polys, IFillType fillType)

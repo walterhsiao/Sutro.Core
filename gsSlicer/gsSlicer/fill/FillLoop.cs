@@ -1,7 +1,6 @@
 ﻿using g3;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace gs
@@ -36,9 +35,14 @@ namespace gs
 
         public Vector2d EntryExitPoint => elements[0].NodeStart.xy;
 
-        public FillLoop(IEnumerable<Vector2d> vertices)
+        public FillLoop(IList<Vector2d> vertices)
         {
-            throw new NotImplementedException();
+            elements.Capacity = vertices.Count;
+            for (int i = 1; i < vertices.Count; i++)
+            {
+                elements.Add(new FillElement<TSegmentInfo>(vertices[i - 1], vertices[i], new TSegmentInfo()));
+            }
+            elements.Add(new FillElement<TSegmentInfo>(vertices[^1], vertices[0], new TSegmentInfo()));
         }
 
         public FillLoop(IEnumerable<FillElement<TSegmentInfo>> elements)
@@ -60,43 +64,61 @@ namespace gs
             return rolledLoop;
         }
 
-        public FillLoop<TSegmentInfo> RollBetweenVertex(int elementIndex, double elementParameterizedDistance, double tolerance = 0.001)
+        public FillLoop<TSegmentInfo> RollBetweenVertices(int elementIndex, double elementParameterizedDistance, double tolerance = 0.001)
         {
-            throw new NotImplementedException();
+            if (!ElementShouldSplit(elementParameterizedDistance, tolerance, elements[elementIndex].GetSegment2d().Length))
+            {
+                if (elementParameterizedDistance > 0.5)
+                {
+                    ++elementIndex;
+                    if (elementIndex >= elements.Count)
+                    {
+                        elementIndex = 0;
+                    }
+                }
 
-            //if (Math.Abs(fNearSeg) < GetSegment2dAfterVertex(iSegment).Extent - tolerance)
-            //{
-            //    int iNextVertex = (iSegment + 1) % VertexCount;
-            //    var interpolatedVertex = InterpolateVertex(Polygon[iSegment], Polygon[iNextVertex], splitParam);
+                return RollToVertex(elementIndex);
+            }
 
-            //    var segData = GetSegmentDataAfterVertex(iSegment);
-            //    var splitSegmentData = segData == null ? Tuple.Create((IFillSegment)new TSegmentInfo(), (IFillSegment)new TSegmentInfo()) : segData.Split(splitParam);
+            var rolledElements = new List<FillElement<TSegmentInfo>>(elements.Count + 1);
 
-            //    rolled.BeginLoop(interpolatedVertex);
-            //    rolled.AddToLoop(Polygon[iNextVertex], (TSegmentInfo)splitSegmentData.Item2);
+            var elementToSplit = elements[elementIndex];
 
-            //    for (int i = iSegment + 2; i < VertexCount; ++i)
-            //        rolled.AddToLoop(Polygon[i], GetSegmentDataBeforeVertex(i));
+            var interpolatedVertex = Vector3d.Lerp(elementToSplit.NodeStart, elementToSplit.NodeEnd, elementParameterizedDistance);
 
-            //    for (int i = 0; i <= iSegment; ++i)
-            //        rolled.AddToLoop(Polygon[i], GetSegmentDataBeforeVertex(i));
+            var splitSegmentData = elementToSplit.Edge == null ?
+                Tuple.Create((IFillSegment)new TSegmentInfo(), (IFillSegment)new TSegmentInfo()) :
+                elementToSplit.Edge.Split(elementParameterizedDistance);
 
-            //    rolled.CloseLoop((TSegmentInfo)splitSegmentData.Item1);
-            //}
-            //else
-            //{
-            //    if (fNearSeg > 0)
-            //        ++iSegment;
-            //    if (iSegment >= VertexCount)
-            //        iSegment = 0;
+            // Add the second half of the split element
+            rolledElements.Add(new FillElement<TSegmentInfo>(
+                    interpolatedVertex,
+                    elementToSplit.NodeEnd,
+                    (TSegmentInfo)splitSegmentData.Item2));
 
-            //    rolled.BeginLoop(Polygon[iSegment]);
-            //    for (int i = iSegment + 1; i < VertexCount; ++i)
-            //        rolled.AddToLoop(Polygon[i], GetSegmentDataBeforeVertex(i));
-            //    for (int i = 0; i < iSegment; ++i)
-            //        rolled.AddToLoop(Polygon[i], GetSegmentDataBeforeVertex(i));
-            //    rolled.CloseLoop(GetSegmentDataBeforeVertex(iSegment));
-            //}
+            // Add all elements after the split element
+            for (int i = elementIndex + 1; i < elements.Count; ++i)
+                rolledElements.Add(elements[i]);
+
+            // Add all elements before the split element
+            for (int i = 0; i < elementIndex; ++i)
+                rolledElements.Add(elements[i]);
+
+            // Add the first half of the split element
+            rolledElements.Add(new FillElement<TSegmentInfo>(
+                    elementToSplit.NodeStart,
+                    interpolatedVertex,
+                    (TSegmentInfo)splitSegmentData.Item1));
+
+            var rolledLoop = new FillLoop<TSegmentInfo>(rolledElements);
+            rolledLoop.CopyProperties(this);
+            return rolledLoop;
+        }
+
+        private static bool ElementShouldSplit(double parameterizedSplitDistance, double tolerance, double segmentLength)
+        {
+            double toleranceParameterized = tolerance / segmentLength;
+            return parameterizedSplitDistance > toleranceParameterized && parameterizedSplitDistance < (1 - toleranceParameterized);
         }
 
         public List<FillLoop<TSegmentInfo>> SplitAtDistances(double[] v)
@@ -106,7 +128,9 @@ namespace gs
 
         public FillCurve<TSegmentInfo> ConvertToCurve()
         {
-            throw new NotImplementedException();
+            var curve = new FillCurve<TSegmentInfo>(elements);
+            curve.CopyProperties(this);
+            return curve;
         }
     }
 }

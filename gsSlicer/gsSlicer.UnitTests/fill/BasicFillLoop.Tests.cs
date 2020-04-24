@@ -55,7 +55,7 @@ namespace gsSlicer.UnitTests.fill
             var triangle = CreateTriangleCCW();
 
             // Act
-            var result = triangle.RollBetweenVertex(0, 0);
+            var result = triangle.RollBetweenVertices(0, 0);
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -80,7 +80,7 @@ namespace gsSlicer.UnitTests.fill
             var triangle = CreateTriangleCW();
 
             // Act
-            var result = triangle.RollBetweenVertex(0, 0);
+            var result = triangle.RollBetweenVertices(0, 0);
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -102,7 +102,7 @@ namespace gsSlicer.UnitTests.fill
             var triangle = CreateTriangleCCW();
 
             // Act
-            var result = triangle.RollBetweenVertex(0, 0.5);
+            var result = triangle.RollBetweenVertices(0, 0.5);
 
             // Assert
             Assert.AreEqual(4, result.Elements.Count);
@@ -127,7 +127,7 @@ namespace gsSlicer.UnitTests.fill
             var triangle = CreateTriangleCW();
 
             // Act
-            var result = triangle.RollBetweenVertex(0, 0.5);
+            var result = triangle.RollBetweenVertices(0, 0.5);
 
             // Assert
             Assert.AreEqual(4, result.Elements.Count);
@@ -152,7 +152,7 @@ namespace gsSlicer.UnitTests.fill
             var triangle = CreateTriangleCCW();
 
             // Act
-            var result = triangle.RollBetweenVertex(1, -0.5);
+            var result = triangle.RollBetweenVertices(1, 1d/3d);
 
             // Assert
             Assert.AreEqual(4, result.Elements.Count);
@@ -177,7 +177,7 @@ namespace gsSlicer.UnitTests.fill
             var triangle = CreateTriangleCW();
 
             // Act
-            var result = triangle.RollBetweenVertex(1, 0);
+            var result = triangle.RollBetweenVertices(1, 0.5);
 
             // Assert
             Assert.AreEqual(4, result.Elements.Count);
@@ -202,7 +202,7 @@ namespace gsSlicer.UnitTests.fill
             var triangle = CreateTriangleCCW();
 
             // Act
-            var result = triangle.RollBetweenVertex(0, 4 * 0.004, 0.005);
+            var result = triangle.RollBetweenVertices(0, 0.004 / 4, 0.005);
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -224,7 +224,7 @@ namespace gsSlicer.UnitTests.fill
             var triangle = CreateTriangleCW();
 
             // Act
-            var result = triangle.RollBetweenVertex(1, 4 * 0.004, 0.005);
+            var result = triangle.RollBetweenVertices(1, 0.004 / 4, 0.005);
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -246,7 +246,7 @@ namespace gsSlicer.UnitTests.fill
             var triangle = CreateTriangleCCW();
 
             // Act
-            var result = triangle.RollBetweenVertex(0, 0.9999, 0.005);
+            var result = triangle.RollBetweenVertices(0, 1 - (0.004 / 4), 0.005);
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -268,7 +268,7 @@ namespace gsSlicer.UnitTests.fill
             var triangle = CreateTriangleCW();
 
             // Act
-            var result = triangle.RollBetweenVertex(1, 0.9999, 0.005);
+            var result = triangle.RollBetweenVertices(1, 1 - (0.004 / 4), 0.005);
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -290,7 +290,7 @@ namespace gsSlicer.UnitTests.fill
             var result = CreateTriangleCCW().ConvertToCurve();
 
             // Assert
-            Assert.AreEqual(4, result.Elements.Count);
+            Assert.AreEqual(3, result.Elements.Count);
 
             Assert.AreEqual(0, result.Elements[0].NodeStart.x, delta);
             Assert.AreEqual(0, result.Elements[0].NodeStart.y, delta);
@@ -301,8 +301,8 @@ namespace gsSlicer.UnitTests.fill
             Assert.AreEqual(4, result.Elements[2].NodeStart.x, delta);
             Assert.AreEqual(3, result.Elements[2].NodeStart.y, delta);
 
-            Assert.AreEqual(0, result.Elements[3].NodeStart.x, delta);
-            Assert.AreEqual(0, result.Elements[3].NodeStart.y, delta);
+            Assert.AreEqual(0, result.Elements[2].NodeEnd.x, delta);
+            Assert.AreEqual(0, result.Elements[2].NodeEnd.y, delta);
         }
 
         [TestMethod]
