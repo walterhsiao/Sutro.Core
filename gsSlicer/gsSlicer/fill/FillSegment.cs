@@ -2,17 +2,12 @@
 
 namespace gs
 {
-    public class FillSegment : IFillSegment, ICloneable
+    public class FillSegment : IFillSegment
     {
         public bool IsConnector { get; set; }
 
         public FillSegment()
         {
-        }
-
-        public void Reverse()
-        {
-
         }
 
         public virtual FillSegment Reversed()

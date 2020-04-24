@@ -2,10 +2,9 @@
 
 namespace gs
 {
-    public interface IFillSegment
+    public interface IFillSegment : ICloneable
     {
         bool IsConnector { get; }
-        void Reverse();
         IFillSegment Reversed();
         Tuple<IFillSegment, IFillSegment> Split(double t);
     }

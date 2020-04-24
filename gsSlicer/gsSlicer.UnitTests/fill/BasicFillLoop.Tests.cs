@@ -3,7 +3,6 @@ using gs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace gsSlicer.UnitTests.fill
 {
@@ -12,29 +11,22 @@ namespace gsSlicer.UnitTests.fill
     {
         private static double delta = 1e-4;
 
-        private FillLoopBase<FillSegment> CreateTriangleCCW()
+        private FillLoop<FillSegment> CreateTriangleCCW()
         {
-            return new FillLoopBase<FillSegment>(new Vector2d[] {
+            return new FillLoop<FillSegment>(new Vector2d[] {
                 new Vector2d(0, 0),
                 new Vector2d(4, 0),
                 new Vector2d(4, 3),
             });
         }
 
-        private FillLoopBase<FillSegment> CreateTriangleCW()
+        private FillLoop<FillSegment> CreateTriangleCW()
         {
-            return new FillLoopBase<FillSegment>(new Vector2d[] {
+            return new FillLoop<FillSegment>(new Vector2d[] {
                 new Vector2d(4, 3),
                 new Vector2d(4, 0),
                 new Vector2d(0, 0),
             });
-        }
-
-
-        [TestMethod]
-        public void DefaultConstructor()
-        {
-            var loop = new FillLoopBase<FillSegment>();
         }
 
         [TestMethod]
@@ -49,12 +41,11 @@ namespace gsSlicer.UnitTests.fill
             };
 
             // Act
-            var loop = new FillLoopBase<FillSegment>(vertices);
+            var loop = new FillLoop<FillSegment>(vertices);
 
             // Assert
-            Assert.AreEqual(3, loop.VertexCount);
-            Assert.AreEqual(3, loop.SegmentCount);
-            Assert.AreEqual(2, loop[0].x);
+            Assert.AreEqual(3, loop.Elements.Count);
+            Assert.AreEqual(2, loop.Elements[0].NodeStart.x);
         }
 
         [TestMethod]
@@ -62,22 +53,24 @@ namespace gsSlicer.UnitTests.fill
         {
             // Arrange
             var triangle = CreateTriangleCCW();
-            var result = new FillLoopBase<FillSegment>();
 
             // Act
-            triangle.RollMidSegment(0, -triangle.GetSegment2dAfterVertex(0).Extent, result);
+            var result = triangle.RollBetweenVertex(0, 0);
 
             // Assert
-            Assert.AreEqual(3, result.VertexCount);
+            Assert.AreEqual(3, result.Elements.Count);
 
-            Assert.AreEqual(0, result[0].x, delta);
-            Assert.AreEqual(0, result[0].y, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[1].x, delta);
-            Assert.AreEqual(0, result[1].y, delta);
+            Assert.AreEqual(4, result.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[1].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[2].x, delta);
-            Assert.AreEqual(3, result[2].y, delta);
+            Assert.AreEqual(4, result.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(3, result.Elements[2].NodeStart.y, delta);
+
+            Assert.AreEqual(0, result.Elements[2].NodeEnd.x, delta);
+            Assert.AreEqual(0, result.Elements[2].NodeEnd.y, delta);
         }
 
         [TestMethod]
@@ -85,22 +78,21 @@ namespace gsSlicer.UnitTests.fill
         {
             // Arrange
             var triangle = CreateTriangleCW();
-            var result = new FillLoopBase<FillSegment>();
 
             // Act
-            triangle.RollMidSegment(0, -triangle.GetSegment2dAfterVertex(0).Extent, result);
+            var result = triangle.RollBetweenVertex(0, 0);
 
             // Assert
-            Assert.AreEqual(3, result.VertexCount);
+            Assert.AreEqual(3, result.Elements.Count);
 
-            Assert.AreEqual(4, result[0].x, delta);
-            Assert.AreEqual(3, result[0].y, delta);
+            Assert.AreEqual(4, result.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(3, result.Elements[0].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[1].x, delta);
-            Assert.AreEqual(0, result[1].y, delta);
+            Assert.AreEqual(4, result.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[1].NodeStart.y, delta);
 
-            Assert.AreEqual(0, result[2].x, delta);
-            Assert.AreEqual(0, result[2].y, delta);
+            Assert.AreEqual(0, result.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[2].NodeStart.y, delta);
         }
 
         [TestMethod]
@@ -108,178 +100,165 @@ namespace gsSlicer.UnitTests.fill
         {
             // Arrange
             var triangle = CreateTriangleCCW();
-            var result = new FillLoopBase<FillSegment>();
 
             // Act
-            triangle.RollMidSegment(0, 0, result);
+            var result = triangle.RollBetweenVertex(0, 0.5);
 
             // Assert
-            Assert.AreEqual(4, result.VertexCount);
+            Assert.AreEqual(4, result.Elements.Count);
 
-            Assert.AreEqual(2, result[0].x, delta);
-            Assert.AreEqual(0, result[0].y, delta);
+            Assert.AreEqual(2, result.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[1].x, delta);
-            Assert.AreEqual(0, result[1].y, delta);
+            Assert.AreEqual(4, result.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[1].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[2].x, delta);
-            Assert.AreEqual(3, result[2].y, delta);
+            Assert.AreEqual(4, result.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(3, result.Elements[2].NodeStart.y, delta);
 
-            Assert.AreEqual(0, result[3].x, delta);
-            Assert.AreEqual(0, result[3].y, delta);
+            Assert.AreEqual(0, result.Elements[3].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[3].NodeStart.y, delta);
         }
-
 
         [TestMethod]
         public void RollFirstSegmentHalfwayCW()
         {
             // Arrange
             var triangle = CreateTriangleCW();
-            var result = new FillLoopBase<FillSegment>();
 
             // Act
-            triangle.RollMidSegment(0, 0, result);
+            var result = triangle.RollBetweenVertex(0, 0.5);
 
             // Assert
-            Assert.AreEqual(4, result.VertexCount);
+            Assert.AreEqual(4, result.Elements.Count);
 
-            Assert.AreEqual(4, result[0].x, delta);
-            Assert.AreEqual(1.5, result[0].y, delta);
+            Assert.AreEqual(4, result.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(1.5, result.Elements[0].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[1].x, delta);
-            Assert.AreEqual(0, result[1].y, delta);
+            Assert.AreEqual(4, result.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[1].NodeStart.y, delta);
 
-            Assert.AreEqual(0, result[2].x, delta);
-            Assert.AreEqual(0, result[2].y, delta);
+            Assert.AreEqual(0, result.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[2].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[3].x, delta);
-            Assert.AreEqual(3, result[3].y, delta);
+            Assert.AreEqual(4, result.Elements[3].NodeStart.x, delta);
+            Assert.AreEqual(3, result.Elements[3].NodeStart.y, delta);
         }
 
         [TestMethod]
         public void RollSecondSegmentHalfwayCCW()
         {
-
             // Arrange
             var triangle = CreateTriangleCCW();
-            var result = new FillLoopBase<FillSegment>();
 
             // Act
-            triangle.RollMidSegment(1, -0.5, result);
+            var result = triangle.RollBetweenVertex(1, -0.5);
 
             // Assert
-            Assert.AreEqual(4, result.VertexCount);
+            Assert.AreEqual(4, result.Elements.Count);
 
-            Assert.AreEqual(4, result[0].x, delta);
-            Assert.AreEqual(1, result[0].y, delta);
+            Assert.AreEqual(4, result.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(1, result.Elements[0].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[1].x, delta);
-            Assert.AreEqual(3, result[1].y, delta);
+            Assert.AreEqual(4, result.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(3, result.Elements[1].NodeStart.y, delta);
 
-            Assert.AreEqual(0, result[2].x, delta);
-            Assert.AreEqual(0, result[2].y, delta);
+            Assert.AreEqual(0, result.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[2].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[3].x, delta);
-            Assert.AreEqual(0, result[3].y, delta);
+            Assert.AreEqual(4, result.Elements[3].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[3].NodeStart.y, delta);
         }
 
         [TestMethod]
         public void RollSecondSegmentHalfwayCW()
         {
-
             // Arrange
             var triangle = CreateTriangleCW();
-            var result = new FillLoopBase<FillSegment>();
 
             // Act
-            triangle.RollMidSegment(1, 0, result);
-            
+            var result = triangle.RollBetweenVertex(1, 0);
+
             // Assert
-            Assert.AreEqual(4, result.VertexCount);
+            Assert.AreEqual(4, result.Elements.Count);
 
-            Assert.AreEqual(2, result[0].x, delta);
-            Assert.AreEqual(0, result[0].y, delta);
+            Assert.AreEqual(2, result.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.y, delta);
 
-            Assert.AreEqual(0, result[1].x, delta);
-            Assert.AreEqual(0, result[1].y, delta);
+            Assert.AreEqual(0, result.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[1].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[2].x, delta);
-            Assert.AreEqual(3, result[2].y, delta);
+            Assert.AreEqual(4, result.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(3, result.Elements[2].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[3].x, delta);
-            Assert.AreEqual(0, result[3].y, delta);
+            Assert.AreEqual(4, result.Elements[3].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[3].NodeStart.y, delta);
         }
 
         [TestMethod]
         public void RollFirstSegmentWithinToleranceLowSideCCW()
         {
-
             // Arrange
             var triangle = CreateTriangleCCW();
-            var result = new FillLoopBase<FillSegment>();
 
             // Act
-            triangle.RollMidSegment(0, -1.999, result, 0.005);
+            var result = triangle.RollBetweenVertex(0, 4 * 0.004, 0.005);
 
             // Assert
-            Assert.AreEqual(3, result.VertexCount);
+            Assert.AreEqual(3, result.Elements.Count);
 
-            Assert.AreEqual(0, result[0].x, delta);
-            Assert.AreEqual(0, result[0].y, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[1].x, delta);
-            Assert.AreEqual(0, result[1].y, delta);
+            Assert.AreEqual(4, result.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[1].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[2].x, delta);
-            Assert.AreEqual(3, result[2].y, delta);
+            Assert.AreEqual(4, result.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(3, result.Elements[2].NodeStart.y, delta);
         }
 
         [TestMethod]
         public void RollFirstSegmentWithinToleranceLowSideCW()
         {
-
             // Arrange
             var triangle = CreateTriangleCW();
-            var result = new FillLoopBase<FillSegment>();
 
             // Act
-            triangle.RollMidSegment(1, -1.999, result, 0.005);
+            var result = triangle.RollBetweenVertex(1, 4 * 0.004, 0.005);
 
             // Assert
-            Assert.AreEqual(3, result.VertexCount);
+            Assert.AreEqual(3, result.Elements.Count);
 
-            Assert.AreEqual(4, result[0].x, delta);
-            Assert.AreEqual(0, result[0].y, delta);
+            Assert.AreEqual(4, result.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.y, delta);
 
-            Assert.AreEqual(0, result[1].x, delta);
-            Assert.AreEqual(0, result[1].y, delta);
+            Assert.AreEqual(0, result.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[1].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[2].x, delta);
-            Assert.AreEqual(3, result[2].y, delta);
+            Assert.AreEqual(4, result.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(3, result.Elements[2].NodeStart.y, delta);
         }
-
 
         [TestMethod]
         public void RollFirstSegmentWithinToleranceHighSideCCW()
         {
             // Arrange
             var triangle = CreateTriangleCCW();
-            var result = new FillLoopBase<FillSegment>();
 
             // Act
-            triangle.RollMidSegment(0, 1.999, result, 0.005);
+            var result = triangle.RollBetweenVertex(0, 0.9999, 0.005);
 
             // Assert
-            Assert.AreEqual(3, result.VertexCount);
+            Assert.AreEqual(3, result.Elements.Count);
 
-            Assert.AreEqual(4, result[0].x, delta);
-            Assert.AreEqual(0, result[0].y, delta);
+            Assert.AreEqual(4, result.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[1].x, delta);
-            Assert.AreEqual(3, result[1].y, delta);
+            Assert.AreEqual(4, result.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(3, result.Elements[1].NodeStart.y, delta);
 
-            Assert.AreEqual(0, result[2].x, delta);
-            Assert.AreEqual(0, result[2].y, delta);
+            Assert.AreEqual(0, result.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[2].NodeStart.y, delta);
         }
 
         [TestMethod]
@@ -287,170 +266,168 @@ namespace gsSlicer.UnitTests.fill
         {
             // Arrange
             var triangle = CreateTriangleCW();
-            var result = new FillLoopBase<FillSegment>();
 
             // Act
-            triangle.RollMidSegment(1, 1.999, result, 0.005);
+            var result = triangle.RollBetweenVertex(1, 0.9999, 0.005);
 
             // Assert
-            Assert.AreEqual(3, result.VertexCount);
+            Assert.AreEqual(3, result.Elements.Count);
 
-            Assert.AreEqual(0, result[0].x, delta);
-            Assert.AreEqual(0, result[0].y, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[1].x, delta);
-            Assert.AreEqual(3, result[1].y, delta);
+            Assert.AreEqual(4, result.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(3, result.Elements[1].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[2].x, delta);
-            Assert.AreEqual(0, result[2].y, delta);
+            Assert.AreEqual(4, result.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[2].NodeStart.y, delta);
         }
 
         [TestMethod]
         public void ConvertToCurve()
         {
             // Act
-            var result = new FillCurveBase<FillSegment>();
-            CreateTriangleCCW().ConvertToCurve(result);
+            var result = CreateTriangleCCW().ConvertToCurve();
 
             // Assert
-            Assert.AreEqual(4, result.VertexCount);
+            Assert.AreEqual(4, result.Elements.Count);
 
-            Assert.AreEqual(0, result[0].x, delta);
-            Assert.AreEqual(0, result[0].y, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[1].x, delta);
-            Assert.AreEqual(0, result[1].y, delta);
+            Assert.AreEqual(4, result.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[1].NodeStart.y, delta);
 
-            Assert.AreEqual(4, result[2].x, delta);
-            Assert.AreEqual(3, result[2].y, delta);
+            Assert.AreEqual(4, result.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(3, result.Elements[2].NodeStart.y, delta);
 
-            Assert.AreEqual(0, result[3].x, delta);
-            Assert.AreEqual(0, result[3].y, delta);
+            Assert.AreEqual(0, result.Elements[3].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[3].NodeStart.y, delta);
         }
 
         [TestMethod]
         public void SplitOnceFirstSegment()
         {
             // Act
-            Func<FillCurveBase<FillSegment>> createFillCurveF = () => new FillCurveBase<FillSegment>();
-            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 3 }, createFillCurveF);
+            Func<FillCurve<FillSegment>> createFillCurveF = () => new FillCurve<FillSegment>();
+            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 3 });
 
             // Assert
             Assert.AreEqual(2, result.Count);
 
             var curve0 = result[0];
-            Assert.AreEqual(2, curve0.VertexCount);
-            Assert.AreEqual(0, curve0[0].x, delta);
-            Assert.AreEqual(0, curve0[0].y, delta);
-            Assert.AreEqual(3, curve0[1].x, delta);
-            Assert.AreEqual(0, curve0[1].y, delta);
+            Assert.AreEqual(2, curve0.Elements.Count);
+            Assert.AreEqual(0, curve0.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, curve0.Elements[0].NodeStart.y, delta);
+            Assert.AreEqual(3, curve0.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, curve0.Elements[1].NodeStart.y, delta);
 
             var curve1 = result[1];
-            Assert.AreEqual(4, curve1.VertexCount);
-            Assert.AreEqual(3, curve1[0].x, delta);
-            Assert.AreEqual(0, curve1[0].y, delta);
-            Assert.AreEqual(4, curve1[1].x, delta);
-            Assert.AreEqual(0, curve1[1].y, delta);
-            Assert.AreEqual(4, curve1[2].x, delta);
-            Assert.AreEqual(3, curve1[2].y, delta);
-            Assert.AreEqual(0, curve1[3].x, delta);
-            Assert.AreEqual(0, curve1[3].y, delta);
+            Assert.AreEqual(4, curve1.Elements.Count);
+            Assert.AreEqual(3, curve1.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, curve1.Elements[0].NodeStart.y, delta);
+            Assert.AreEqual(4, curve1.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, curve1.Elements[1].NodeStart.y, delta);
+            Assert.AreEqual(4, curve1.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(3, curve1.Elements[2].NodeStart.y, delta);
+            Assert.AreEqual(0, curve1.Elements[3].NodeStart.x, delta);
+            Assert.AreEqual(0, curve1.Elements[3].NodeStart.y, delta);
         }
 
         [TestMethod]
         public void SplitOnceSecondSegment()
         {
             // Act
-            Func<FillCurveBase<FillSegment>> createFillCurveF = () => new FillCurveBase<FillSegment>();
-            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 5 }, createFillCurveF);
+            Func<FillCurve<FillSegment>> createFillCurveF = () => new FillCurve<FillSegment>();
+            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 5 });
 
             // Assert
             Assert.AreEqual(2, result.Count);
 
             var curve0 = result[0];
-            Assert.AreEqual(3, curve0.VertexCount);
-            Assert.AreEqual(0, curve0[0].x, delta);
-            Assert.AreEqual(0, curve0[0].y, delta);
-            Assert.AreEqual(4, curve0[1].x, delta);
-            Assert.AreEqual(0, curve0[1].y, delta);
-            Assert.AreEqual(4, curve0[2].x, delta);
-            Assert.AreEqual(1, curve0[2].y, delta);
+            Assert.AreEqual(3, curve0.Elements.Count);
+            Assert.AreEqual(0, curve0.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, curve0.Elements[0].NodeStart.y, delta);
+            Assert.AreEqual(4, curve0.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, curve0.Elements[1].NodeStart.y, delta);
+            Assert.AreEqual(4, curve0.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(1, curve0.Elements[2].NodeStart.y, delta);
 
             var curve1 = result[1];
-            Assert.AreEqual(3, curve1.VertexCount);
-            Assert.AreEqual(4, curve1[0].x, delta);
-            Assert.AreEqual(1, curve1[0].y, delta);
-            Assert.AreEqual(4, curve1[1].x, delta);
-            Assert.AreEqual(3, curve1[1].y, delta);
-            Assert.AreEqual(0, curve1[2].x, delta);
-            Assert.AreEqual(0, curve1[2].y, delta);
+            Assert.AreEqual(3, curve1.Elements.Count);
+            Assert.AreEqual(4, curve1.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(1, curve1.Elements[0].NodeStart.y, delta);
+            Assert.AreEqual(4, curve1.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(3, curve1.Elements[1].NodeStart.y, delta);
+            Assert.AreEqual(0, curve1.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(0, curve1.Elements[2].NodeStart.y, delta);
         }
 
         [TestMethod]
         public void SplitTwiceFirstSegment()
         {
             // Act
-            Func<FillCurveBase<FillSegment>> createFillCurveF = () => new FillCurveBase<FillSegment>();
-            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, createFillCurveF);
+            Func<FillCurve<FillSegment>> createFillCurveF = () => new FillCurve<FillSegment>();
+            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 });
 
             // Assert
             Assert.AreEqual(3, result.Count);
 
             var curve0 = result[0];
-            Assert.AreEqual(2, curve0.VertexCount);
-            Assert.AreEqual(0, curve0[0].x, delta);
-            Assert.AreEqual(0, curve0[0].y, delta);
-            Assert.AreEqual(1, curve0[1].x, delta);
-            Assert.AreEqual(0, curve0[1].y, delta);
+            Assert.AreEqual(2, curve0.Elements.Count);
+            Assert.AreEqual(0, curve0.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, curve0.Elements[0].NodeStart.y, delta);
+            Assert.AreEqual(1, curve0.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, curve0.Elements[1].NodeStart.y, delta);
 
             var curve1 = result[1];
-            Assert.AreEqual(2, curve1.VertexCount);
-            Assert.AreEqual(1, curve1[0].x, delta);
-            Assert.AreEqual(0, curve1[0].y, delta);
-            Assert.AreEqual(3, curve1[1].x, delta);
-            Assert.AreEqual(0, curve1[1].y, delta);
+            Assert.AreEqual(2, curve1.Elements.Count);
+            Assert.AreEqual(1, curve1.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, curve1.Elements[0].NodeStart.y, delta);
+            Assert.AreEqual(3, curve1.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, curve1.Elements[1].NodeStart.y, delta);
 
             var curve2 = result[2];
-            Assert.AreEqual(4, curve2.VertexCount);
-            Assert.AreEqual(3, curve2[0].x, delta);
-            Assert.AreEqual(0, curve2[0].y, delta);
-            Assert.AreEqual(4, curve2[1].x, delta);
-            Assert.AreEqual(0, curve2[1].y, delta);
-            Assert.AreEqual(4, curve2[2].x, delta);
-            Assert.AreEqual(3, curve2[2].y, delta);
-            Assert.AreEqual(0, curve2[3].x, delta);
-            Assert.AreEqual(0, curve2[3].y, delta);
+            Assert.AreEqual(4, curve2.Elements.Count);
+            Assert.AreEqual(3, curve2.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, curve2.Elements[0].NodeStart.y, delta);
+            Assert.AreEqual(4, curve2.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, curve2.Elements[1].NodeStart.y, delta);
+            Assert.AreEqual(4, curve2.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(3, curve2.Elements[2].NodeStart.y, delta);
+            Assert.AreEqual(0, curve2.Elements[3].NodeStart.x, delta);
+            Assert.AreEqual(0, curve2.Elements[3].NodeStart.y, delta);
         }
 
         [TestMethod]
         public void SplitTwiceFirstSegmentConnect()
         {
             // Act
-            Func<FillCurveBase<FillSegment>> createFillCurveF = () => new FillCurveBase<FillSegment>();
-            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, createFillCurveF, true);
+            Func<FillCurve<FillSegment>> createFillCurveF = () => new FillCurve<FillSegment>();
+            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 });
 
             // Assert
             Assert.AreEqual(2, result.Count);
 
             var curve0 = result[0];
-            Assert.AreEqual(2, curve0.VertexCount);
-            Assert.AreEqual(1, curve0[0].x, delta);
-            Assert.AreEqual(0, curve0[0].y, delta);
-            Assert.AreEqual(3, curve0[1].x, delta);
-            Assert.AreEqual(0, curve0[1].y, delta);
+            Assert.AreEqual(2, curve0.Elements.Count);
+            Assert.AreEqual(1, curve0.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, curve0.Elements[0].NodeStart.y, delta);
+            Assert.AreEqual(3, curve0.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, curve0.Elements[1].NodeStart.y, delta);
 
             var curve1 = result[1];
-            Assert.AreEqual(5, curve1.VertexCount);
-            Assert.AreEqual(3, curve1[0].x, delta);
-            Assert.AreEqual(0, curve1[0].y, delta);
-            Assert.AreEqual(4, curve1[1].x, delta);
-            Assert.AreEqual(0, curve1[1].y, delta);
-            Assert.AreEqual(4, curve1[2].x, delta);
-            Assert.AreEqual(3, curve1[2].y, delta);
-            Assert.AreEqual(0, curve1[3].x, delta);
-            Assert.AreEqual(0, curve1[3].y, delta);
-            Assert.AreEqual(1, curve1[4].x, delta);
-            Assert.AreEqual(0, curve1[4].y, delta);
+            Assert.AreEqual(5, curve1.Elements.Count);
+            Assert.AreEqual(3, curve1.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, curve1.Elements[0].NodeStart.y, delta);
+            Assert.AreEqual(4, curve1.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, curve1.Elements[1].NodeStart.y, delta);
+            Assert.AreEqual(4, curve1.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(3, curve1.Elements[2].NodeStart.y, delta);
+            Assert.AreEqual(0, curve1.Elements[3].NodeStart.x, delta);
+            Assert.AreEqual(0, curve1.Elements[3].NodeStart.y, delta);
+            Assert.AreEqual(1, curve1.Elements[4].NodeStart.x, delta);
+            Assert.AreEqual(0, curve1.Elements[4].NodeStart.y, delta);
         }
     }
 }

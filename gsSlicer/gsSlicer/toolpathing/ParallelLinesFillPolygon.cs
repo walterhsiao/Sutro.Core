@@ -144,7 +144,7 @@ namespace gs
                 int vid = start_vid;
                 int eid = pathGraph.GetVtxEdges(vid)[0];
 
-                var path = new FillCurveBase<FillSegment>() { FillType = this.FillType };
+                var path = new FillCurve<FillSegment>() { FillType = this.FillType };
 
                 path.BeginCurve(pathGraph.GetVertex(vid));
                 while (true)
@@ -170,16 +170,16 @@ namespace gs
                 }
 
                 // discard paths that are too short
-                if (path.ArcLength < MinPathLengthMM)
+                if (path.GetCurveLength() < MinPathLengthMM)
                     continue;
 
                 // run polyline simplification to get rid of unneccesary detail in connectors
                 // [TODO] we could do this at graph level...)
                 // [TODO] maybe should be checking for collisions? we could end up creating
                 //  non-trivial overlaps here...
-                if (SimplifyAmount != SimplificationLevel.None && path.VertexCount > 2)
+                if (SimplifyAmount != SimplificationLevel.None && path.Elements.Count > 1)
                 {
-                    var simp = new PolySimplification2(new PolyLine2d(path.Vertices));
+                    var simp = new PolySimplification2(new PolyLine2d(path.Vertices()));
                     switch (SimplifyAmount)
                     {
                         default:
@@ -191,7 +191,7 @@ namespace gs
                             simp.SimplifyDeviationThreshold = ToolWidth / 2; break;
                     }
                     simp.Simplify();
-                    path = new FillCurveBase<FillSegment>(simp.Result.ToArray()) { FillType = this.FillType };
+                    path = new FillCurve<FillSegment>(simp.Result.ToArray()) { FillType = this.FillType };
                 }
 
                 paths.Append(path);

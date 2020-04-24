@@ -85,7 +85,7 @@ namespace gs
             {
                 foreach (Segment2d seg in seglist)
                 {
-                    var fill_seg = new FillCurveBase<FillSegment>()
+                    var fill_seg = new FillCurve<FillSegment>()
                     {
                         FillType = FillType,
                     };

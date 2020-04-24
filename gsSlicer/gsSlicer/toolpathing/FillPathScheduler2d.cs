@@ -3,6 +3,7 @@ using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace gs
 {
@@ -49,14 +50,14 @@ namespace gs
 
         public Vector2d CurrentPosition => Builder.Position.xy;
 
-        protected virtual void AppendFill(FillElementBase<FillSegment> fill)
+        protected virtual void AppendFill(FillBase<FillSegment> fill)
         {
             switch (fill)
             {
-                case FillLoopBase<FillSegment> basicFillLoop:
+                case FillLoop<FillSegment> basicFillLoop:
                     AppendBasicFillLoop(basicFillLoop);
                     break;
-                case FillCurveBase<FillSegment> basicFillCurve:
+                case FillCurve<FillSegment> basicFillCurve:
                     AppendBasicFillCurve(basicFillCurve);
                     break;
                 default:
@@ -73,9 +74,9 @@ namespace gs
             }
         }
 
-        protected static List<FillElementBase<FillSegment>> FlattenFillCurveSets(List<FillCurveSet2d> fillSets)
+        protected static List<FillBase<FillSegment>> FlattenFillCurveSets(List<FillCurveSet2d> fillSets)
         {
-            var fillElements = new List<FillElementBase<FillSegment>>();
+            var fillElements = new List<FillBase<FillSegment>>();
 
             foreach (var fills in fillSets)
             {
@@ -87,7 +88,7 @@ namespace gs
         }
 
         // [TODO] no reason we couldn't start on edge midpoint??
-        public virtual void AppendBasicFillLoop(FillLoopBase<FillSegment> poly)
+        public virtual void AppendBasicFillLoop(FillLoop<FillSegment> poly)
         {
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;
@@ -95,42 +96,34 @@ namespace gs
             AssertValidLoop(poly);
 
             int startIndex = FindLoopEntryPoint(poly, currentPos2);
+            var rolled = poly.RollToVertex(startIndex);
 
-            Vector2d startPt = poly[startIndex];
-
-            AppendTravel(currentPos2, startPt);
-
-            List<Vector2d> loopV = new List<Vector2d>(poly.VertexCount + 1);
-            for (int i = 0; i <= poly.VertexCount; i++)
-            {
-                int k = (startIndex + i) % poly.VertexCount;
-                loopV.Add(poly[k]);
-            }
+            AppendTravel(currentPos2, rolled.EntryExitPoint);
 
             double useSpeed = SelectSpeed(poly);
 
-            Builder.AppendExtrude(loopV, useSpeed, poly.FillType, null);
+            Builder.AppendExtrude(rolled.Vertices().ToList(), useSpeed, poly.FillType, null);
         }
 
-        private int FindLoopEntryPoint(FillLoopBase<FillSegment> poly, Vector2d currentPos2)
+        private int FindLoopEntryPoint(FillLoop<FillSegment> poly, Vector2d currentPos2)
         {
             int startIndex;
             if (Settings.ZipperAlignedToPoint && poly.FillType.IsEntryLocationSpecified())
             {
                 // split edges to position zipper closer to the desired point?
                 Vector2d zipperLocation = new Vector2d(Settings.ZipperLocationX, Settings.ZipperLocationY);
-                startIndex = CurveUtils2.FindNearestVertex(zipperLocation, poly.Vertices);
+                startIndex = CurveUtils2.FindNearestVertex(zipperLocation, poly.Vertices());
             }
             else if (Settings.ShellRandomizeStart && poly.FillType.IsEntryLocationSpecified())
             {
                 // split edges for a actual random location along the perimeter instead of a random vertex?
                 Random rnd = new Random();
-                startIndex = rnd.Next(poly.VertexCount);
+                startIndex = rnd.Next(poly.Elements.Count);
             }
             else
             {
                 // use the vertex closest to the current nozzle position
-                startIndex = CurveUtils2.FindNearestVertex(currentPos2, poly.Vertices);
+                startIndex = CurveUtils2.FindNearestVertex(currentPos2, poly.Vertices());
             }
 
             return startIndex;
@@ -161,25 +154,24 @@ namespace gs
         }
 
         // [TODO] would it ever make sense to break polyline to avoid huge travel??
-        public virtual void AppendBasicFillCurve(FillCurveBase<FillSegment> curve)
+        public virtual void AppendBasicFillCurve(FillCurve<FillSegment> curve)
         {
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;
 
             AssertValidCurve(curve);
 
-            if (curve.Start.DistanceSquared(currentPos2) > curve.End.DistanceSquared(currentPos2))
+            if (curve.Entry.DistanceSquared(currentPos2) > curve.Exit.DistanceSquared(currentPos2))
             {
-                // This modifies input; avoid?
-                curve.Reverse();
+                curve = new FillCurve<FillSegment>(curve.ElementsReversed());
             }
 
-            AppendTravel(currentPos2, curve[0]);
+            AppendTravel(currentPos2, curve.Entry);
 
-            var flags = new List<TPVertexFlags>(curve.VertexCount);
+            var vertices = curve.Vertices().ToList();
 
-            var vertices = new List<Vector2d>(curve.VertexCount);
-            for (int i = 0; i < curve.VertexCount; i++)
+            var flags = new List<TPVertexFlags>(curve.Elements.Count + 1);
+            for (int i = 0; i < vertices.Count; i++)
             {
                 var flag = TPVertexFlags.None;
 
@@ -187,12 +179,11 @@ namespace gs
                     flag = TPVertexFlags.IsPathStart;
                 else
                 {
-                    var segInfo = curve.GetSegmentDataBeforeVertex(i);
+                    var segInfo = curve.Elements[i - 1].Edge;
                     if (segInfo != null && segInfo.IsConnector)
                         flag = TPVertexFlags.IsConnector;
                 }
 
-                vertices.Add(curve[i]);
                 flags.Add(flag);
             }
 
@@ -206,7 +197,7 @@ namespace gs
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
         //       (currently this is only set on first layer)
-        public virtual double SelectSpeed(FillElementBase<FillSegment> pathCurve)
+        public virtual double SelectSpeed(FillBase<FillSegment> pathCurve)
         {
             double speed = SpeedHint == SchedulerSpeedHint.Careful ?
                 Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;
@@ -214,29 +205,29 @@ namespace gs
             return pathCurve.FillType.ModifySpeed(speed, SpeedHint);
         }
 
-        protected void AssertValidCurve(FillCurveBase<FillSegment> curve)
+        protected void AssertValidCurve(FillCurve<FillSegment> curve)
         {
-            int N = curve.VertexCount;
+            int N = curve.Elements.Count;
+            if (N < 1)
+            {
+                StackFrame frame = new StackFrame(1);
+                var method = frame.GetMethod();
+                var type = method.DeclaringType;
+                var name = method.Name;
+                throw new ArgumentException($"{type}.{name}: degenerate curve; must have at least 1 edge.");
+            }
+        }
+
+        protected void AssertValidLoop(FillLoop<FillSegment> curve)
+        {
+            int N = curve.Elements.Count;
             if (N < 2)
             {
                 StackFrame frame = new StackFrame(1);
                 var method = frame.GetMethod();
                 var type = method.DeclaringType;
                 var name = method.Name;
-                throw new ArgumentException($"{type}.{name}: degenerate curve; must have at least 2 points.");
-            }
-        }
-
-        protected void AssertValidLoop(FillLoopBase<FillSegment> curve)
-        {
-            int N = curve.VertexCount;
-            if (N < 3)
-            {
-                StackFrame frame = new StackFrame(1);
-                var method = frame.GetMethod();
-                var type = method.DeclaringType;
-                var name = method.Name;
-                throw new ArgumentException($"{type}.{name}: degenerate loop; must have at least 3 points");
+                throw new ArgumentException($"{type}.{name}: degenerate loop; must have at least 2 edges");
             }
         }
     }

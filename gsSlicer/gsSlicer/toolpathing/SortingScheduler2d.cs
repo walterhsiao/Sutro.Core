@@ -34,7 +34,7 @@ namespace gs
 
         protected class PathLoop : PathItem
         {
-            public FillLoopBase<FillSegment> loop;
+            public FillLoop<FillSegment> loop;
             public bool reverse = false;
         }
 
@@ -42,7 +42,7 @@ namespace gs
 
         protected class PathSpan : PathItem
         {
-            public FillCurveBase<FillSegment> curve;
+            public FillCurve<FillSegment> curve;
             public bool reverse = false;
         }
 
@@ -52,10 +52,10 @@ namespace gs
         {
             foreach (FillCurveSet2d polySet in paths)
             {
-                foreach (FillLoopBase<FillSegment> loop in polySet.Loops)
+                foreach (FillLoop<FillSegment> loop in polySet.Loops)
                     Loops.Add(new PathLoop() { loop = loop, speedHint = SpeedHint });
 
-                foreach (FillCurveBase<FillSegment> curve in polySet.Curves)
+                foreach (FillCurve<FillSegment> curve in polySet.Curves)
                     Spans.Add(new PathSpan() { curve = curve, speedHint = SpeedHint });
             }
         }
@@ -77,23 +77,23 @@ namespace gs
                     pathHint = loop.speedHint;
                     if (idx.c != 0)
                     {
-                        loop.loop.Roll(idx.c);
-                        paths.Append(loop.loop);
-                        CurrentPosition = loop.loop.EntryExitPoint;
+                        var rolled = loop.loop.RollToVertex(idx.c);
+                        paths.Append(rolled);
+                        CurrentPosition = rolled.EntryExitPoint;
                     }
                     else
                     {
                         paths.Append(loop.loop);
-                        CurrentPosition = loop.loop[0];
+                        CurrentPosition = loop.loop.EntryExitPoint;
                     }
                 }
                 else
                 {  // span
                     PathSpan span = Spans[idx.b];
                     if (idx.c == 1)
-                        span.curve.Reverse();
+                        span.curve = span.curve.Reversed();
                     paths.Append(span.curve);
-                    CurrentPosition = span.curve.End;
+                    CurrentPosition = span.curve.Exit;
                     pathHint = span.speedHint;
                 }
 
@@ -165,7 +165,7 @@ namespace gs
                 { // loop
                     PathLoop loop = Loops[idx.b];
                     int iNearSeg; double nearSegT;
-                    double d_sqr = loop.loop.DistanceSquared(pt, out iNearSeg, out nearSegT);
+                    double d_sqr = loop.loop.FindClosestElementToPoint(pt, out iNearSeg, out nearSegT);
                     if (d_sqr < nearest_sqr)
                     {
                         nearest_sqr = d_sqr;
@@ -175,13 +175,13 @@ namespace gs
                 else
                 {  // span
                     PathSpan span = Spans[idx.b];
-                    double start_d = span.curve.Start.DistanceSquared(pt);
+                    double start_d = span.curve.Entry.DistanceSquared(pt);
                     if (start_d < nearest_sqr)
                     {
                         nearest_sqr = start_d;
                         nearest_idx = new Index3i(idx.a, idx.b, 0);
                     }
-                    double end_d = span.curve.End.DistanceSquared(pt);
+                    double end_d = span.curve.Exit.DistanceSquared(pt);
                     if (end_d < nearest_sqr)
                     {
                         nearest_sqr = end_d;
@@ -214,13 +214,13 @@ namespace gs
                 else
                 {  // span
                     PathSpan span = Spans[idx.b];
-                    double start_d = span.curve.Start.DistanceSquared(pt);
+                    double start_d = span.curve.Entry.DistanceSquared(pt);
                     if (start_d < nearest_sqr)
                     {
                         nearest_sqr = start_d;
                         nearest_idx = new Index3i(idx.a, idx.b, 0);
                     }
-                    double end_d = span.curve.End.DistanceSquared(pt);
+                    double end_d = span.curve.Exit.DistanceSquared(pt);
                     if (end_d < nearest_sqr)
                     {
                         nearest_sqr = end_d;
@@ -243,7 +243,7 @@ namespace gs
             }
             else
             {
-                return loop.loop.DistanceSquared(startPoint, out entryPointSegmentI, out entryPointSegmentT);
+                return loop.loop.FindClosestElementToPoint(startPoint, out entryPointSegmentI, out entryPointSegmentT);
             }
         }
 
@@ -252,7 +252,7 @@ namespace gs
             if (idx.a == 0)
             { // loop
                 PathLoop loop = Loops[idx.b];
-                return loop.loop.GetSegment2dAfterVertex(idx.c).Center;
+                return loop.loop.Elements[idx.c].GetSegment2d().Center;
             }
             else
             {  // span
@@ -261,7 +261,7 @@ namespace gs
                 // [GDM] Reversed this logic 2019.10.23; by my thinking:
                 // - if the curve ISN'T reversed, the exit point should be the end
                 // - if the curve IS reversed, the exit point should be the start
-                return (idx.c == 0) ? span.curve.End : span.curve.Start;
+                return (idx.c == 0) ? span.curve.Entry : span.curve.Exit;
             }
         }
 

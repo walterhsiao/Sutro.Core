@@ -152,7 +152,7 @@ namespace gs
 
         // this is called on polyline paths, return *true* to filter out a path. Useful for things like very short segments, etc
         // In default Initialize(), is set to a constant multiple of tool size
-        public Func<FillCurveBase<FillSegment>, bool> PathFilterF = null;
+        public Func<FillCurve<FillSegment>, bool> PathFilterF = null;
 
         // Called after we have finished print generation, use this to post-process the paths, etc.
         // By default appends a comment block with print time & material usage statistics
@@ -218,7 +218,7 @@ namespace gs
             LayerPostProcessor = null;
 
             if (PathFilterF == null)
-                PathFilterF = (pline) => { return pline.ArcLength < 3 * Settings.Machine.NozzleDiamMM; };
+                PathFilterF = (pline) => { return pline.GetCurveLength() < 3 * Settings.Machine.NozzleDiamMM; };
         }
 
         public virtual bool Generate()
@@ -1026,19 +1026,19 @@ namespace gs
             FillCurveSet2d paths = new FillCurveSet2d();
             for (int pi = 0; pi < slice.Paths.Count; ++pi)
             {
-                var pline = new FillCurveBase<FillSegment>(slice.Paths[pi])
+                var pline = new FillCurve<FillSegment>(slice.Paths[pi])
                 {
                     FillType = new OpenShellCurveFillType()
                 };
 
                 // leave space for end-blobs (input paths are extent we want to hit)
-                pline.TrimFrontAndBack(Settings.Machine.NozzleDiamMM / 2);
+                var trimmed = FillCurveTrimmer.TrimFrontAndBack(pline, Settings.Machine.NozzleDiamMM / 2);
 
                 // ignore tiny paths
-                if (PathFilterF != null && PathFilterF(pline) == true)
+                if (PathFilterF != null && PathFilterF(trimmed) == true)
                     continue;
 
-                paths.Append(pline);
+                paths.Append(trimmed);
             }
 
             scheduler.AppendCurveSets(new List<FillCurveSet2d>() { paths });
