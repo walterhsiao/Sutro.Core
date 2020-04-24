@@ -309,29 +309,28 @@ namespace gsSlicer.UnitTests.fill
         public void SplitOnceFirstSegment()
         {
             // Act
-            Func<FillCurve<FillSegment>> createFillCurveF = () => new FillCurve<FillSegment>();
-            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 3 });
+            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 3 }, false);
 
             // Assert
             Assert.AreEqual(2, result.Count);
 
             var curve0 = result[0];
-            Assert.AreEqual(2, curve0.Elements.Count);
+            Assert.AreEqual(1, curve0.Elements.Count);
             Assert.AreEqual(0, curve0.Elements[0].NodeStart.x, delta);
             Assert.AreEqual(0, curve0.Elements[0].NodeStart.y, delta);
-            Assert.AreEqual(3, curve0.Elements[1].NodeStart.x, delta);
-            Assert.AreEqual(0, curve0.Elements[1].NodeStart.y, delta);
+            Assert.AreEqual(3, curve0.Elements[0].NodeEnd.x, delta);
+            Assert.AreEqual(0, curve0.Elements[0].NodeEnd.y, delta);
 
             var curve1 = result[1];
-            Assert.AreEqual(4, curve1.Elements.Count);
+            Assert.AreEqual(3, curve1.Elements.Count);
             Assert.AreEqual(3, curve1.Elements[0].NodeStart.x, delta);
             Assert.AreEqual(0, curve1.Elements[0].NodeStart.y, delta);
             Assert.AreEqual(4, curve1.Elements[1].NodeStart.x, delta);
             Assert.AreEqual(0, curve1.Elements[1].NodeStart.y, delta);
             Assert.AreEqual(4, curve1.Elements[2].NodeStart.x, delta);
             Assert.AreEqual(3, curve1.Elements[2].NodeStart.y, delta);
-            Assert.AreEqual(0, curve1.Elements[3].NodeStart.x, delta);
-            Assert.AreEqual(0, curve1.Elements[3].NodeStart.y, delta);
+            Assert.AreEqual(0, curve1.Elements[2].NodeEnd.x, delta);
+            Assert.AreEqual(0, curve1.Elements[2].NodeEnd.y, delta);
         }
 
         [TestMethod]
@@ -345,22 +344,22 @@ namespace gsSlicer.UnitTests.fill
             Assert.AreEqual(2, result.Count);
 
             var curve0 = result[0];
-            Assert.AreEqual(3, curve0.Elements.Count);
+            Assert.AreEqual(2, curve0.Elements.Count);
             Assert.AreEqual(0, curve0.Elements[0].NodeStart.x, delta);
             Assert.AreEqual(0, curve0.Elements[0].NodeStart.y, delta);
             Assert.AreEqual(4, curve0.Elements[1].NodeStart.x, delta);
             Assert.AreEqual(0, curve0.Elements[1].NodeStart.y, delta);
-            Assert.AreEqual(4, curve0.Elements[2].NodeStart.x, delta);
-            Assert.AreEqual(1, curve0.Elements[2].NodeStart.y, delta);
+            Assert.AreEqual(4, curve0.Elements[1].NodeEnd.x, delta);
+            Assert.AreEqual(1, curve0.Elements[1].NodeEnd.y, delta);
 
             var curve1 = result[1];
-            Assert.AreEqual(3, curve1.Elements.Count);
+            Assert.AreEqual(2, curve1.Elements.Count);
             Assert.AreEqual(4, curve1.Elements[0].NodeStart.x, delta);
             Assert.AreEqual(1, curve1.Elements[0].NodeStart.y, delta);
             Assert.AreEqual(4, curve1.Elements[1].NodeStart.x, delta);
             Assert.AreEqual(3, curve1.Elements[1].NodeStart.y, delta);
-            Assert.AreEqual(0, curve1.Elements[2].NodeStart.x, delta);
-            Assert.AreEqual(0, curve1.Elements[2].NodeStart.y, delta);
+            Assert.AreEqual(0, curve1.Elements[1].NodeEnd.x, delta);
+            Assert.AreEqual(0, curve1.Elements[1].NodeEnd.y, delta);
         }
 
         [TestMethod]
@@ -374,29 +373,29 @@ namespace gsSlicer.UnitTests.fill
             Assert.AreEqual(3, result.Count);
 
             var curve0 = result[0];
-            Assert.AreEqual(2, curve0.Elements.Count);
+            Assert.AreEqual(1, curve0.Elements.Count);
             Assert.AreEqual(0, curve0.Elements[0].NodeStart.x, delta);
             Assert.AreEqual(0, curve0.Elements[0].NodeStart.y, delta);
-            Assert.AreEqual(1, curve0.Elements[1].NodeStart.x, delta);
-            Assert.AreEqual(0, curve0.Elements[1].NodeStart.y, delta);
+            Assert.AreEqual(1, curve0.Elements[0].NodeEnd.x, delta);
+            Assert.AreEqual(0, curve0.Elements[0].NodeEnd.y, delta);
 
             var curve1 = result[1];
-            Assert.AreEqual(2, curve1.Elements.Count);
+            Assert.AreEqual(1, curve1.Elements.Count);
             Assert.AreEqual(1, curve1.Elements[0].NodeStart.x, delta);
             Assert.AreEqual(0, curve1.Elements[0].NodeStart.y, delta);
-            Assert.AreEqual(3, curve1.Elements[1].NodeStart.x, delta);
-            Assert.AreEqual(0, curve1.Elements[1].NodeStart.y, delta);
+            Assert.AreEqual(3, curve1.Elements[0].NodeEnd.x, delta);
+            Assert.AreEqual(0, curve1.Elements[0].NodeEnd.y, delta);
 
             var curve2 = result[2];
-            Assert.AreEqual(4, curve2.Elements.Count);
+            Assert.AreEqual(3, curve2.Elements.Count);
             Assert.AreEqual(3, curve2.Elements[0].NodeStart.x, delta);
             Assert.AreEqual(0, curve2.Elements[0].NodeStart.y, delta);
             Assert.AreEqual(4, curve2.Elements[1].NodeStart.x, delta);
             Assert.AreEqual(0, curve2.Elements[1].NodeStart.y, delta);
             Assert.AreEqual(4, curve2.Elements[2].NodeStart.x, delta);
             Assert.AreEqual(3, curve2.Elements[2].NodeStart.y, delta);
-            Assert.AreEqual(0, curve2.Elements[3].NodeStart.x, delta);
-            Assert.AreEqual(0, curve2.Elements[3].NodeStart.y, delta);
+            Assert.AreEqual(0, curve2.Elements[2].NodeEnd.x, delta);
+            Assert.AreEqual(0, curve2.Elements[2].NodeEnd.y, delta);
         }
 
         [TestMethod]
@@ -404,20 +403,20 @@ namespace gsSlicer.UnitTests.fill
         {
             // Act
             Func<FillCurve<FillSegment>> createFillCurveF = () => new FillCurve<FillSegment>();
-            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 });
+            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, true);
 
             // Assert
             Assert.AreEqual(2, result.Count);
 
             var curve0 = result[0];
-            Assert.AreEqual(2, curve0.Elements.Count);
+            Assert.AreEqual(1, curve0.Elements.Count);
             Assert.AreEqual(1, curve0.Elements[0].NodeStart.x, delta);
             Assert.AreEqual(0, curve0.Elements[0].NodeStart.y, delta);
-            Assert.AreEqual(3, curve0.Elements[1].NodeStart.x, delta);
-            Assert.AreEqual(0, curve0.Elements[1].NodeStart.y, delta);
+            Assert.AreEqual(3, curve0.Elements[0].NodeEnd.x, delta);
+            Assert.AreEqual(0, curve0.Elements[0].NodeEnd.y, delta);
 
             var curve1 = result[1];
-            Assert.AreEqual(5, curve1.Elements.Count);
+            Assert.AreEqual(4, curve1.Elements.Count);
             Assert.AreEqual(3, curve1.Elements[0].NodeStart.x, delta);
             Assert.AreEqual(0, curve1.Elements[0].NodeStart.y, delta);
             Assert.AreEqual(4, curve1.Elements[1].NodeStart.x, delta);
@@ -426,8 +425,8 @@ namespace gsSlicer.UnitTests.fill
             Assert.AreEqual(3, curve1.Elements[2].NodeStart.y, delta);
             Assert.AreEqual(0, curve1.Elements[3].NodeStart.x, delta);
             Assert.AreEqual(0, curve1.Elements[3].NodeStart.y, delta);
-            Assert.AreEqual(1, curve1.Elements[4].NodeStart.x, delta);
-            Assert.AreEqual(0, curve1.Elements[4].NodeStart.y, delta);
+            Assert.AreEqual(1, curve1.Elements[3].NodeEnd.x, delta);
+            Assert.AreEqual(0, curve1.Elements[3].NodeEnd.y, delta);
         }
     }
 }

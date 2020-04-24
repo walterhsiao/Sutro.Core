@@ -121,9 +121,25 @@ namespace gs
             return parameterizedSplitDistance > toleranceParameterized && parameterizedSplitDistance < (1 - toleranceParameterized);
         }
 
-        public List<FillLoop<TSegmentInfo>> SplitAtDistances(double[] v)
+        public List<FillCurve<TSegmentInfo>> SplitAtDistances(double[] splitDistances, bool joinFirstAndLast = false)
         {
-            throw new NotImplementedException();
+            var elementGroups = FillSplitter<TSegmentInfo>.SplitAtDistances(splitDistances, elements);
+
+            if (joinFirstAndLast)
+            {
+                var firstCurve = elementGroups[0];
+                elementGroups.RemoveAt(0);
+                elementGroups[^1].AddRange(firstCurve);
+            }
+
+            var curves = new List<FillCurve<TSegmentInfo>>();
+            foreach(var elementGroup in elementGroups)
+            {
+                var curve = new FillCurve<TSegmentInfo>(elementGroup);
+                curve.CopyProperties(this);
+                curves.Add(curve);
+            }
+            return curves;
         }
 
         public FillCurve<TSegmentInfo> ConvertToCurve()

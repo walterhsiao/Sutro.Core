@@ -131,9 +131,18 @@ namespace gs
             }
         }
 
-        public FillCurve<TSegmentInfo> TrimFrontAndBack(double v)
+        public List<FillCurve<TSegmentInfo>> SplitAtDistances(double[] splitDistances)
         {
-            throw new NotImplementedException();
+            var elementGroups = FillSplitter<TSegmentInfo>.SplitAtDistances(splitDistances, elements);
+
+            var curves = new List<FillCurve<TSegmentInfo>>();
+            foreach (var elementGroup in elementGroups)
+            {
+                var curve = new FillCurve<TSegmentInfo>(elementGroup);
+                curve.CopyProperties(this);
+                curves.Add(curve);
+            }
+            return curves;
         }
     }
 }

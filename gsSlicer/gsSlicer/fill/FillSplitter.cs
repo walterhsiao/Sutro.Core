@@ -17,14 +17,14 @@ namespace gs
 
             var result = new List<List<FillElement<TSegmentInfo>>>();
 
-            // Initialize the first curve
-            var curve = new List<FillElement<TSegmentInfo>>();
+            // Initialize the first list of elements
+            var splitElements = new List<FillElement<TSegmentInfo>>();
 
             // If splits are empty, just return the full copy of this curve
             if (splitsQueue.Count == 0)
             {
-                curve.AddRange(elements);
-                result.Add(curve);
+                splitElements.AddRange(elements);
+                result.Add(splitElements);
                 return result;
             }
 
@@ -38,7 +38,7 @@ namespace gs
                 // If no splits are left, just add the current point
                 if (splitsQueue.Count == 0)
                 {
-                    curve.Add(element);
+                    splitElements.Add(element);
                     continue;
                 }
 
@@ -54,24 +54,25 @@ namespace gs
                     double splitDistance = splitsQueue.Dequeue() - cumulativeDistance;
                     double t = splitDistance / nextDistance;
 
-                    var splitVertex = Vector3d.Lerp(curve[^1].NodeEnd, element.NodeEnd, t);
+                    var splitVertex = Vector3d.Lerp(nodeStart, element.NodeEnd, t);
 
                     var splitSegmentData = element.Edge.Split(t);
 
-                    curve.Add( new FillElement<TSegmentInfo>(curve[^1].NodeEnd, splitVertex, (TSegmentInfo)splitSegmentData.Item1));
-                    result.Add(curve);
-                    curve = new List<FillElement<TSegmentInfo>>();
+                    splitElements.Add( new FillElement<TSegmentInfo>(nodeStart, splitVertex, (TSegmentInfo)splitSegmentData.Item1));
+                    result.Add(splitElements);
+                    splitElements = new List<FillElement<TSegmentInfo>>();
 
                     segmentInfo = (TSegmentInfo)splitSegmentData.Item2;
                     cumulativeDistance += splitDistance;
                     nextDistance -= splitDistance;
+                    nodeStart = splitVertex;
                 }
 
-                curve.Add(new FillElement<TSegmentInfo>(nodeStart, element.NodeEnd, segmentInfo));
+                splitElements.Add(new FillElement<TSegmentInfo>(nodeStart, element.NodeEnd, segmentInfo));
 
                 cumulativeDistance += nextDistance;
             }
-            result.Add(curve);
+            result.Add(splitElements);
             return result;
         }
     }
