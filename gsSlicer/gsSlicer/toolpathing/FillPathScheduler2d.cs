@@ -102,7 +102,7 @@ namespace gs
 
             double useSpeed = SelectSpeed(poly);
 
-            Builder.AppendExtrude(rolled.Vertices().ToList(), useSpeed, poly.FillType, null);
+            Builder.AppendExtrude(rolled.Vertices(true).ToList(), useSpeed, poly.FillType, null);
         }
 
         private int FindLoopEntryPoint(FillLoop<FillSegment> poly, Vector2d currentPos2)
@@ -163,7 +163,7 @@ namespace gs
 
             if (curve.Entry.DistanceSquared(currentPos2) > curve.Exit.DistanceSquared(currentPos2))
             {
-                curve = new FillCurve<FillSegment>(curve.ElementsReversed());
+                curve = curve.Reversed();
             }
 
             AppendTravel(currentPos2, curve.Entry);
