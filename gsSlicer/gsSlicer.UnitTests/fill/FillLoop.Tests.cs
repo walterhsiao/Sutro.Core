@@ -3,31 +3,15 @@ using gs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace gsSlicer.UnitTests.fill
+namespace gs.UnitTests.Fill
 {
     [TestClass]
-    public class BasicFillLoopTests
+    public class FillLoopTests
     {
         private static double delta = 1e-4;
 
-        private FillLoop<FillSegment> CreateTriangleCCW()
-        {
-            return new FillLoop<FillSegment>(new Vector2d[] {
-                new Vector2d(0, 0),
-                new Vector2d(4, 0),
-                new Vector2d(4, 3),
-            });
-        }
-
-        private FillLoop<FillSegment> CreateTriangleCW()
-        {
-            return new FillLoop<FillSegment>(new Vector2d[] {
-                new Vector2d(4, 3),
-                new Vector2d(4, 0),
-                new Vector2d(0, 0),
-            });
-        }
 
         [TestMethod]
         public void EnumerableVector2dConstructor()
@@ -49,10 +33,51 @@ namespace gsSlicer.UnitTests.fill
         }
 
         [TestMethod]
+        public void Vertices_RepeatFirstFalse()
+        {
+            // Act
+            var vertices = FillFactory.CreateTriangleCCW().Vertices(false).ToList();
+
+            // Assert
+            Assert.AreEqual(3, vertices.Count);
+
+            Assert.AreEqual(0, vertices[0].x, delta);
+            Assert.AreEqual(0, vertices[0].y, delta);
+
+            Assert.AreEqual(4, vertices[1].x, delta);
+            Assert.AreEqual(0, vertices[1].y, delta);
+
+            Assert.AreEqual(4, vertices[2].x, delta);
+            Assert.AreEqual(3, vertices[2].y, delta);
+        }
+
+        [TestMethod]
+        public void Vertices_RepeatFirstTrue()
+        {
+            // Act
+            var vertices = FillFactory.CreateTriangleCCW().Vertices(true).ToList();
+
+            // Assert
+            Assert.AreEqual(4, vertices.Count);
+
+            Assert.AreEqual(0, vertices[0].x, delta);
+            Assert.AreEqual(0, vertices[0].y, delta);
+
+            Assert.AreEqual(4, vertices[1].x, delta);
+            Assert.AreEqual(0, vertices[1].y, delta);
+
+            Assert.AreEqual(4, vertices[2].x, delta);
+            Assert.AreEqual(3, vertices[2].y, delta);
+
+            Assert.AreEqual(0, vertices[3].x, delta);
+            Assert.AreEqual(0, vertices[0].y, delta);
+        }
+
+        [TestMethod]
         public void RollNoEffectCCW()
         {
             // Arrange
-            var triangle = CreateTriangleCCW();
+            var triangle = FillFactory.CreateTriangleCCW();
 
             // Act
             var result = triangle.RollBetweenVertices(0, 0);
@@ -77,7 +102,7 @@ namespace gsSlicer.UnitTests.fill
         public void RollNoEffectCW()
         {
             // Arrange
-            var triangle = CreateTriangleCW();
+            var triangle = FillFactory.CreateTriangleCW();
 
             // Act
             var result = triangle.RollBetweenVertices(0, 0);
@@ -99,7 +124,7 @@ namespace gsSlicer.UnitTests.fill
         public void RollFirstSegmentHalfwayCCW()
         {
             // Arrange
-            var triangle = CreateTriangleCCW();
+            var triangle = FillFactory.CreateTriangleCCW();
 
             // Act
             var result = triangle.RollBetweenVertices(0, 0.5);
@@ -124,7 +149,7 @@ namespace gsSlicer.UnitTests.fill
         public void RollFirstSegmentHalfwayCW()
         {
             // Arrange
-            var triangle = CreateTriangleCW();
+            var triangle = FillFactory.CreateTriangleCW();
 
             // Act
             var result = triangle.RollBetweenVertices(0, 0.5);
@@ -149,10 +174,10 @@ namespace gsSlicer.UnitTests.fill
         public void RollSecondSegmentHalfwayCCW()
         {
             // Arrange
-            var triangle = CreateTriangleCCW();
+            var triangle = FillFactory.CreateTriangleCCW();
 
             // Act
-            var result = triangle.RollBetweenVertices(1, 1d/3d);
+            var result = triangle.RollBetweenVertices(1, 1d / 3d);
 
             // Assert
             Assert.AreEqual(4, result.Elements.Count);
@@ -174,7 +199,7 @@ namespace gsSlicer.UnitTests.fill
         public void RollSecondSegmentHalfwayCW()
         {
             // Arrange
-            var triangle = CreateTriangleCW();
+            var triangle = FillFactory.CreateTriangleCW();
 
             // Act
             var result = triangle.RollBetweenVertices(1, 0.5);
@@ -199,7 +224,7 @@ namespace gsSlicer.UnitTests.fill
         public void RollFirstSegmentWithinToleranceLowSideCCW()
         {
             // Arrange
-            var triangle = CreateTriangleCCW();
+            var triangle = FillFactory.CreateTriangleCCW();
 
             // Act
             var result = triangle.RollBetweenVertices(0, 0.004 / 4, 0.005);
@@ -221,7 +246,7 @@ namespace gsSlicer.UnitTests.fill
         public void RollFirstSegmentWithinToleranceLowSideCW()
         {
             // Arrange
-            var triangle = CreateTriangleCW();
+            var triangle = FillFactory.CreateTriangleCW();
 
             // Act
             var result = triangle.RollBetweenVertices(1, 0.004 / 4, 0.005);
@@ -243,7 +268,7 @@ namespace gsSlicer.UnitTests.fill
         public void RollFirstSegmentWithinToleranceHighSideCCW()
         {
             // Arrange
-            var triangle = CreateTriangleCCW();
+            var triangle = FillFactory.CreateTriangleCCW();
 
             // Act
             var result = triangle.RollBetweenVertices(0, 1 - (0.004 / 4), 0.005);
@@ -265,7 +290,7 @@ namespace gsSlicer.UnitTests.fill
         public void RollFirstSegmentWithinToleranceHighSideCW()
         {
             // Arrange
-            var triangle = CreateTriangleCW();
+            var triangle = FillFactory.CreateTriangleCW();
 
             // Act
             var result = triangle.RollBetweenVertices(1, 1 - (0.004 / 4), 0.005);
@@ -287,7 +312,7 @@ namespace gsSlicer.UnitTests.fill
         public void ConvertToCurve()
         {
             // Act
-            var result = CreateTriangleCCW().ConvertToCurve();
+            var result = FillFactory.CreateTriangleCCW().ConvertToCurve();
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -309,7 +334,7 @@ namespace gsSlicer.UnitTests.fill
         public void SplitOnceFirstSegment()
         {
             // Act
-            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 3 }, false);
+            var result = FillFactory.CreateTriangleCCW().SplitAtDistances(new double[] { 3 }, false);
 
             // Assert
             Assert.AreEqual(2, result.Count);
@@ -337,8 +362,7 @@ namespace gsSlicer.UnitTests.fill
         public void SplitOnceSecondSegment()
         {
             // Act
-            Func<FillCurve<FillSegment>> createFillCurveF = () => new FillCurve<FillSegment>();
-            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 5 });
+            var result = FillFactory.CreateTriangleCCW().SplitAtDistances(new double[] { 5 });
 
             // Assert
             Assert.AreEqual(2, result.Count);
@@ -366,8 +390,7 @@ namespace gsSlicer.UnitTests.fill
         public void SplitTwiceFirstSegment()
         {
             // Act
-            Func<FillCurve<FillSegment>> createFillCurveF = () => new FillCurve<FillSegment>();
-            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 });
+            var result = FillFactory.CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 });
 
             // Assert
             Assert.AreEqual(3, result.Count);
@@ -402,8 +425,7 @@ namespace gsSlicer.UnitTests.fill
         public void SplitTwiceFirstSegmentConnect()
         {
             // Act
-            Func<FillCurve<FillSegment>> createFillCurveF = () => new FillCurve<FillSegment>();
-            var result = CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, true);
+            var result = FillFactory.CreateTriangleCCW().SplitAtDistances(new double[] { 1, 3 }, true);
 
             // Assert
             Assert.AreEqual(2, result.Count);
@@ -428,5 +450,46 @@ namespace gsSlicer.UnitTests.fill
             Assert.AreEqual(1, curve1.Elements[3].NodeEnd.x, delta);
             Assert.AreEqual(0, curve1.Elements[3].NodeEnd.y, delta);
         }
+
+        [TestMethod]
+        public void IsClockwise_True()
+        {
+            // Arrange
+            var loop = FillFactory.CreateTriangleCW();
+
+            // Act
+            bool isClockwise = loop.IsClockwise();
+
+            // Assert
+            Assert.IsTrue(isClockwise);
+        }
+
+        [TestMethod]
+        public void IsClockwise_False()
+        {
+            // Arrange
+            var loop = FillFactory.CreateTriangleCCW();
+
+            // Act
+            bool isClockwise = loop.IsClockwise();
+
+            // Assert
+            Assert.IsFalse(isClockwise);
+        }
+
+        [TestMethod]
+        public void RollToVertex()
+        {
+            // Arrange
+            var loop = FillFactory.CreateTriangleCCW();
+
+            // Act
+            var rolled = loop.RollToVertex(1);
+
+            // Assert
+            Assert.AreEqual(loop.Elements.Count, rolled.Elements.Count);
+            Assert.AreEqual(loop.Elements[0].NodeEnd, rolled.Elements[0].NodeStart);
+        }
+
     }
 }

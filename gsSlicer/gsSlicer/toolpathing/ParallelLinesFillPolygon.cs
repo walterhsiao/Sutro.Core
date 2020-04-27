@@ -170,7 +170,7 @@ namespace gs
                 }
 
                 // discard paths that are too short
-                if (path.GetCurveLength() < MinPathLengthMM)
+                if (path.TotalLength() < MinPathLengthMM)
                     continue;
 
                 // run polyline simplification to get rid of unneccesary detail in connectors

@@ -218,7 +218,7 @@ namespace gs
             LayerPostProcessor = null;
 
             if (PathFilterF == null)
-                PathFilterF = (pline) => { return pline.GetCurveLength() < 3 * Settings.Machine.NozzleDiamMM; };
+                PathFilterF = (pline) => { return pline.TotalLength() < 3 * Settings.Machine.NozzleDiamMM; };
         }
 
         public virtual bool Generate()

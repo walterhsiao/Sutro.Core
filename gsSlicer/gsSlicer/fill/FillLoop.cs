@@ -30,8 +30,12 @@ namespace gs
             return curve;
         }
 
-        public bool IsClockwise { get { throw new NotImplementedException("FIX"); } }
-        public double LoopPerimeter { get { throw new NotImplementedException("FIX"); } }
+        public bool IsClockwise()
+        {
+            // Note: Could cache or otherwise optimize this computation
+            var poly = new Polygon2d(Vertices(false));
+            return poly.IsClockwise;
+        }
 
         public Vector2d EntryExitPoint => elements[0].NodeStart.xy;
 
@@ -133,7 +137,7 @@ namespace gs
             }
 
             var curves = new List<FillCurve<TSegmentInfo>>();
-            foreach(var elementGroup in elementGroups)
+            foreach (var elementGroup in elementGroups)
             {
                 var curve = new FillCurve<TSegmentInfo>(elementGroup);
                 curve.CopyProperties(this);
@@ -147,6 +151,15 @@ namespace gs
             var curve = new FillCurve<TSegmentInfo>(elements);
             curve.CopyProperties(this);
             return curve;
+        }
+
+        public virtual IEnumerable<Vector2d> Vertices(bool repeatFirst = false)
+        {
+            foreach (var edge in elements)
+                yield return edge.NodeStart.xy;
+
+            if (repeatFirst)
+                yield return elements[0].NodeStart.xy;
         }
     }
 }

@@ -17,13 +17,6 @@ namespace gs
         protected List<FillElement<TSegmentInfo>> elements = new List<FillElement<TSegmentInfo>>();
         public IReadOnlyList<FillElement<TSegmentInfo>> Elements => elements.AsReadOnly();
 
-        public virtual IEnumerable<Vector2d> Vertices()
-        {
-            yield return elements[0].NodeStart.xy;
-            foreach (var edge in elements)
-                yield return edge.NodeEnd.xy;
-        }
-
         public virtual void CopyProperties(FillBase<TSegmentInfo> other)
         {
             FillType = other.FillType;
@@ -42,16 +35,52 @@ namespace gs
             }
         }
 
-
         public double TotalLength()
         {
-            double totalLength;
-            throw new NotImplementedException();
+            double length = 0;
+
+            foreach (var element in elements)
+            {
+                length += (element.NodeEnd - element.NodeStart).Length;
+            }
+
+            return length;
         }
 
         public double FindClosestElementToPoint(Vector2d point, out int elementIndex, out double elementParameterizedDistance)
         {
-            throw new NotImplementedException();
+            elementParameterizedDistance = double.MaxValue;
+            double closestDistanceSquared = double.MaxValue;
+            elementIndex = -1;
+
+            int currentElementIndex = 0;
+            foreach (var element in elements)
+            {
+                // Update results if current element is closer
+                Segment2d seg = element.GetSegment2d();
+                double t = (point - seg.Center).Dot(seg.Direction);
+                t = Math.Clamp(t, -seg.Extent, seg.Extent);
+                double currentSegmentClosestDistanceSquared = seg.DistanceSquared(point);
+
+                // Update results if current element is closer
+                if (currentSegmentClosestDistanceSquared < closestDistanceSquared)
+                {
+                    closestDistanceSquared = currentSegmentClosestDistanceSquared;
+                    elementIndex = currentElementIndex;
+                    elementParameterizedDistance = (t / seg.Extent + 1) / 2d;
+                }
+
+                currentElementIndex++;
+            }
+
+            // For consistency, if the closest point is on a vertex, 
+            // give the index of the element after the vertex
+            if (elementParameterizedDistance == 1)
+            {
+                elementParameterizedDistance = 0;
+                elementIndex = (elementIndex + 1) % elements.Count;
+            }
+            return Math.Sqrt(closestDistanceSquared);
         }
 
     }

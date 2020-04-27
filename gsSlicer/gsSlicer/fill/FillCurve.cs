@@ -93,7 +93,7 @@ namespace gs
         {
             var loopElements = new List<FillElement<TSegmentInfo>>(elements.Count + 1);
             loopElements.AddRange(elements);
-            loopElements.Add(new FillElement<TSegmentInfo>(loopElements[^-1].NodeEnd, loopElements[0].NodeStart, segmentInfo));
+            loopElements.Add(new FillElement<TSegmentInfo>(loopElements[^1].NodeEnd, loopElements[0].NodeStart, segmentInfo));
             var loop = new FillLoop<TSegmentInfo>(loopElements);
             loop.CopyProperties(this);
             return loop;
@@ -104,22 +104,25 @@ namespace gs
             return CloseCurve(new TSegmentInfo());
         }
 
-
-        public double GetCurveLength()
+        public virtual IEnumerable<Vector2d> Vertices()
         {
-            throw new NotImplementedException("TODO: Fix this");
+            yield return elements[0].NodeStart.xy;
+            foreach (var edge in elements)
+                yield return edge.NodeEnd.xy;
         }
 
-        internal FillCurve<FillSegment> Reversed()
+        public FillCurve<TSegmentInfo> Reversed()
         {
-            throw new NotImplementedException();
+            var curve = new FillCurve<TSegmentInfo>(ElementsReversed());
+            curve.CopyProperties(this);
+            return curve;
         }
 
         public void Extend(IEnumerable<FillElement<TSegmentInfo>> elements, double stitchTolerance = 1e-6)
         {
             var enumerator = elements.GetEnumerator();
             enumerator.MoveNext();
-        
+
             if (!enumerator.Current.NodeStart.EpsilonEqual(base.elements[^1].NodeEnd, stitchTolerance))
             {
                 throw new ArgumentException("Can only extend with a FillCurve that starts where this FillCurve ends.");
