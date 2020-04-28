@@ -5,17 +5,11 @@ using System.Linq;
 
 namespace gs
 {
-    public interface IFillLoop
-    {
-        bool IsClockwise();
-        IEnumerable<Vector2d> Vertices(bool repeatFirst = false);
-    }
-
     /// <summary>
     /// Additive polygon fill curve
     /// </summary>
     public class FillLoop<TSegmentInfo> :
-        FillBase<TSegmentInfo>, IFillLoop
+        FillBase<TSegmentInfo>
         where TSegmentInfo : IFillSegment, new()
     {
         protected FillLoop()
@@ -78,19 +72,8 @@ namespace gs
         {
             if (!ElementShouldSplit(elementParameterizedDistance, tolerance, elements[elementIndex].GetSegment2d().Length))
             {
-                if (elementParameterizedDistance > 0.5)
-                {
-                    ++elementIndex;
-                    if (elementIndex >= elements.Count)
-                    {
-                        elementIndex = 0;
-                    }
-                }
-
-                return RollToVertex(elementIndex);
+                return RollToVertex(IdentifyClosestVertex(elementIndex, elementParameterizedDistance));
             }
-
-            var rolledElements = new List<FillElement<TSegmentInfo>>(elements.Count + 1);
 
             var elementToSplit = elements[elementIndex];
 
@@ -99,6 +82,8 @@ namespace gs
             var splitSegmentData = elementToSplit.Edge == null ?
                 Tuple.Create((IFillSegment)new TSegmentInfo(), (IFillSegment)new TSegmentInfo()) :
                 elementToSplit.Edge.Split(elementParameterizedDistance);
+
+            var rolledElements = new List<FillElement<TSegmentInfo>>(elements.Count + 1);
 
             // Add the second half of the split element
             rolledElements.Add(new FillElement<TSegmentInfo>(
@@ -123,6 +108,20 @@ namespace gs
             var rolledLoop = new FillLoop<TSegmentInfo>(rolledElements);
             rolledLoop.CopyProperties(this);
             return rolledLoop;
+        }
+
+        private int IdentifyClosestVertex(int elementIndex, double elementParameterizedDistance)
+        {
+            if (elementParameterizedDistance > 0.5)
+            {
+                ++elementIndex;
+                if (elementIndex >= elements.Count)
+                {
+                    elementIndex = 0;
+                }
+            }
+
+            return elementIndex;
         }
 
         private static bool ElementShouldSplit(double parameterizedSplitDistance, double tolerance, double segmentLength)

@@ -75,7 +75,7 @@ namespace gs
 
             // For consistency, if the closest point is on a vertex, 
             // give the index of the element after the vertex
-            if (elementParameterizedDistance == 1)
+            if (MathUtil.EpsilonEqual(elementParameterizedDistance, 1, 1e-6))
             {
                 elementParameterizedDistance = 0;
                 elementIndex = (elementIndex + 1) % elements.Count;

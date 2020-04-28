@@ -1,9 +1,8 @@
 ﻿using g3;
-using gs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using gs.FillTypes;
 
 namespace gs.UnitTests.Fill
 {
@@ -11,7 +10,6 @@ namespace gs.UnitTests.Fill
     public class FillLoopTests
     {
         private static double delta = 1e-4;
-
 
         [TestMethod]
         public void EnumerableVector2dConstructor()
@@ -196,6 +194,28 @@ namespace gs.UnitTests.Fill
         }
 
         [TestMethod]
+        public void RollLastSegmentAtEnd()
+        {
+            // Arrange
+            var triangle = FillFactory.CreateTriangleCCW();
+
+            // Act
+            var result = triangle.RollBetweenVertices(2, 1);
+
+            // Assert
+            Assert.AreEqual(3, result.Elements.Count);
+
+            Assert.AreEqual(0, result.Elements[0].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[0].NodeStart.y, delta);
+
+            Assert.AreEqual(4, result.Elements[1].NodeStart.x, delta);
+            Assert.AreEqual(0, result.Elements[1].NodeStart.y, delta);
+
+            Assert.AreEqual(4, result.Elements[2].NodeStart.x, delta);
+            Assert.AreEqual(3, result.Elements[2].NodeStart.y, delta);
+        }
+
+        [TestMethod]
         public void RollSecondSegmentHalfwayCW()
         {
             // Arrange
@@ -328,6 +348,48 @@ namespace gs.UnitTests.Fill
 
             Assert.AreEqual(0, result.Elements[2].NodeEnd.x, delta);
             Assert.AreEqual(0, result.Elements[2].NodeEnd.y, delta);
+        }
+
+        [TestMethod]
+        public void CloneBare()
+        {
+            // Arrange
+            var settings = new SingleMaterialFFFSettings();
+            var loop = FillFactory.CreateTriangleCCW();
+            loop.FillType = new OuterPerimeterFillType(settings);
+            loop.PerimOrder = 100;
+            loop.IsHoleShell = true;
+            loop.FillThickness = 3;
+
+            // Act
+            var clone = loop.CloneBare();
+
+            // Assert
+            Assert.AreEqual(100, clone.PerimOrder);
+            Assert.AreEqual(3, clone.FillThickness);
+            Assert.IsTrue(clone.IsHoleShell);
+            Assert.IsInstanceOfType(clone.FillType, typeof(OuterPerimeterFillType));
+        }
+
+        [TestMethod]
+        public void CloneBareAsCurve()
+        {
+            // Arrange
+            var settings = new SingleMaterialFFFSettings();
+            var loop = FillFactory.CreateTriangleCCW();
+            loop.FillType = new OuterPerimeterFillType(settings);
+            loop.PerimOrder = 100;
+            loop.IsHoleShell = true;
+            loop.FillThickness = 3;
+
+            // Act
+            var clone = loop.CloneBareAsCurve();
+
+            // Assert
+            Assert.AreEqual(100, clone.PerimOrder);
+            Assert.AreEqual(3, clone.FillThickness);
+            Assert.IsTrue(clone.IsHoleShell);
+            Assert.IsInstanceOfType(clone.FillType, typeof(OuterPerimeterFillType));
         }
 
         [TestMethod]
@@ -491,5 +553,20 @@ namespace gs.UnitTests.Fill
             Assert.AreEqual(loop.Elements[0].NodeEnd, rolled.Elements[0].NodeStart);
         }
 
+        [TestMethod]
+        public void Reversed()
+        {
+            // Arrange
+            var loop = FillFactory.CreateTriangleCCW();
+
+            // Act
+            var reversed = loop.Reversed();
+
+            // Assert
+            Assert.AreEqual(loop.Elements.Count, reversed.Elements.Count);
+            Assert.AreEqual(loop.Elements[0].NodeStart, reversed.Elements[0].NodeStart);
+            Assert.AreEqual(loop.Elements[^1].NodeEnd, reversed.Elements[^1].NodeEnd);
+            Assert.IsTrue(reversed.IsClockwise());
+        }
     }
 }
