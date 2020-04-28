@@ -9,7 +9,7 @@ namespace gs
     /// </summary>
     public class FillCurve<TSegmentInfo> :
         FillBase<TSegmentInfo>
-        where TSegmentInfo : IFillSegment, ICloneable, new()
+        where TSegmentInfo : IFillSegment, new()
     {
         public Vector2d Entry { get => elements[0].NodeStart.xy; }
         public Vector2d Exit { get => elements[^1].NodeEnd.xy; }

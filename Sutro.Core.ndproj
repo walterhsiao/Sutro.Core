@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<NDepend AppName="Sutro.Core" Platform="DotNet" FileWrittenByProductVersion="2019.3.0.9290">
+<NDepend AppName="Sutro.Core" Platform="DotNet" FileWrittenByProductVersion="2020.1.0.9404">
   <OutputDir KeepXmlFiles="False">.\NDependOut</OutputDir>
   <IDEFiles>
     <IDEFile FilePath=".\Sutro.Core.sln" Filters="-test -gsSlicer.CLI" Configuration="DEBUG|AnyCPU" />
@@ -61,6 +61,7 @@
   <SourceFileRebasing FromPath="" ToPath="" />
   <PathVariables />
   <RuleFiles />
+  <GraphFiles />
   <ProjectRules AreActive="True" />
   <ProjectDebtSettings DebtSettingsStorage="0" SettingsFilePath="">
     <DebtSettings>

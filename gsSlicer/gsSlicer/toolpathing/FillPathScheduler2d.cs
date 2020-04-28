@@ -50,62 +50,55 @@ namespace gs
 
         public Vector2d CurrentPosition => Builder.Position.xy;
 
-        protected virtual void AppendFill(FillBase<FillSegment> fill)
-        {
-            switch (fill)
-            {
-                case FillLoop<FillSegment> basicFillLoop:
-                    AppendBasicFillLoop(basicFillLoop);
-                    break;
-                case FillCurve<FillSegment> basicFillCurve:
-                    AppendBasicFillCurve(basicFillCurve);
-                    break;
-                default:
-                    throw new NotImplementedException($"{fill.GetType()} not supported by {nameof(SequentialScheduler2d)}");
-            }
-        }
-
         public virtual void AppendCurveSets(List<FillCurveSet2d> fillSets)
         {
             OnAppendCurveSetsF?.Invoke(fillSets, this);
-            foreach (var fill in FlattenFillCurveSets(fillSets))
+            foreach (var curveSet in fillSets)
             {
-                AppendFill(fill);
+                foreach (var curve in curveSet.Curves)
+                    AppendFillCurve(curve);
+
+                foreach (var loop in curveSet.Loops)
+                    AppendFillLoop (loop);
             }
-        }
-
-        protected static List<FillBase<FillSegment>> FlattenFillCurveSets(List<FillCurveSet2d> fillSets)
-        {
-            var fillElements = new List<FillBase<FillSegment>>();
-
-            foreach (var fills in fillSets)
-            {
-                fillElements.AddRange(fills.Loops);
-                fillElements.AddRange(fills.Curves);
-            }
-
-            return fillElements;
         }
 
         // [TODO] no reason we couldn't start on edge midpoint??
-        public virtual void AppendBasicFillLoop(FillLoop<FillSegment> poly)
+        public virtual void AppendFillLoop<TSegment>(FillLoop<TSegment> loop) 
+            where TSegment : IFillSegment, new()
         {
-            Vector3d currentPos = Builder.Position;
-            Vector2d currentPos2 = currentPos.xy;
+            AssertValidLoop(loop);
 
-            AssertValidLoop(poly);
+            var oriented = SelectLoopDirection(loop);
+            var rolled = SelectLoopEntry(oriented, Builder.Position.xy);
 
-            int startIndex = FindLoopEntryPoint(poly, currentPos2);
-            var rolled = poly.RollToVertex(startIndex);
+            AppendTravel(Builder.Position.xy, rolled.EntryExitPoint);
 
-            AppendTravel(currentPos2, rolled.EntryExitPoint);
-
-            double useSpeed = SelectSpeed(poly);
-
-            Builder.AppendExtrude(rolled.Vertices(true).ToList(), useSpeed, poly.FillType, null);
+            double useSpeed = SelectSpeed(rolled);
+            BuildLoop(rolled, useSpeed);
         }
 
-        private int FindLoopEntryPoint(FillLoop<FillSegment> poly, Vector2d currentPos2)
+        protected virtual FillLoop<TSegment> SelectLoopEntry<TSegment>(FillLoop<TSegment> loop, Vector2d currentPosition)
+            where TSegment : IFillSegment, new()
+
+        {
+            int startIndex = FindLoopEntryPoint(loop, currentPosition);
+            return loop.RollToVertex(startIndex);
+        }
+
+        protected virtual void BuildLoop<TSegment>(FillLoop<TSegment> rolled, double useSpeed) where TSegment : IFillSegment, new()
+        {
+            Builder.AppendExtrude(rolled.Vertices(true).ToList(), useSpeed, rolled.FillType, null);
+        }
+
+        protected virtual FillLoop<TSegment> SelectLoopDirection<TSegment>(FillLoop<TSegment> loop)
+            where TSegment : IFillSegment, new()
+        {
+            return loop;
+        }
+
+        protected int FindLoopEntryPoint<TSegment>(FillLoop<TSegment> poly, Vector2d currentPos2)
+            where TSegment : IFillSegment, new()
         {
             int startIndex;
             if (Settings.ZipperAlignedToPoint && poly.FillType.IsEntryLocationSpecified())
@@ -154,7 +147,8 @@ namespace gs
         }
 
         // [TODO] would it ever make sense to break polyline to avoid huge travel??
-        public virtual void AppendBasicFillCurve(FillCurve<FillSegment> curve)
+        public virtual void AppendFillCurve<TSegment>(FillCurve<TSegment> curve)
+            where TSegment : IFillSegment, new()
         {
             Vector3d currentPos = Builder.Position;
             Vector2d currentPos2 = currentPos.xy;
@@ -180,7 +174,7 @@ namespace gs
                 else
                 {
                     var segInfo = curve.Elements[i - 1].Edge;
-                    if (segInfo != null && segInfo.IsConnector)
+                    if (segInfo.IsConnector)
                         flag = TPVertexFlags.IsConnector;
                 }
 
@@ -197,7 +191,8 @@ namespace gs
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed
         //       (currently this is only set on first layer)
-        public virtual double SelectSpeed(FillBase<FillSegment> pathCurve)
+        public virtual double SelectSpeed<TSegment>(FillBase<TSegment> pathCurve)
+            where TSegment : IFillSegment, new()
         {
             double speed = SpeedHint == SchedulerSpeedHint.Careful ?
                 Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;
@@ -205,7 +200,8 @@ namespace gs
             return pathCurve.FillType.ModifySpeed(speed, SpeedHint);
         }
 
-        protected void AssertValidCurve(FillCurve<FillSegment> curve)
+        protected void AssertValidCurve<TSegment>(FillCurve<TSegment> curve)
+            where TSegment : IFillSegment, new()
         {
             int N = curve.Elements.Count;
             if (N < 1)
@@ -218,7 +214,8 @@ namespace gs
             }
         }
 
-        protected void AssertValidLoop(FillLoop<FillSegment> curve)
+        protected void AssertValidLoop<TSegment>(FillLoop<TSegment> curve)
+            where TSegment : IFillSegment, new()
         {
             int N = curve.Elements.Count;
             if (N < 2)

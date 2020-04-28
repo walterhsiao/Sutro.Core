@@ -19,5 +19,7 @@
         {
             return speedModifier * speed;
         }
+
+        public bool IsPartShell() { return true; }
     }
 }

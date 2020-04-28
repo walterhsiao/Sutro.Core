@@ -5,14 +5,20 @@ using System.Linq;
 
 namespace gs
 {
+    public interface IFillLoop
+    {
+        bool IsClockwise();
+        IEnumerable<Vector2d> Vertices(bool repeatFirst = false);
+    }
+
     /// <summary>
     /// Additive polygon fill curve
     /// </summary>
     public class FillLoop<TSegmentInfo> :
-        FillBase<TSegmentInfo>
+        FillBase<TSegmentInfo>, IFillLoop
         where TSegmentInfo : IFillSegment, new()
     {
-        private FillLoop()
+        protected FillLoop()
         {
         }
 
@@ -151,6 +157,13 @@ namespace gs
             var curve = new FillCurve<TSegmentInfo>(elements);
             curve.CopyProperties(this);
             return curve;
+        }
+
+        public FillLoop<TSegmentInfo> Reversed()
+        {
+            var loop = new FillLoop<TSegmentInfo>(ElementsReversed());
+            loop.CopyProperties(this);
+            return loop;
         }
 
         public virtual IEnumerable<Vector2d> Vertices(bool repeatFirst = false)

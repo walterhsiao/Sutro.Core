@@ -10,13 +10,10 @@
 
         string GetLabel();
 
-        bool IsPart()
-        {
-            return true;
-        }
-
-        static int Flag { get; } = 0;
-
         bool IsEntryLocationSpecified();
+
+        bool IsPart() { return true; }
+
+        bool IsPartShell() { return false; }
     }
 }

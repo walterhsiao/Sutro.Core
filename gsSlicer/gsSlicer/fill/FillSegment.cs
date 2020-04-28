@@ -2,15 +2,11 @@
 
 namespace gs
 {
-    public class FillSegment : IFillSegment
+    public struct FillSegment : IFillSegment
     {
         public bool IsConnector { get; set; }
 
-        public FillSegment()
-        {
-        }
-
-        public virtual FillSegment Reversed()
+        public FillSegment Reversed()
         {
             return new FillSegment(this);
         }
@@ -23,11 +19,6 @@ namespace gs
         public Tuple<IFillSegment, IFillSegment> Split(double t)
         {
             return Tuple.Create((IFillSegment)new FillSegment(this), (IFillSegment)new FillSegment(this));
-        }
-
-        public object Clone()
-        {
-            return new FillSegment(this);
         }
 
         public FillSegment(FillSegment other)

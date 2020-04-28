@@ -2,7 +2,7 @@
 
 namespace gs
 {
-    public interface IFillSegment : ICloneable
+    public interface IFillSegment
     {
         bool IsConnector { get; }
         IFillSegment Reversed();
