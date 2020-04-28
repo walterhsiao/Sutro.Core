@@ -6,8 +6,6 @@
 
         double AdjustVolume(double volume);
 
-        static string Label { get; }
-
         string GetLabel();
 
         bool IsEntryLocationSpecified();
