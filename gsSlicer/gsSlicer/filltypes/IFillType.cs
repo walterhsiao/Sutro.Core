@@ -1,4 +1,4 @@
-﻿namespace gs
+﻿namespace gs.FillTypes
 {
     public interface IFillType
     {

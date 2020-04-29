@@ -1,6 +1,7 @@
 ﻿using g3;
 using System;
 using System.Collections.Generic;
+using gs.FillTypes;
 
 namespace gs
 {
