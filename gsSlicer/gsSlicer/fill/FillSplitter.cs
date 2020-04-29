@@ -1,4 +1,5 @@
-﻿using g3;
+﻿using System;
+using g3;
 using System.Collections.Generic;
 
 namespace gs
@@ -29,7 +30,7 @@ namespace gs
             }
 
             // If there is a split location on the first vertex, remove first split
-            if (splitsQueue.Peek() == 0)
+            if (MathUtil.EpsilonEqual(splitsQueue.Peek(), 0))
                 splitsQueue.Dequeue();
 
             // Iterate through the fill elements in the polygon.
@@ -44,31 +45,25 @@ namespace gs
 
                 // Calculate how much distance the current segment adds
                 double nextDistance = element.GetSegment2d().Length;
-                var nodeStart = element.NodeStart;
-                var segmentInfo = element.Edge;
+                var currentElement = element;
 
                 // For each split distance within the current segment
                 while (splitsQueue.Count > 0 && splitsQueue.Peek() < cumulativeDistance + nextDistance)
                 {
                     // Create normalized split distance (0,1)
                     double splitDistance = splitsQueue.Dequeue() - cumulativeDistance;
-                    double t = splitDistance / nextDistance;
 
-                    var splitVertex = Vector3d.Lerp(nodeStart, element.NodeEnd, t);
+                    currentElement.SplitElement(splitDistance / nextDistance, out var splitElementFront, out currentElement); 
 
-                    var splitSegmentData = element.Edge.Split(t);
-
-                    splitElements.Add( new FillElement<TSegmentInfo>(nodeStart, splitVertex, (TSegmentInfo)splitSegmentData.Item1));
+                    splitElements.Add(splitElementFront);
                     result.Add(splitElements);
                     splitElements = new List<FillElement<TSegmentInfo>>();
 
-                    segmentInfo = (TSegmentInfo)splitSegmentData.Item2;
                     cumulativeDistance += splitDistance;
                     nextDistance -= splitDistance;
-                    nodeStart = splitVertex;
                 }
 
-                splitElements.Add(new FillElement<TSegmentInfo>(nodeStart, element.NodeEnd, segmentInfo));
+                splitElements.Add(currentElement);
 
                 cumulativeDistance += nextDistance;
             }

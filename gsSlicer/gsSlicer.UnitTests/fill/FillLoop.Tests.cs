@@ -78,7 +78,7 @@ namespace gs.UnitTests.Fill
             var triangle = FillFactory.CreateTriangleCCW();
 
             // Act
-            var result = triangle.RollBetweenVertices(0, 0);
+            var result = triangle.RollBetweenVertices(new ElementLocation(0, 0));
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -103,7 +103,7 @@ namespace gs.UnitTests.Fill
             var triangle = FillFactory.CreateTriangleCW();
 
             // Act
-            var result = triangle.RollBetweenVertices(0, 0);
+            var result = triangle.RollBetweenVertices(new ElementLocation(0, 0));
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -125,7 +125,7 @@ namespace gs.UnitTests.Fill
             var triangle = FillFactory.CreateTriangleCCW();
 
             // Act
-            var result = triangle.RollBetweenVertices(0, 0.5);
+            var result = triangle.RollBetweenVertices(new ElementLocation(0, 0.5));
 
             // Assert
             Assert.AreEqual(4, result.Elements.Count);
@@ -150,7 +150,7 @@ namespace gs.UnitTests.Fill
             var triangle = FillFactory.CreateTriangleCW();
 
             // Act
-            var result = triangle.RollBetweenVertices(0, 0.5);
+            var result = triangle.RollBetweenVertices(new ElementLocation(0, 0.5));
 
             // Assert
             Assert.AreEqual(4, result.Elements.Count);
@@ -175,7 +175,7 @@ namespace gs.UnitTests.Fill
             var triangle = FillFactory.CreateTriangleCCW();
 
             // Act
-            var result = triangle.RollBetweenVertices(1, 1d / 3d);
+            var result = triangle.RollBetweenVertices(new ElementLocation(1, 1d / 3d));
 
             // Assert
             Assert.AreEqual(4, result.Elements.Count);
@@ -200,7 +200,7 @@ namespace gs.UnitTests.Fill
             var triangle = FillFactory.CreateTriangleCCW();
 
             // Act
-            var result = triangle.RollBetweenVertices(2, 1);
+            var result = triangle.RollBetweenVertices(new ElementLocation(2, 1));
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -222,7 +222,7 @@ namespace gs.UnitTests.Fill
             var triangle = FillFactory.CreateTriangleCW();
 
             // Act
-            var result = triangle.RollBetweenVertices(1, 0.5);
+            var result = triangle.RollBetweenVertices(new ElementLocation(1, 0.5));
 
             // Assert
             Assert.AreEqual(4, result.Elements.Count);
@@ -247,7 +247,7 @@ namespace gs.UnitTests.Fill
             var triangle = FillFactory.CreateTriangleCCW();
 
             // Act
-            var result = triangle.RollBetweenVertices(0, 0.004 / 4, 0.005);
+            var result = triangle.RollBetweenVertices(new ElementLocation(0, 0.004 / 4), 0.005);
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -269,7 +269,7 @@ namespace gs.UnitTests.Fill
             var triangle = FillFactory.CreateTriangleCW();
 
             // Act
-            var result = triangle.RollBetweenVertices(1, 0.004 / 4, 0.005);
+            var result = triangle.RollBetweenVertices(new ElementLocation(1, 0.004 / 4), 0.005);
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -291,7 +291,7 @@ namespace gs.UnitTests.Fill
             var triangle = FillFactory.CreateTriangleCCW();
 
             // Act
-            var result = triangle.RollBetweenVertices(0, 1 - (0.004 / 4), 0.005);
+            var result = triangle.RollBetweenVertices(new ElementLocation(0, 1 - (0.004 / 4)), 0.005);
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);
@@ -313,7 +313,7 @@ namespace gs.UnitTests.Fill
             var triangle = FillFactory.CreateTriangleCW();
 
             // Act
-            var result = triangle.RollBetweenVertices(1, 1 - (0.004 / 4), 0.005);
+            var result = triangle.RollBetweenVertices(new ElementLocation(1, 1 - (0.004 / 4)), 0.005);
 
             // Assert
             Assert.AreEqual(3, result.Elements.Count);

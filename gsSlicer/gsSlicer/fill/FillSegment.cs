@@ -2,9 +2,14 @@
 
 namespace gs
 {
-    public struct FillSegment : IFillSegment
+    public readonly struct FillSegment : IFillSegment
     {
-        public bool IsConnector { get; set; }
+        public FillSegment(bool isConnector = false)
+        {
+            IsConnector = isConnector;
+        }
+
+        public bool IsConnector { get; }
 
         public FillSegment Reversed()
         {
@@ -24,6 +29,18 @@ namespace gs
         public FillSegment(FillSegment other)
         {
             IsConnector = other.IsConnector;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is FillSegment other))
+                return false;
+            return other.IsConnector == IsConnector;
+        }
+
+        public override int GetHashCode()
+        {
+            return Tuple.Create(IsConnector).GetHashCode();
         }
     }
 }

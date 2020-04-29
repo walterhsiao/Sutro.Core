@@ -40,12 +40,12 @@ namespace gs.UnitTests.Fill
             var point = new Vector2d(5, 2);
 
             // Act
-            var distance = loop.FindClosestElementToPoint(point, out int index, out double parameter);
+            var distance = loop.FindClosestElementToPoint(point, out var location);
 
             // Assert
             Assert.AreEqual(1, distance, delta);
-            Assert.AreEqual(1, index);
-            Assert.AreEqual(2d / 3d, parameter, delta);
+            Assert.AreEqual(1, location.Index);
+            Assert.AreEqual(2d / 3d, location.ParameterizedDistance, delta);
         }
 
         [TestMethod]
@@ -56,12 +56,12 @@ namespace gs.UnitTests.Fill
             var point = new Vector2d(5, -1);
 
             // Act
-            var distance = loop.FindClosestElementToPoint(point, out int index, out double parameter);
+            var distance = loop.FindClosestElementToPoint(point, out var location);
 
             // Assert
             Assert.AreEqual(Math.Sqrt(2), distance, delta);
-            Assert.AreEqual(1, index);
-            Assert.AreEqual(0, parameter, delta);
+            Assert.AreEqual(1, location.Index);
+            Assert.AreEqual(0, location.ParameterizedDistance, delta);
         }
 
         [TestMethod]

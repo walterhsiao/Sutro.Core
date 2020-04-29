@@ -147,5 +147,42 @@ namespace gs
             }
             return curves;
         }
+
+        public FillCurve<TSegmentInfo> TrimFront(double trimDistance)
+        {
+            ValidateTrimDistance(trimDistance, TotalLength());
+            return SplitAtDistances(new double[] {trimDistance})[1];
+        }
+
+        public FillCurve<TSegmentInfo> TrimBack(double trimDistance)
+        {
+            double totalLength = TotalLength();
+            double trimLocation = totalLength - trimDistance;
+            ValidateTrimDistance(trimLocation, totalLength);
+            return SplitAtDistances(new double[] { trimLocation })[0];
+        }
+
+        public FillCurve<TSegmentInfo> TrimFrontAndBack(double trimDistanceFront, double? trimDistanceBack = null)
+        {
+            double totalLength = TotalLength();
+            double trimLocationBack = totalLength - (trimDistanceBack ?? trimDistanceFront);
+
+            ValidateTrimDistance(trimDistanceFront, totalLength);
+            ValidateTrimDistance(trimLocationBack, totalLength);
+
+            if (trimLocationBack < trimDistanceFront)
+                throw new ArgumentException("Combined trim amounts are greater than curve length.");
+
+            return SplitAtDistances(new double[] { trimDistanceFront, trimLocationBack })[1];
+        }
+
+        private void ValidateTrimDistance(double trimLocation, double totalLength)
+        {
+            if (trimLocation > totalLength)
+                throw new ArgumentException("Trim location must be less than total length.");
+
+            if (trimLocation <= 0)
+                throw new ArgumentException("Trim location must be greater than 0.");
+        }
     }
 }

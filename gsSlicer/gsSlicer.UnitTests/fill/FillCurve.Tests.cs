@@ -1,13 +1,15 @@
 ﻿using g3;
+using gs.FillTypes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using gs.FillTypes;
 
 namespace gs.UnitTests.Fill
 {
     [TestClass]
     public class FillCurveTests
     {
+        private const double tolerance = 1e-6;
+
         private static Vector2d[] CreateSimpleVector2dArray()
         {
             return new Vector2d[]
@@ -43,7 +45,7 @@ namespace gs.UnitTests.Fill
         }
 
         [TestMethod]
-        public void Constructor_FromPolyline()
+        public void Constructor_FromPolyLine()
         {
             // Arrange
             var polyline = new PolyLine2d(CreateSimpleVector2dArray());
@@ -64,7 +66,7 @@ namespace gs.UnitTests.Fill
             // Act
             curve.BeginCurve(new Vector2d(0, 0));
             curve.AddToCurve(new Vector3d(1, 0, 0));
-            curve.AddToCurve(new Vector2d(1, 2), new FillSegment() { IsConnector = true });
+            curve.AddToCurve(new Vector2d(1, 2), new FillSegment(true));
 
             // Assert
             Assert.AreEqual(2, curve.Elements.Count);
@@ -121,7 +123,6 @@ namespace gs.UnitTests.Fill
             Assert.IsTrue(clone.IsHoleShell);
             Assert.IsInstanceOfType(clone.FillType, typeof(OuterPerimeterFillType));
         }
-
 
         [TestMethod]
         public void CloseCurve()
@@ -267,6 +268,94 @@ namespace gs.UnitTests.Fill
             Assert.AreEqual(curve.Elements[1].NodeStart, split1.Elements[1].NodeStart);
             Assert.AreEqual(curve.Elements[2].NodeStart, split1.Elements[2].NodeStart);
             Assert.AreEqual(curve.Elements[2].NodeEnd, split1.Elements[2].NodeEnd);
+        }
+
+        [TestMethod]
+        public void TrimFront()
+        {
+            // Arrange
+            var curve = CreateSimpleFillCurve();
+
+            // Act
+            var trimmed = curve.TrimFront(2d);
+
+            // Assert
+            Assert.AreEqual(2, trimmed.Elements.Count);
+            Assert.AreEqual(2, trimmed.Elements[0].NodeStart.x, tolerance);
+            Assert.AreEqual(3, trimmed.Elements[1].NodeStart.x, tolerance);
+            Assert.AreEqual(4, trimmed.Elements[1].NodeEnd.x, tolerance);
+        }
+
+        [TestMethod]
+        public void TrimBack()
+        {
+            // Arrange
+            var curve = CreateSimpleFillCurve();
+
+            // Act
+            var trimmed = curve.TrimBack(1.5d);
+
+            // Assert
+            Assert.AreEqual(2, trimmed.Elements.Count);
+            Assert.AreEqual(0, trimmed.Elements[0].NodeStart.x, tolerance);
+            Assert.AreEqual(1, trimmed.Elements[1].NodeStart.x, tolerance);
+            Assert.AreEqual(2.5, trimmed.Elements[1].NodeEnd.x, tolerance);
+        }
+
+        [TestMethod]
+        public void TrimFrontAndBack()
+        {
+            // Arrange
+            var curve = CreateSimpleFillCurve();
+
+            // Act
+            var trimmed = curve.TrimFrontAndBack(0.5d, 0.75d);
+
+            // Assert
+            Assert.AreEqual(3, trimmed.Elements.Count);
+            Assert.AreEqual(0.5, trimmed.Elements[0].NodeStart.x, tolerance);
+            Assert.AreEqual(1, trimmed.Elements[1].NodeStart.x, tolerance);
+            Assert.AreEqual(3, trimmed.Elements[2].NodeStart.x, tolerance);
+            Assert.AreEqual(3.25, trimmed.Elements[2].NodeEnd.x, tolerance);
+        }
+
+        [TestMethod]
+        public void TrimFront_ExceptionOnTrimDistanceExceedsCurveLength()
+        {
+            // Arrange
+            var curve = CreateSimpleFillCurve();
+
+            // Act & Assert
+            Assert.ThrowsException<ArgumentException>(() =>
+            {
+                curve.TrimFront(5);
+            });
+        }
+
+        [TestMethod]
+        public void TrimFront_NegativeDistance()
+        {
+            // Arrange
+            var curve = CreateSimpleFillCurve();
+
+            // Act & Assert
+            Assert.ThrowsException<ArgumentException>(() =>
+            {
+                curve.TrimFront(-1);
+            });
+        }
+
+        [TestMethod]
+        public void TrimFrontAndBack_ExceptionOnTrimDistanceExceedsCurveLength()
+        {
+            // Arrange
+            var curve = CreateSimpleFillCurve();
+
+            // Act & Assert
+            Assert.ThrowsException<ArgumentException>(() =>
+            {
+                curve.TrimFrontAndBack(3);
+            });
         }
     }
 }

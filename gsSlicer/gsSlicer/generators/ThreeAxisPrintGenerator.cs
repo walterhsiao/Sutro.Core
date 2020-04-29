@@ -1032,7 +1032,7 @@ namespace gs
                 };
 
                 // leave space for end-blobs (input paths are extent we want to hit)
-                var trimmed = FillCurveTrimmer.TrimFrontAndBack(pline, Settings.Machine.NozzleDiamMM / 2);
+                var trimmed = pline.TrimFrontAndBack(Settings.Machine.NozzleDiamMM / 2);
 
                 // ignore tiny paths
                 if (PathFilterF != null && PathFilterF(trimmed) == true)

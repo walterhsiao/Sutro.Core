@@ -10,6 +10,7 @@ namespace gs
     {
         // General Properties
         public IFillType FillType { get; set; } = new DefaultFillType();
+
         public double FillThickness { get; set; }
         public bool IsHoleShell { get; set; } = false;
         public int PerimOrder { get; set; } = -1;
@@ -27,11 +28,11 @@ namespace gs
 
         public IEnumerable<FillElement<TSegmentInfo>> ElementsReversed()
         {
-            for(int i = elements.Count - 1; i >=0; i--)
+            for (int i = elements.Count - 1; i >= 0; i--)
             {
                 var element = elements[i];
                 // Review: (TSegmentInfo) cast seems messy
-                yield return new FillElement<TSegmentInfo>(element.NodeEnd, element.NodeStart, (TSegmentInfo)element.Edge.Reversed()); 
+                yield return new FillElement<TSegmentInfo>(element.NodeEnd, element.NodeStart, (TSegmentInfo)element.Edge.Reversed());
             }
         }
 
@@ -46,42 +47,44 @@ namespace gs
 
             return length;
         }
-
-        public double FindClosestElementToPoint(Vector2d point, out int elementIndex, out double elementParameterizedDistance)
+        
+        public double FindClosestElementToPoint(Vector2d point, out ElementLocation location)
         {
-            elementParameterizedDistance = double.MaxValue;
-            double closestDistanceSquared = double.MaxValue;
-            elementIndex = -1;
+            location = new ElementLocation(int.MinValue, 0);
 
+            double closestDistanceSquared = double.MaxValue;
             int currentElementIndex = 0;
+
             foreach (var element in elements)
             {
                 // Update results if current element is closer
                 Segment2d seg = element.GetSegment2d();
-                double t = (point - seg.Center).Dot(seg.Direction);
-                t = Math.Clamp(t, -seg.Extent, seg.Extent);
                 double currentSegmentClosestDistanceSquared = seg.DistanceSquared(point);
 
                 // Update results if current element is closer
                 if (currentSegmentClosestDistanceSquared < closestDistanceSquared)
                 {
                     closestDistanceSquared = currentSegmentClosestDistanceSquared;
-                    elementIndex = currentElementIndex;
-                    elementParameterizedDistance = (t / seg.Extent + 1) / 2d;
+                    location.Index = currentElementIndex;
+                    location.ParameterizedDistance = GetParameterizedDistance(point, seg);
                 }
 
                 currentElementIndex++;
             }
 
-            // For consistency, if the closest point is on a vertex, 
+            // For consistency, if the closest point is on a vertex,
             // give the index of the element after the vertex
-            if (MathUtil.EpsilonEqual(elementParameterizedDistance, 1, 1e-6))
+            if (MathUtil.EpsilonEqual(location.ParameterizedDistance, 1, 1e-6))
             {
-                elementParameterizedDistance = 0;
-                elementIndex = (elementIndex + 1) % elements.Count;
+                location.ParameterizedDistance = 0;
+                location.Index = (location.Index + 1) % elements.Count;
             }
             return Math.Sqrt(closestDistanceSquared);
         }
 
+        private static double GetParameterizedDistance(Vector2d point, Segment2d seg)
+        {
+            return (Math.Clamp((point - seg.Center).Dot(seg.Direction), -seg.Extent, seg.Extent) / seg.Extent + 1) / 2d;
+        }
     }
 }

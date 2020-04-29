@@ -68,28 +68,36 @@ namespace gs
             return rolledLoop;
         }
 
-        public FillLoop<TSegmentInfo> RollBetweenVertices(int elementIndex, double elementParameterizedDistance, double tolerance = 0.001)
+        public FillLoop<TSegmentInfo> RollBetweenVertices(ElementLocation location, double tolerance = 0.001)
         {
-            if (!ElementShouldSplit(elementParameterizedDistance, tolerance, elements[elementIndex].GetSegment2d().Length))
+            if (!ElementShouldSplit(location.ParameterizedDistance, tolerance, elements[location.Index].GetSegment2d().Length))
             {
-                return RollToVertex(IdentifyClosestVertex(elementIndex, elementParameterizedDistance));
+                return RollToVertex(IdentifyClosestVertex(location.Index, location.ParameterizedDistance));
             }
 
-            var elementToSplit = elements[elementIndex];
+            var elementToSplit = elements[location.Index];
 
-            var interpolatedVertex = Vector3d.Lerp(elementToSplit.NodeStart, elementToSplit.NodeEnd, elementParameterizedDistance);
+            var interpolatedVertex = Vector3d.Lerp(elementToSplit.NodeStart, elementToSplit.NodeEnd, location.ParameterizedDistance);
 
-            var splitSegmentData = elementToSplit.Edge == null ?
-                Tuple.Create((IFillSegment)new TSegmentInfo(), (IFillSegment)new TSegmentInfo()) :
-                elementToSplit.Edge.Split(elementParameterizedDistance);
+            var splitSegmentData = SplitSegment(location.ParameterizedDistance, elementToSplit);
 
+            var rolledElements = CreateRolledElements(location.Index, interpolatedVertex, elementToSplit, splitSegmentData);
+
+            var rolledLoop = new FillLoop<TSegmentInfo>(rolledElements);
+            rolledLoop.CopyProperties(this);
+            return rolledLoop;
+        }
+
+        private List<FillElement<TSegmentInfo>> CreateRolledElements(int elementIndex, Vector3d interpolatedVertex, FillElement<TSegmentInfo> elementToSplit,
+            Tuple<IFillSegment, IFillSegment> splitSegmentData)
+        {
             var rolledElements = new List<FillElement<TSegmentInfo>>(elements.Count + 1);
 
             // Add the second half of the split element
             rolledElements.Add(new FillElement<TSegmentInfo>(
-                    interpolatedVertex,
-                    elementToSplit.NodeEnd,
-                    (TSegmentInfo)splitSegmentData.Item2));
+                interpolatedVertex,
+                elementToSplit.NodeEnd,
+                (TSegmentInfo) splitSegmentData.Item2));
 
             // Add all elements after the split element
             for (int i = elementIndex + 1; i < elements.Count; ++i)
@@ -101,13 +109,17 @@ namespace gs
 
             // Add the first half of the split element
             rolledElements.Add(new FillElement<TSegmentInfo>(
-                    elementToSplit.NodeStart,
-                    interpolatedVertex,
-                    (TSegmentInfo)splitSegmentData.Item1));
+                elementToSplit.NodeStart,
+                interpolatedVertex,
+                (TSegmentInfo) splitSegmentData.Item1));
+            return rolledElements;
+        }
 
-            var rolledLoop = new FillLoop<TSegmentInfo>(rolledElements);
-            rolledLoop.CopyProperties(this);
-            return rolledLoop;
+        private static Tuple<IFillSegment, IFillSegment> SplitSegment(double parameterizedDistance, FillElement<TSegmentInfo> element)
+        {
+            return element.Edge == null
+                ? Tuple.Create((IFillSegment) new TSegmentInfo(), (IFillSegment) new TSegmentInfo())
+                : element.Edge.Split(parameterizedDistance);
         }
 
         private int IdentifyClosestVertex(int elementIndex, double elementParameterizedDistance)

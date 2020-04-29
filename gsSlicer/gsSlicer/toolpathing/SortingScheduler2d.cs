@@ -164,12 +164,11 @@ namespace gs
                 if (idx.a == 0)
                 { // loop
                     PathLoop loop = Loops[idx.b];
-                    int iNearSeg; double nearSegT;
-                    double d_sqr = loop.loop.FindClosestElementToPoint(pt, out iNearSeg, out nearSegT);
+                    double d_sqr = loop.loop.FindClosestElementToPoint(pt, out var location);
                     if (d_sqr < nearest_sqr)
                     {
                         nearest_sqr = d_sqr;
-                        nearest_idx = new Index3i(idx.a, idx.b, iNearSeg);
+                        nearest_idx = new Index3i(idx.a, idx.b, location.Index);
                     }
                 }
                 else
@@ -202,13 +201,12 @@ namespace gs
                 if (idx.a == 0)
                 { // loop
                     PathLoop loop = Loops[idx.b];
-                    int iNearSeg; double nearSegT;
-                    double d_sqr = GetLoopEntryPoint(pt, loop, out iNearSeg, out nearSegT);
+                    double d_sqr = GetLoopEntryPoint(pt, loop, out var location);
 
                     if (d_sqr < nearest_sqr)
                     {
                         nearest_sqr = d_sqr;
-                        nearest_idx = new Index3i(idx.a, idx.b, iNearSeg);
+                        nearest_idx = new Index3i(idx.a, idx.b, location.Index);
                     }
                 }
                 else
@@ -233,18 +231,15 @@ namespace gs
         }
 
         private static double GetLoopEntryPoint(Vector2d startPoint, PathLoop loop,
-            out int entryPointSegmentI, out double entryPointSegmentT)
+            out ElementLocation location)
         {
             if (loop.loop.FillType.IsEntryLocationSpecified())
             {
-                entryPointSegmentI = 0;
-                entryPointSegmentT = 0;
+                location = new ElementLocation(0, 0);
                 return loop.loop.EntryExitPoint.Distance(startPoint);
             }
-            else
-            {
-                return loop.loop.FindClosestElementToPoint(startPoint, out entryPointSegmentI, out entryPointSegmentT);
-            }
+            
+            return loop.loop.FindClosestElementToPoint(startPoint, out location);
         }
 
         protected virtual Vector2d get_point(Index3i idx)
