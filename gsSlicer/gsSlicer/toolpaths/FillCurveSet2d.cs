@@ -13,11 +13,11 @@ namespace gs
     /// </summary>
 	public class FillCurveSet2d
     {
-        public List<FillLoop<FillSegment>> Loops = 
-            new List<FillLoop<FillSegment>>();
+        public List<FillLoop> Loops = 
+            new List<FillLoop>();
         
-        public List<FillCurve<FillSegment>> Curves = 
-            new List<FillCurve<FillSegment>>();
+        public List<FillCurve> Curves = 
+            new List<FillCurve>();
 
         public void Append(GeneralPolygon2d poly, IFillType fillType)
         {
@@ -43,7 +43,7 @@ namespace gs
                 Append(p, fillType);
         }
 
-        public IEnumerable<FillBase<FillSegment>> EnumerateAll()
+        public IEnumerable<FillBase> EnumerateAll()
         {
             foreach (var loop in Loops)
                 yield return loop;
@@ -52,12 +52,12 @@ namespace gs
                 yield return curve;
         }
 
-        public void Append(FillLoop<FillSegment> loop)
+        public void Append(FillLoop loop)
         {
             Loops.Add(loop);
         }
 
-        public void Append(FillBase<FillSegment> element)
+        public void Append(FillBase element)
         {
             switch (element)
             {
@@ -67,21 +67,23 @@ namespace gs
                 case FillCurve<FillSegment> curve:
                     Append(curve);
                     break;
+                default:
+                    throw new NotImplementedException($"FillCurveSet2d.Append encountered unexpected type {element.GetType()}");
             }
         }
 
-        public void Append(List<FillLoop<FillSegment>> loops)
+        public void Append(List<FillLoop> loops)
         {
             foreach (var l in loops)
                 Loops.Add(l);
         }
 
-        public void Append(FillCurve<FillSegment> curve)
+        public void Append(FillCurve curve)
         {
             Curves.Add(curve);
         }
 
-        public void Append(List<FillCurve<FillSegment>> curves)
+        public void Append(List<FillCurve> curves)
         {
             foreach (var p in curves)
                 Append(p);

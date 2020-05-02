@@ -34,7 +34,7 @@ namespace gs
 
         protected class PathLoop : PathItem
         {
-            public FillLoop<FillSegment> loop;
+            public FillLoop loop;
             public bool reverse = false;
         }
 
@@ -42,7 +42,7 @@ namespace gs
 
         protected class PathSpan : PathItem
         {
-            public FillCurve<FillSegment> curve;
+            public FillCurve curve;
             public bool reverse = false;
         }
 
@@ -52,10 +52,10 @@ namespace gs
         {
             foreach (FillCurveSet2d polySet in paths)
             {
-                foreach (FillLoop<FillSegment> loop in polySet.Loops)
+                foreach (var loop in polySet.Loops)
                     Loops.Add(new PathLoop() { loop = loop, speedHint = SpeedHint });
 
-                foreach (FillCurve<FillSegment> curve in polySet.Curves)
+                foreach (var curve in polySet.Curves)
                     Spans.Add(new PathSpan() { curve = curve, speedHint = SpeedHint });
             }
         }
@@ -79,12 +79,12 @@ namespace gs
                     {
                         var rolled = loop.loop.RollToVertex(idx.c);
                         paths.Append(rolled);
-                        CurrentPosition = rolled.EntryExitPoint;
+                        CurrentPosition = rolled.Entry;
                     }
                     else
                     {
                         paths.Append(loop.loop);
-                        CurrentPosition = loop.loop.EntryExitPoint;
+                        CurrentPosition = loop.loop.Entry;
                     }
                 }
                 else
@@ -236,7 +236,7 @@ namespace gs
             if (loop.loop.FillType.IsEntryLocationSpecified())
             {
                 location = new ElementLocation(0, 0);
-                return loop.loop.EntryExitPoint.Distance(startPoint);
+                return loop.loop.Entry.Distance(startPoint);
             }
             
             return loop.loop.FindClosestElementToPoint(startPoint, out location);
@@ -247,7 +247,7 @@ namespace gs
             if (idx.a == 0)
             { // loop
                 PathLoop loop = Loops[idx.b];
-                return loop.loop.Elements[idx.c].GetSegment2d().Center;
+                return loop.loop.GetSegment2d(idx.c).Center;
             }
             else
             {  // span

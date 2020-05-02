@@ -152,7 +152,7 @@ namespace gs
 
         // this is called on polyline paths, return *true* to filter out a path. Useful for things like very short segments, etc
         // In default Initialize(), is set to a constant multiple of tool size
-        public Func<FillCurve<FillSegment>, bool> PathFilterF = null;
+        public Func<FillCurve, bool> PathFilterF = null;
 
         // Called after we have finished print generation, use this to post-process the paths, etc.
         // By default appends a comment block with print time & material usage statistics

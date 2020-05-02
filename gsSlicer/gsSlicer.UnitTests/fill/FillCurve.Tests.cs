@@ -136,7 +136,7 @@ namespace gs.UnitTests.Fill
 
             // Assert
             Assert.AreEqual(3, loop.Elements.Count);
-            Assert.AreEqual(curve.Entry, loop.EntryExitPoint);
+            Assert.AreEqual(curve.Entry, loop.Entry);
         }
 
         [TestMethod]
@@ -215,13 +215,13 @@ namespace gs.UnitTests.Fill
 
             Assert.AreEqual(2, splitCurves.Count);
 
-            var split1 = splitCurves[0];
+            var split1 = (FillCurve<FillSegment>)splitCurves[0];
             Assert.AreEqual(2, split1.Elements.Count);
             Assert.AreEqual(curve.Elements[0].NodeStart, split1.Elements[0].NodeStart);
             Assert.AreEqual(curve.Elements[0].NodeEnd, split1.Elements[1].NodeStart);
             Assert.AreEqual(new Vector3d(2, 0, 0), split1.Elements[1].NodeEnd);
 
-            var split2 = splitCurves[1];
+            var split2 = (FillCurve<FillSegment>)splitCurves[1];
             Assert.AreEqual(2, split2.Elements.Count);
             Assert.AreEqual(new Vector3d(2, 0, 0), split2.Elements[0].NodeStart);
             Assert.AreEqual(curve.Elements[^1].NodeStart, split2.Elements[1].NodeStart);
@@ -241,7 +241,7 @@ namespace gs.UnitTests.Fill
 
             Assert.AreEqual(1, splitCurves.Count);
 
-            var split1 = splitCurves[0];
+            var split1 = (FillCurve<FillSegment>)splitCurves[0];
             Assert.AreEqual(3, split1.Elements.Count);
             Assert.AreEqual(curve.Elements[0].NodeStart, split1.Elements[0].NodeStart);
             Assert.AreEqual(curve.Elements[1].NodeStart, split1.Elements[1].NodeStart);
@@ -262,7 +262,7 @@ namespace gs.UnitTests.Fill
 
             Assert.AreEqual(1, splitCurves.Count);
 
-            var split1 = splitCurves[0];
+            var split1 = (FillCurve<FillSegment>)splitCurves[0];
             Assert.AreEqual(3, split1.Elements.Count);
             Assert.AreEqual(curve.Elements[0].NodeStart, split1.Elements[0].NodeStart);
             Assert.AreEqual(curve.Elements[1].NodeStart, split1.Elements[1].NodeStart);
@@ -277,7 +277,7 @@ namespace gs.UnitTests.Fill
             var curve = CreateSimpleFillCurve();
 
             // Act
-            var trimmed = curve.TrimFront(2d);
+            var trimmed = (FillCurve<FillSegment>)curve.TrimFront(2d);
 
             // Assert
             Assert.AreEqual(2, trimmed.Elements.Count);
@@ -293,7 +293,7 @@ namespace gs.UnitTests.Fill
             var curve = CreateSimpleFillCurve();
 
             // Act
-            var trimmed = curve.TrimBack(1.5d);
+            var trimmed = (FillCurve<FillSegment>)curve.TrimBack(1.5d);
 
             // Assert
             Assert.AreEqual(2, trimmed.Elements.Count);
@@ -309,7 +309,7 @@ namespace gs.UnitTests.Fill
             var curve = CreateSimpleFillCurve();
 
             // Act
-            var trimmed = curve.TrimFrontAndBack(0.5d, 0.75d);
+            var trimmed = (FillCurve<FillSegment>)curve.TrimFrontAndBack(0.5d, 0.75d);
 
             // Assert
             Assert.AreEqual(3, trimmed.Elements.Count);

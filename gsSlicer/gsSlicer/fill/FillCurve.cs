@@ -4,15 +4,38 @@ using System.Collections.Generic;
 
 namespace gs
 {
+    public abstract class FillCurve : FillBase
+    {
+        public abstract List<FillCurve> SplitAtDistances(double[] splitDistances);
+        public abstract FillCurve Reversed();
+        public abstract FillCurve TrimFront(double trimDistance);
+        public abstract FillCurve TrimBack(double trimDistance);
+        public abstract FillCurve TrimFrontAndBack(double trimDistanceFront, double? trimDistanceBack = null);
+        public abstract IEnumerable<Vector2d> Vertices();
+    }
+
     /// <summary>
     /// Additive polyline fill curve
     /// </summary>
-    public class FillCurve<TSegmentInfo> :
-        FillBase<TSegmentInfo>
+    public class FillCurve<TSegmentInfo> : FillCurve
         where TSegmentInfo : IFillSegment, new()
     {
-        public Vector2d Entry { get => elements[0].NodeStart.xy; }
-        public Vector2d Exit { get => elements[^1].NodeEnd.xy; }
+        public override Vector2d Entry => elementsList.Elements[0].NodeStart.xy;
+        public override Vector2d Exit => elementsList.Elements [^1].NodeEnd.xy;
+        public override int ElementCount => elementsList.Elements.Count;
+
+        private readonly FillElementList<TSegmentInfo> elementsList = new FillElementList<TSegmentInfo>();
+        public IReadOnlyList<FillElement<TSegmentInfo>> Elements => elementsList.Elements;
+
+        public override double TotalLength()
+        {
+            return elementsList.TotalLength();
+        }
+
+        public override double FindClosestElementToPoint(Vector2d point, out ElementLocation location)
+        {
+            return elementsList.FindClosestElementToPoint(point, out location);
+        }
 
         public FillCurve<TSegmentInfo> CloneBare()
         {
@@ -31,24 +54,24 @@ namespace gs
 
         public FillCurve(IList<Vector2d> vertices)
         {
-            elements.Capacity = vertices.Count - 1;
             for (int i = 1; i < vertices.Count; i++)
             {
-                elements.Add(new FillElement<TSegmentInfo>(vertices[i - 1], vertices[i], new TSegmentInfo()));
+                elementsList.Add(new FillElement<TSegmentInfo>(vertices[i - 1], vertices[i], new TSegmentInfo()));
             }
         }
 
         public FillCurve(IEnumerable<FillElement<TSegmentInfo>> elements)
         {
             // Note: may want to add continuity checking here for start/end vertices
-            base.elements.AddRange(elements);
+            foreach (var e in elements)
+                elementsList.Add(e);
         }
 
         private Vector3d? firstPoint = null;
 
         public void BeginCurve(Vector3d pt)
         {
-            if (elements.Count > 0 || firstPoint != null)
+            if (elementsList.Elements.Count > 0 || firstPoint != null)
                 throw new MethodAccessException("BeginCurve called more than once.");
             firstPoint = pt;
         }
@@ -60,13 +83,13 @@ namespace gs
 
         public void AddToCurve(Vector3d pt, TSegmentInfo segmentInfo)
         {
-            if (elements.Count > 0)
+            if (elementsList.Elements.Count > 0)
             {
-                elements.Add(new FillElement<TSegmentInfo>(elements[^1].NodeEnd, pt, segmentInfo));
+                elementsList.Add(new FillElement<TSegmentInfo>(elementsList.Elements[^1].NodeEnd, pt, segmentInfo));
             }
             else if (firstPoint.HasValue)
             {
-                elements.Add(new FillElement<TSegmentInfo>(firstPoint.Value, pt, segmentInfo));
+                elementsList.Add(new FillElement<TSegmentInfo>(firstPoint.Value, pt, segmentInfo));
             }
             else
             {
@@ -91,8 +114,9 @@ namespace gs
 
         public FillLoop<TSegmentInfo> CloseCurve(TSegmentInfo segmentInfo)
         {
-            var loopElements = new List<FillElement<TSegmentInfo>>(elements.Count + 1);
-            loopElements.AddRange(elements);
+            var loopElements = new List<FillElement<TSegmentInfo>>(elementsList.Elements.Count + 1);
+            foreach (var e in elementsList.Elements)
+                loopElements.Add(e);
             loopElements.Add(new FillElement<TSegmentInfo>(loopElements[^1].NodeEnd, loopElements[0].NodeStart, segmentInfo));
             var loop = new FillLoop<TSegmentInfo>(loopElements);
             loop.CopyProperties(this);
@@ -104,16 +128,16 @@ namespace gs
             return CloseCurve(new TSegmentInfo());
         }
 
-        public virtual IEnumerable<Vector2d> Vertices()
+        public override IEnumerable<Vector2d> Vertices()
         {
-            yield return elements[0].NodeStart.xy;
-            foreach (var edge in elements)
+            yield return elementsList.Elements[0].NodeStart.xy;
+            foreach (var edge in elementsList.Elements)
                 yield return edge.NodeEnd.xy;
         }
 
-        public FillCurve<TSegmentInfo> Reversed()
+        public override FillCurve Reversed()
         {
-            var curve = new FillCurve<TSegmentInfo>(ElementsReversed());
+            var curve = new FillCurve<TSegmentInfo>(elementsList.Reversed());
             curve.CopyProperties(this);
             return curve;
         }
@@ -123,22 +147,23 @@ namespace gs
             var enumerator = elements.GetEnumerator();
             enumerator.MoveNext();
 
-            if (!enumerator.Current.NodeStart.EpsilonEqual(base.elements[^1].NodeEnd, stitchTolerance))
+            if (!enumerator.Current.NodeStart.EpsilonEqual(elementsList.Elements[^1].NodeEnd, stitchTolerance))
             {
                 throw new ArgumentException("Can only extend with a FillCurve that starts where this FillCurve ends.");
             }
-            base.elements.Add(enumerator.Current);
+            elementsList.Add(enumerator.Current);
             while (enumerator.MoveNext())
             {
-                base.elements.Add(enumerator.Current);
+                elementsList.Add(enumerator.Current);
             }
+            enumerator.Dispose();
         }
 
-        public List<FillCurve<TSegmentInfo>> SplitAtDistances(double[] splitDistances)
+        public override List<FillCurve> SplitAtDistances(double[] splitDistances)
         {
-            var elementGroups = FillSplitter<TSegmentInfo>.SplitAtDistances(splitDistances, elements);
+            var elementGroups = FillSplitter<TSegmentInfo>.SplitAtDistances(splitDistances, elementsList.Elements);
 
-            var curves = new List<FillCurve<TSegmentInfo>>();
+            var curves = new List<FillCurve>();
             foreach (var elementGroup in elementGroups)
             {
                 var curve = new FillCurve<TSegmentInfo>(elementGroup);
@@ -148,13 +173,13 @@ namespace gs
             return curves;
         }
 
-        public FillCurve<TSegmentInfo> TrimFront(double trimDistance)
+        public override FillCurve TrimFront(double trimDistance)
         {
             ValidateTrimDistance(trimDistance, TotalLength());
             return SplitAtDistances(new double[] {trimDistance})[1];
         }
 
-        public FillCurve<TSegmentInfo> TrimBack(double trimDistance)
+        public override FillCurve TrimBack(double trimDistance)
         {
             double totalLength = TotalLength();
             double trimLocation = totalLength - trimDistance;
@@ -162,7 +187,7 @@ namespace gs
             return SplitAtDistances(new double[] { trimLocation })[0];
         }
 
-        public FillCurve<TSegmentInfo> TrimFrontAndBack(double trimDistanceFront, double? trimDistanceBack = null)
+        public override FillCurve TrimFrontAndBack(double trimDistanceFront, double? trimDistanceBack = null)
         {
             double totalLength = TotalLength();
             double trimLocationBack = totalLength - (trimDistanceBack ?? trimDistanceFront);

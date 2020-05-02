@@ -5,13 +5,27 @@ using System.Linq;
 
 namespace gs
 {
+    public abstract class FillLoop : FillBase
+    {
+        public abstract FillLoop RollToVertex(int index);
+        public abstract FillLoop RollBetweenVertices(ElementLocation location, double tolerance = 0.001);
+        public abstract FillLoop Reversed();
+        public abstract bool IsClockwise();
+        public abstract IEnumerable<Vector2d> Vertices(bool repeatFirst = false);
+
+        public abstract Vector3d GetVertex(int index);
+        public abstract Segment2d GetSegment2d(int index);
+    }
+
     /// <summary>
     /// Additive polygon fill curve
     /// </summary>
-    public class FillLoop<TSegmentInfo> :
-        FillBase<TSegmentInfo>
+    public class FillLoop<TSegmentInfo> : FillLoop
         where TSegmentInfo : IFillSegment, new()
     {
+        private readonly FillElementList<TSegmentInfo> elementsList = new FillElementList<TSegmentInfo>();
+        public IReadOnlyList<FillElement<TSegmentInfo>> Elements => elementsList.Elements;
+
         protected FillLoop()
         {
         }
@@ -30,52 +44,54 @@ namespace gs
             return curve;
         }
 
-        public bool IsClockwise()
+        public override bool IsClockwise()
         {
             // Note: Could cache or otherwise optimize this computation
             var poly = new Polygon2d(Vertices(false));
             return poly.IsClockwise;
         }
 
-        public Vector2d EntryExitPoint => elements[0].NodeStart.xy;
+        public override Vector2d Entry => elementsList.Elements[0].NodeStart.xy;
+        public override Vector2d Exit => Entry;
+        public override int ElementCount => elementsList.Elements.Count;
 
         public FillLoop(IList<Vector2d> vertices)
         {
-            elements.Capacity = vertices.Count;
             for (int i = 1; i < vertices.Count; i++)
             {
-                elements.Add(new FillElement<TSegmentInfo>(vertices[i - 1], vertices[i], new TSegmentInfo()));
+                elementsList.Add(new FillElement<TSegmentInfo>(vertices[i - 1], vertices[i], new TSegmentInfo()));
             }
-            elements.Add(new FillElement<TSegmentInfo>(vertices[^1], vertices[0], new TSegmentInfo()));
+            elementsList.Add(new FillElement<TSegmentInfo>(vertices[^1], vertices[0], new TSegmentInfo()));
         }
 
         public FillLoop(IEnumerable<FillElement<TSegmentInfo>> elements)
         {
-            this.elements = elements.ToList();
+            foreach (var e in elements)
+                elementsList.Add(e);
         }
 
-        public FillLoop<TSegmentInfo> RollToVertex(int startIndex)
+        public override FillLoop RollToVertex(int startIndex)
         {
             // TODO: Add range checking for startIndex
             var rolledLoop = new FillLoop<TSegmentInfo>();
             rolledLoop.CopyProperties(this);
 
-            for (int i = 0; i < elements.Count; i++)
+            for (int i = 0; i < elementsList.Elements.Count; i++)
             {
-                rolledLoop.elements.Add(elements[(i + startIndex) % elements.Count]);
+                rolledLoop.elementsList.Add(elementsList.Elements[(i + startIndex) % elementsList.Elements.Count]);
             }
 
             return rolledLoop;
         }
 
-        public FillLoop<TSegmentInfo> RollBetweenVertices(ElementLocation location, double tolerance = 0.001)
+        public override FillLoop RollBetweenVertices(ElementLocation location, double tolerance = 0.001)
         {
-            if (!ElementShouldSplit(location.ParameterizedDistance, tolerance, elements[location.Index].GetSegment2d().Length))
+            if (!ElementShouldSplit(location.ParameterizedDistance, tolerance, elementsList.Elements[location.Index].GetSegment2d().Length))
             {
                 return RollToVertex(IdentifyClosestVertex(location.Index, location.ParameterizedDistance));
             }
 
-            var elementToSplit = elements[location.Index];
+            var elementToSplit = elementsList.Elements[location.Index];
 
             var interpolatedVertex = Vector3d.Lerp(elementToSplit.NodeStart, elementToSplit.NodeEnd, location.ParameterizedDistance);
 
@@ -91,7 +107,7 @@ namespace gs
         private List<FillElement<TSegmentInfo>> CreateRolledElements(int elementIndex, Vector3d interpolatedVertex, FillElement<TSegmentInfo> elementToSplit,
             Tuple<IFillSegment, IFillSegment> splitSegmentData)
         {
-            var rolledElements = new List<FillElement<TSegmentInfo>>(elements.Count + 1);
+            var rolledElements = new List<FillElement<TSegmentInfo>>(elementsList.Elements.Count + 1);
 
             // Add the second half of the split element
             rolledElements.Add(new FillElement<TSegmentInfo>(
@@ -100,12 +116,12 @@ namespace gs
                 (TSegmentInfo) splitSegmentData.Item2));
 
             // Add all elements after the split element
-            for (int i = elementIndex + 1; i < elements.Count; ++i)
-                rolledElements.Add(elements[i]);
+            for (int i = elementIndex + 1; i < elementsList.Elements.Count; ++i)
+                rolledElements.Add(elementsList.Elements[i]);
 
             // Add all elements before the split element
             for (int i = 0; i < elementIndex; ++i)
-                rolledElements.Add(elements[i]);
+                rolledElements.Add(elementsList.Elements[i]);
 
             // Add the first half of the split element
             rolledElements.Add(new FillElement<TSegmentInfo>(
@@ -127,7 +143,7 @@ namespace gs
             if (elementParameterizedDistance > 0.5)
             {
                 ++elementIndex;
-                if (elementIndex >= elements.Count)
+                if (elementIndex >= elementsList.Elements.Count)
                 {
                     elementIndex = 0;
                 }
@@ -144,7 +160,7 @@ namespace gs
 
         public List<FillCurve<TSegmentInfo>> SplitAtDistances(double[] splitDistances, bool joinFirstAndLast = false)
         {
-            var elementGroups = FillSplitter<TSegmentInfo>.SplitAtDistances(splitDistances, elements);
+            var elementGroups = FillSplitter<TSegmentInfo>.SplitAtDistances(splitDistances, elementsList.Elements);
 
             if (joinFirstAndLast)
             {
@@ -165,25 +181,45 @@ namespace gs
 
         public FillCurve<TSegmentInfo> ConvertToCurve()
         {
-            var curve = new FillCurve<TSegmentInfo>(elements);
+            var curve = new FillCurve<TSegmentInfo>(elementsList.Elements);
             curve.CopyProperties(this);
             return curve;
         }
 
-        public FillLoop<TSegmentInfo> Reversed()
+        public override FillLoop Reversed()
         {
-            var loop = new FillLoop<TSegmentInfo>(ElementsReversed());
+            var loop = new FillLoop<TSegmentInfo>(elementsList.Reversed());
             loop.CopyProperties(this);
             return loop;
         }
 
-        public virtual IEnumerable<Vector2d> Vertices(bool repeatFirst = false)
+        public override IEnumerable<Vector2d> Vertices(bool repeatFirst)
         {
-            foreach (var edge in elements)
+            foreach (var edge in elementsList.Elements)
                 yield return edge.NodeStart.xy;
 
             if (repeatFirst)
-                yield return elements[0].NodeStart.xy;
+                yield return elementsList.Elements[0].NodeStart.xy;
+        }
+
+        public override Vector3d GetVertex(int index)
+        {
+            return elementsList.GetVertex(index);
+        }
+
+        public override Segment2d GetSegment2d(int index)
+        {
+            return elementsList.GetSegment2d(index);
+        }
+
+        public override double TotalLength()
+        {
+            return elementsList.TotalLength();
+        }
+
+        public override double FindClosestElementToPoint(Vector2d point, out ElementLocation location)
+        {
+            return elementsList.FindClosestElementToPoint(point, out location);
         }
     }
 }

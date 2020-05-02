@@ -367,9 +367,9 @@ namespace gs
             return paths;
         }
 
-        public List<FillBase<FillSegment>> thin_offset(GeneralPolygon2d p)
+        public List<FillBase> thin_offset(GeneralPolygon2d p)
         {
-            List<FillBase<FillSegment>> result = new List<FillBase<FillSegment>>();
+            var result = new List<FillBase>();
 
             // to support non-hole thin offsets we need to return polylines
             if (p.Holes.Count == 0)
@@ -385,7 +385,7 @@ namespace gs
             double clip_dist = ToolWidth * ToolWidthClipMultiplier;
             foreach (GeneralPolygon2d offset_poly in offsets)
             {
-                List<FillBase<FillSegment>> clipped = clip_to_band(offset_poly.Outer, p, clip_dist);
+                var clipped = clip_to_band(offset_poly.Outer, p, clip_dist);
                 result.AddRange(clipped);
             }
 
@@ -411,7 +411,7 @@ namespace gs
         // vertices are discarded if outside clipPoly, or within clip_dist
         // remaining polylines are returned
         // In all-pass case currently returns polyline w/ explicit first==last vertices
-        public List<FillBase<FillSegment>> clip_to_band(Polygon2d insetpoly, GeneralPolygon2d clipPoly, double clip_dist)
+        public List<FillBase> clip_to_band(Polygon2d insetpoly, GeneralPolygon2d clipPoly, double clip_dist)
         {
             double clipSqr = clip_dist * clip_dist;
 
@@ -442,18 +442,18 @@ namespace gs
                 midline[i] = po;
             }
             if (nClipped == N)
-                return new List<FillBase<FillSegment>>();
+                return new List<FillBase>();
             if (nClipped == 0)
             {
                 var all = new FillCurve<FillSegment>(midline);
-                return new List<FillBase<FillSegment>>() { all.CloseCurve() };
+                return new List<FillBase>() { all.CloseCurve() };
             }
 
             return find_polygon_spans(midline, clipped);
         }
 
         // extract set of spans from poly where clipped=false
-        private List<FillBase<FillSegment>> find_polygon_spans(Vector2d[] poly, bool[] clipped)
+        private List<FillBase> find_polygon_spans(Vector2d[] poly, bool[] clipped)
         {
             // assumption: at least one vtx is clipped
             int iStart = 0;
@@ -469,7 +469,7 @@ namespace gs
                     iStart++;
             }
 
-            var result = new List<FillBase<FillSegment>>();
+            var result = new List<FillBase>();
             int iCur = iStart;
             bool done = false;
 
