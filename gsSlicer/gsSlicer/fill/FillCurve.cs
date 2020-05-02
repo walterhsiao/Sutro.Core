@@ -4,15 +4,21 @@ using System.Collections.Generic;
 
 namespace gs
 {
+    public interface IFillCurve : IFill
+    {
+        Vector2d Entry { get; }
+        Vector2d Exit { get; }
+    }
+
     /// <summary>
     /// Additive polyline fill curve
     /// </summary>
     public class FillCurve<TSegmentInfo> :
-        FillBase<TSegmentInfo>
+        FillBase<TSegmentInfo>, IFillCurve
         where TSegmentInfo : IFillSegment, new()
     {
-        public Vector2d Entry { get => elements[0].NodeStart.xy; }
-        public Vector2d Exit { get => elements[^1].NodeEnd.xy; }
+        public Vector2d Entry => elements[0].NodeStart.xy;
+        public Vector2d Exit => elements[^1].NodeEnd.xy;
 
         public FillCurve<TSegmentInfo> CloneBare()
         {
@@ -134,7 +140,7 @@ namespace gs
             }
         }
 
-        public List<FillCurve<TSegmentInfo>> SplitAtDistances(double[] splitDistances)
+        public List<FillCurve<TSegmentInfo>> SplitAtDistances(IEnumerable<double> splitDistances)
         {
             var elementGroups = FillSplitter<TSegmentInfo>.SplitAtDistances(splitDistances, elements);
 

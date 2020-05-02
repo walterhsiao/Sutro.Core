@@ -5,11 +5,16 @@ using System.Linq;
 
 namespace gs
 {
+    public interface IFillLoop : IFill
+    {
+        bool IsClockwise();
+    }
+
     /// <summary>
     /// Additive polygon fill curve
     /// </summary>
     public class FillLoop<TSegmentInfo> :
-        FillBase<TSegmentInfo>
+        FillBase<TSegmentInfo>, IFillLoop
         where TSegmentInfo : IFillSegment, new()
     {
         protected FillLoop()

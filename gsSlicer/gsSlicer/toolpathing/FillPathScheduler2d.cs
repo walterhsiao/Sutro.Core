@@ -40,13 +40,7 @@ namespace gs
             Settings = settings;
         }
 
-        private SchedulerSpeedHint speed_hint = SchedulerSpeedHint.Default;
-
-        public virtual SchedulerSpeedHint SpeedHint
-        {
-            get { return speed_hint; }
-            set { speed_hint = value; }
-        }
+        public virtual SchedulerSpeedHint SpeedHint { get; set; } = SchedulerSpeedHint.Default;
 
         public Vector2d CurrentPosition => Builder.Position.xy;
 
@@ -56,10 +50,18 @@ namespace gs
             foreach (var curveSet in fillSets)
             {
                 foreach (var curve in curveSet.Curves)
-                    AppendFillCurve(curve);
+                {
+                    if (!(curve is FillCurve<FillSegment> fillCurve))
+                        throw new ArgumentException($"FillPathScheduler doesn't support type {curve}");
+                    AppendFillCurve(fillCurve);
+                }
 
                 foreach (var loop in curveSet.Loops)
-                    AppendFillLoop (loop);
+                {
+                    if (!(loop is FillLoop<FillSegment> fillLoop))
+                        throw new ArgumentException($"FillPathScheduler doesn't support type {loop}");
+                    AppendFillLoop(fillLoop);
+                }
             }
         }
 
@@ -122,7 +124,7 @@ namespace gs
             return startIndex;
         }
 
-        protected void AppendTravel(Vector2d startPt, Vector2d endPt)
+        protected virtual void AppendTravel(Vector2d startPt, Vector2d endPt)
         {
             double travelDistance = startPt.Distance(endPt);
 
@@ -150,18 +152,17 @@ namespace gs
         public virtual void AppendFillCurve<TSegment>(FillCurve<TSegment> curve)
             where TSegment : IFillSegment, new()
         {
-            Vector3d currentPos = Builder.Position;
-            Vector2d currentPos2 = currentPos.xy;
-
             AssertValidCurve(curve);
 
-            if (curve.Entry.DistanceSquared(currentPos2) > curve.Exit.DistanceSquared(currentPos2))
-            {
-                curve = curve.Reversed();
-            }
+            var oriented = SelectCurveDirection(curve);
+            
+            AppendTravel(Builder.Position.xy, oriented.Entry);
+            
+            BuildCurve(oriented);
+        }
 
-            AppendTravel(currentPos2, curve.Entry);
-
+        protected virtual void BuildCurve<TSegment>(FillCurve<TSegment> curve) where TSegment : IFillSegment, new()
+        {
             var vertices = curve.Vertices().ToList();
 
             var flags = new List<TPVertexFlags>(curve.Elements.Count + 1);
@@ -181,12 +182,24 @@ namespace gs
                 flags.Add(flag);
             }
 
-            double useSpeed = SelectSpeed(curve);
-
             Vector2d dimensions = GCodeUtil.UnspecifiedDimensions;
             if (curve.FillThickness > 0)
                 dimensions.x = curve.FillThickness;
+
+            double useSpeed = SelectSpeed(curve);
+
             Builder.AppendExtrude(vertices, useSpeed, dimensions, curve.FillType, curve.IsHoleShell, flags);
+        }
+
+        protected virtual FillCurve<TSegment> SelectCurveDirection<TSegment>(FillCurve<TSegment> curve) 
+            where TSegment : IFillSegment, new()
+        {
+            if (curve.Entry.DistanceSquared(Builder.Position.xy) > curve.Exit.DistanceSquared(Builder.Position.xy))
+            {
+                return curve.Reversed();
+            }
+
+            return curve;
         }
 
         // 1) If we have "careful" speed hint set, use CarefulExtrudeSpeed

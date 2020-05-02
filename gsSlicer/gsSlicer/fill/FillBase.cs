@@ -5,7 +5,18 @@ using System.Collections.Generic;
 
 namespace gs
 {
-    public abstract class FillBase<TSegmentInfo>
+    public interface IFill
+    {
+        // General Properties
+        IFillType FillType { get; set; }
+        double FillThickness { get; set; }
+        bool IsHoleShell { get; set; }
+        int PerimOrder { get; set; }
+
+        double TotalLength();
+    }
+
+    public abstract class FillBase<TSegmentInfo> : IFill
         where TSegmentInfo : IFillSegment, new()
     {
         // General Properties

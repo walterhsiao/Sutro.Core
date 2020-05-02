@@ -13,11 +13,9 @@ namespace gs
     /// </summary>
 	public class FillCurveSet2d
     {
-        public List<FillLoop<FillSegment>> Loops = 
-            new List<FillLoop<FillSegment>>();
+        public List<IFillLoop> Loops = new List<IFillLoop>();
         
-        public List<FillCurve<FillSegment>> Curves = 
-            new List<FillCurve<FillSegment>>();
+        public List<IFillCurve> Curves = new List<IFillCurve>();
 
         public void Append(GeneralPolygon2d poly, IFillType fillType)
         {
@@ -43,7 +41,7 @@ namespace gs
                 Append(p, fillType);
         }
 
-        public IEnumerable<FillBase<FillSegment>> EnumerateAll()
+        public IEnumerable<IFill> EnumerateAll()
         {
             foreach (var loop in Loops)
                 yield return loop;
@@ -52,36 +50,45 @@ namespace gs
                 yield return curve;
         }
 
-        public void Append(FillLoop<FillSegment> loop)
+        //public void Append(IFill fill)
+        //{
+        //    if (!(fill is FillBase<FillSegment> f))
+        //        throw new ArgumentException($"Can't append type {fill.GetType()}.");
+        //    Append(f);
+        //}
+
+        public void Append(IFillLoop loop)
         {
             Loops.Add(loop);
         }
 
-        public void Append(FillBase<FillSegment> element)
+        public void Append(IFill element)
         {
             switch (element)
             {
-                case FillLoop<FillSegment> loop:
+                case IFillLoop loop:
                     Append(loop);
                     break;
-                case FillCurve<FillSegment> curve:
+                case IFillCurve curve:
                     Append(curve);
                     break;
+                default:
+                    throw new ArgumentException($"Can't append type {element.GetType()}.");
             }
         }
 
-        public void Append(List<FillLoop<FillSegment>> loops)
+        public void Append(List<IFillLoop> loops)
         {
             foreach (var l in loops)
                 Loops.Add(l);
         }
 
-        public void Append(FillCurve<FillSegment> curve)
+        public void Append(IFillCurve curve)
         {
             Curves.Add(curve);
         }
 
-        public void Append(List<FillCurve<FillSegment>> curves)
+        public void Append(List<IFillCurve> curves)
         {
             foreach (var p in curves)
                 Append(p);
