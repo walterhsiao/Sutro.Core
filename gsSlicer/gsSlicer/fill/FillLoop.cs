@@ -12,9 +12,7 @@ namespace gs
         public abstract FillLoop Reversed();
         public abstract bool IsClockwise();
         public abstract IEnumerable<Vector2d> Vertices(bool repeatFirst = false);
-
-        public abstract Vector3d GetVertex(int index);
-        public abstract Segment2d GetSegment2d(int index);
+        public abstract List<FillCurve> SplitAtDistances(IEnumerable<double> splitDistances, bool joinEnds);
     }
 
     /// <summary>
@@ -200,6 +198,28 @@ namespace gs
 
             if (repeatFirst)
                 yield return elementsList.Elements[0].NodeStart.xy;
+        }
+
+        public override List<FillCurve> SplitAtDistances(IEnumerable<double> splitDistances, bool joinEnds)
+        {
+            var elementGroups = FillSplitter<TSegmentInfo>.SplitAtDistances(splitDistances, elementsList.Elements);
+
+            var curves = new List<FillCurve>();
+            foreach (var elementGroup in elementGroups)
+            {
+                var curve = new FillCurve<TSegmentInfo>(elementGroup);
+                curve.CopyProperties(this);
+                curves.Add(curve);
+            }
+
+            if (joinEnds)
+            {
+                var firstCurve = curves[0];
+                curves.RemoveAt(0);
+                curves[^1].Extend(firstCurve);
+            }
+
+            return curves;
         }
 
         public override Vector3d GetVertex(int index)

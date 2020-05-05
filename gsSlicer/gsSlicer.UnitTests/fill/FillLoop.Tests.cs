@@ -357,7 +357,7 @@ namespace gs.UnitTests.Fill
             var settings = new SingleMaterialFFFSettings();
             var loop = FillFactory.CreateTriangleCCW();
             loop.FillType = new OuterPerimeterFillType(settings);
-            loop.PerimOrder = 100;
+            loop.PerimeterOrder = 100;
             loop.IsHoleShell = true;
             loop.FillThickness = 3;
 
@@ -365,7 +365,7 @@ namespace gs.UnitTests.Fill
             var clone = loop.CloneBare();
 
             // Assert
-            Assert.AreEqual(100, clone.PerimOrder);
+            Assert.AreEqual(100, clone.PerimeterOrder);
             Assert.AreEqual(3, clone.FillThickness);
             Assert.IsTrue(clone.IsHoleShell);
             Assert.IsInstanceOfType(clone.FillType, typeof(OuterPerimeterFillType));
@@ -378,7 +378,7 @@ namespace gs.UnitTests.Fill
             var settings = new SingleMaterialFFFSettings();
             var loop = FillFactory.CreateTriangleCCW();
             loop.FillType = new OuterPerimeterFillType(settings);
-            loop.PerimOrder = 100;
+            loop.PerimeterOrder = 100;
             loop.IsHoleShell = true;
             loop.FillThickness = 3;
 
@@ -386,7 +386,7 @@ namespace gs.UnitTests.Fill
             var clone = loop.CloneBareAsCurve();
 
             // Assert
-            Assert.AreEqual(100, clone.PerimOrder);
+            Assert.AreEqual(100, clone.PerimeterOrder);
             Assert.AreEqual(3, clone.FillThickness);
             Assert.IsTrue(clone.IsHoleShell);
             Assert.IsInstanceOfType(clone.FillType, typeof(OuterPerimeterFillType));

@@ -6,12 +6,14 @@ namespace gs
 {
     public abstract class FillCurve : FillBase
     {
-        public abstract List<FillCurve> SplitAtDistances(double[] splitDistances);
+        public abstract List<FillCurve> SplitAtDistances(IEnumerable<double> splitDistances);
         public abstract FillCurve Reversed();
         public abstract FillCurve TrimFront(double trimDistance);
         public abstract FillCurve TrimBack(double trimDistance);
         public abstract FillCurve TrimFrontAndBack(double trimDistanceFront, double? trimDistanceBack = null);
         public abstract IEnumerable<Vector2d> Vertices();
+        public abstract void Extend(FillCurve other, double vertexComparisonTolerance = 1e-6);
+
     }
 
     /// <summary>
@@ -142,12 +144,19 @@ namespace gs
             return curve;
         }
 
-        public void Extend(IEnumerable<FillElement<TSegmentInfo>> elements, double stitchTolerance = 1e-6)
+        public override void Extend(FillCurve other, double vertexComparisonTolerance)
+        {
+            if (!(other is FillCurve<TSegmentInfo> o))
+                throw new ArgumentException($"Cannot merge FillCurves with different segment types: {this.GetType()} and {other.GetType()}");
+            Extend(o.Elements);
+        }
+
+        public void Extend(IEnumerable<FillElement<TSegmentInfo>> elements, double vertexComparisonTolerance = 1e-6)
         {
             var enumerator = elements.GetEnumerator();
             enumerator.MoveNext();
 
-            if (!enumerator.Current.NodeStart.EpsilonEqual(elementsList.Elements[^1].NodeEnd, stitchTolerance))
+            if (!enumerator.Current.NodeStart.EpsilonEqual(elementsList.Elements[^1].NodeEnd, vertexComparisonTolerance))
             {
                 throw new ArgumentException("Can only extend with a FillCurve that starts where this FillCurve ends.");
             }
@@ -159,7 +168,7 @@ namespace gs
             enumerator.Dispose();
         }
 
-        public override List<FillCurve> SplitAtDistances(double[] splitDistances)
+        public override List<FillCurve> SplitAtDistances(IEnumerable<double> splitDistances)
         {
             var elementGroups = FillSplitter<TSegmentInfo>.SplitAtDistances(splitDistances, elementsList.Elements);
 
@@ -208,6 +217,16 @@ namespace gs
 
             if (trimLocation <= 0)
                 throw new ArgumentException("Trim location must be greater than 0.");
+        }
+
+        public override Vector3d GetVertex(int index)
+        {
+            return elementsList.GetVertex(index);
+        }
+
+        public override Segment2d GetSegment2d(int index)
+        {
+            return elementsList.GetSegment2d(index);
         }
     }
 }

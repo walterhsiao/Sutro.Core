@@ -109,7 +109,7 @@ namespace gs.UnitTests.Fill
             var curve = new FillCurve<FillSegment>()
             {
                 FillType = new OuterPerimeterFillType(settings),
-                PerimOrder = 100,
+                PerimeterOrder = 100,
                 IsHoleShell = true,
                 FillThickness = 3
             };
@@ -118,7 +118,7 @@ namespace gs.UnitTests.Fill
             var clone = curve.CloneBare();
 
             // Assert
-            Assert.AreEqual(100, clone.PerimOrder);
+            Assert.AreEqual(100, clone.PerimeterOrder);
             Assert.AreEqual(3, clone.FillThickness);
             Assert.IsTrue(clone.IsHoleShell);
             Assert.IsInstanceOfType(clone.FillType, typeof(OuterPerimeterFillType));

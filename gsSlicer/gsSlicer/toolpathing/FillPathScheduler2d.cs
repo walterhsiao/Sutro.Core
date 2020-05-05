@@ -40,13 +40,7 @@ namespace gs
             Settings = settings;
         }
 
-        private SchedulerSpeedHint speed_hint = SchedulerSpeedHint.Default;
-
-        public virtual SchedulerSpeedHint SpeedHint
-        {
-            get { return speed_hint; }
-            set { speed_hint = value; }
-        }
+        public virtual SchedulerSpeedHint SpeedHint { get; set; } = SchedulerSpeedHint.Default;
 
         public Vector2d CurrentPosition => Builder.Position.xy;
 
@@ -127,7 +121,7 @@ namespace gs
             return startIndex;
         }
 
-        protected void AppendTravel(Vector2d startPt, Vector2d endPt)
+        protected virtual void AppendTravel(Vector2d startPt, Vector2d endPt)
         {
             double travelDistance = startPt.Distance(endPt);
 
