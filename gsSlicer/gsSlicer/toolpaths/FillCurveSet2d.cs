@@ -61,10 +61,10 @@ namespace gs
         {
             switch (element)
             {
-                case FillLoop<FillSegment> loop:
+                case FillLoop loop:
                     Append(loop);
                     break;
-                case FillCurve<FillSegment> curve:
+                case FillCurve curve:
                     Append(curve);
                     break;
                 default:

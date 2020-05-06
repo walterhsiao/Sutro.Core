@@ -153,17 +153,11 @@ namespace gs
                             curPos = newPos;
                             curRate = newRate;
 
-                            double segment_height, segment_width;
-                            if (GCodeUtil.UnspecifiedDimensions != path[i].Dimensions)
-                            {
-                                segment_height = path[i].Dimensions[0];
-                                segment_width = path[i].Dimensions[1];
-                            }
-                            else
-                            {
-                                segment_height = path_height;
-                                segment_width = path_width;
-                            }
+                            double segment_width = (path[i].Dimensions.x != GCodeUtil.UnspecifiedValue) ?
+                                path[i].Dimensions.x : path_width;
+
+                            double segment_height = (path[i].Dimensions.y != GCodeUtil.UnspecifiedValue) ?
+                                path[i].Dimensions.y : path_height;
 
                             double feed = ExtrusionMath.PathLengthToFilamentLength(
                                 segment_height, segment_width, Settings.Machine.FilamentDiamMM,

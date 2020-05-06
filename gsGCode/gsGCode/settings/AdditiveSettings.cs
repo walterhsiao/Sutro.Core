@@ -316,6 +316,8 @@ namespace gs
 
         public bool RepairMesh = true;                  // run a mesh auto-repair after it's been loaded
 
+        public bool GCodeAppendBeadDimensions { get; set; } = true; 
+
         /*
          * functions that calculate derived values
          * NOTE: these cannot be properties because then they will be json-serialized!

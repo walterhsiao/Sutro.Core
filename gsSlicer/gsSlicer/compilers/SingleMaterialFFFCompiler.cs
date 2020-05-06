@@ -218,13 +218,16 @@ namespace gs
             Builder.AddBlankLine();
         }
 
-        private void AppendDimensions(Vector2d dimensions)
+        protected virtual void AppendDimensions(Vector2d dimensions)
         {
-            if (dimensions.x == GCodeUtil.UnspecifiedDimensions.x)
-                dimensions.x = Settings.Machine.NozzleDiamMM;
-            if (dimensions.y == GCodeUtil.UnspecifiedDimensions.y)
-                dimensions.y = Settings.LayerHeightMM;
-            Assembler.AppendComment(" tool H" + dimensions.y + " W" + dimensions.x);
+            if (Settings.GCodeAppendBeadDimensions)
+            {
+                if (dimensions.x == GCodeUtil.UnspecifiedDimensions.x)
+                    dimensions.x = Settings.Machine.NozzleDiamMM;
+                if (dimensions.y == GCodeUtil.UnspecifiedDimensions.y)
+                    dimensions.y = Settings.LayerHeightMM;
+                Assembler.AppendComment(" tool H" + dimensions.y + " W" + dimensions.x);
+            }
         }
 
         public virtual void AppendComment(string comment)
