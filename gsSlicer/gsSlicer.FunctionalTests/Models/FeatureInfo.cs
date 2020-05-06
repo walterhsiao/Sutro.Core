@@ -1,5 +1,4 @@
 ﻿using g3;
-using gs;
 
 namespace gsCore.FunctionalTests.Models
 {

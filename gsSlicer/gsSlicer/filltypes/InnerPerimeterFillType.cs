@@ -15,11 +15,15 @@
         {
             speedModifier = settings.InnerPerimeterSpeedX;
         }
+
         public override double ModifySpeed(double speed, SchedulerSpeedHint speedHint)
         {
             return speedModifier * speed;
         }
 
-        public bool IsPartShell() { return true; }
+        public override bool IsPartShell()
+        {
+            return true;
+        }
     }
 }

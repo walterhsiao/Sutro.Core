@@ -18,5 +18,10 @@
         {
             return false;
         }
+
+        public virtual bool IsPartShell()
+        {
+            return false;
+        }
     }
 }

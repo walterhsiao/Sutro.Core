@@ -26,6 +26,9 @@
             return true;
         }
 
-        public bool IsPartShell() { return true; }
+        public override bool IsPartShell()
+        {
+            return true;
+        }
     }
 }

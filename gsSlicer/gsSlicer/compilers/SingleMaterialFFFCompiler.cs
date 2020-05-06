@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using gs.utility;
 using System;
 using System.Collections.Generic;
@@ -101,6 +102,9 @@ namespace gs
                 Assembler.EndTravel();
                 Assembler.EnableFan();
             }
+
+            AddFeatureTypeLabel(path.FillType);
+            AppendDimensions(path.Start.Dimensions);
         }
 
         public virtual void HandleTravelAndPlaneChangePath(LinearToolpath path, int pathIndex, SingleMaterialFFFSettings useSettings)
@@ -139,7 +143,7 @@ namespace gs
             calc.Calculate(Assembler.NozzlePosition, Assembler.ExtruderA, Assembler.InRetract);
 
             int path_index = 0;
-            foreach (var gpath in paths)
+            foreach (var gpath in toolpathSet)
             {
                 path_index++;
 
@@ -168,11 +172,6 @@ namespace gs
                             // we are already at this pos
 
                 var currentDimensions = p[1].Dimensions;
-                if (p.Type == ToolpathTypes.Deposition)
-                {
-                    AddFeatureTypeLabel(p.FillType.GetLabel());
-                    AppendDimensions(currentDimensions);
-                }
 
                 for (; i < p.VertexCount; ++i)
                 {
@@ -203,7 +202,12 @@ namespace gs
             Assembler.FlushQueues();
         }
 
-        private void AddFeatureTypeLabel(string featureLabel)
+        protected virtual void AddFeatureTypeLabel(IFillType fillType)
+        {
+            AddFeatureTypeLabel(fillType.GetLabel());
+        }
+
+        protected virtual void AddFeatureTypeLabel(string featureLabel)
         {
             Builder.AddExplicitLine("");
             Builder.AddCommentLine(" feature " + featureLabel);

@@ -1871,12 +1871,14 @@ namespace gs
         protected virtual IFillPathScheduler2d get_layer_scheduler(PrintLayerData layer_data)
         {
             SequentialScheduler2d scheduler = new SequentialScheduler2d(layer_data.PathAccum, layer_data.Settings);
-
-            // be careful on first layer
-            scheduler.SpeedHint = (layer_data.layer_i == CurStartLayer) ?
-                SchedulerSpeedHint.Careful : SchedulerSpeedHint.Rapid;
-
+            scheduler.SpeedHint = GetSchedulerSpeedHint(layer_data);
             return scheduler;
+        }
+
+        protected virtual SchedulerSpeedHint GetSchedulerSpeedHint(PrintLayerData layer_data)
+        {
+            return (layer_data.layer_i == CurStartLayer) ?
+                            SchedulerSpeedHint.Careful : SchedulerSpeedHint.Rapid;
         }
 
         protected virtual void count_progress_step()

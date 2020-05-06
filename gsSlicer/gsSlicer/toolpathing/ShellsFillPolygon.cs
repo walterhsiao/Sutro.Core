@@ -3,6 +3,7 @@ using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace gs
 {
@@ -350,7 +351,18 @@ namespace gs
                 foreach (var polygon in solids.Polygons)
                 {
                     polygon.EnforceCounterClockwise();
-                    paths.Append(polygon, currentFillType);
+                    paths.Append(new FillLoop<FillSegment>(polygon.Outer.Vertices) { 
+                        FillType = currentFillType, 
+                        PerimeterOrder = nShell });
+                    foreach (var hole in polygon.Holes)
+                    {
+                        paths.Append(new FillLoop<FillSegment>(hole.Vertices)
+                        {
+                            FillType = currentFillType,
+                            PerimeterOrder = nShell,
+                            IsHoleShell = true,
+                        });
+                    }
                 }
 
                 #endregion Borrow nesting calculations from PlanarSlice to enforce winding direction

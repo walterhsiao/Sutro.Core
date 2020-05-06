@@ -12,6 +12,6 @@
 
         bool IsPart() { return true; }
 
-        bool IsPartShell() { return false; }
+        bool IsPartShell();
     }
 }
