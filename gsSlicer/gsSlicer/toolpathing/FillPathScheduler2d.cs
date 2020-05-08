@@ -73,8 +73,8 @@ namespace gs
 
         protected virtual FillLoop SelectLoopEntry(FillLoop loop, Vector2d currentPosition)
         {
-            int startIndex = FindLoopEntryPoint(loop, currentPosition);
-            return loop.RollToVertex(startIndex);
+            var location = FindLoopEntryPoint(loop, currentPosition);
+            return loop.RollBetweenVertices(location);
         }
 
         protected virtual void BuildLoop(FillLoop loop, double useSpeed)
@@ -84,7 +84,7 @@ namespace gs
             BuildLoopConcrete(o, useSpeed);
         }
 
-        protected void BuildLoopConcrete<TSegment>(FillLoop<TSegment> rolled, double useSpeed) where TSegment : IFillSegment, new()
+        protected virtual void BuildLoopConcrete<TSegment>(FillLoop<TSegment> rolled, double useSpeed) where TSegment : IFillSegment, new()
         {
             Builder.AppendExtrude(rolled.Vertices(true).ToList(), useSpeed, rolled.FillType, null);
         }
@@ -96,7 +96,7 @@ namespace gs
             return loop;
         }
 
-        protected int FindLoopEntryPoint(FillLoop poly, Vector2d currentPos2)
+        protected virtual ElementLocation FindLoopEntryPoint(FillLoop poly, Vector2d currentPos2)
         {
             int startIndex;
             if (Settings.ZipperAlignedToPoint && poly.FillType.IsEntryLocationSpecified())
@@ -118,7 +118,7 @@ namespace gs
                 startIndex = CurveUtils2.FindNearestVertex(currentPos2, poly.Vertices(true));
             }
 
-            return startIndex;
+            return new ElementLocation(startIndex, 0);
         }
 
         protected virtual void AppendTravel(Vector2d startPt, Vector2d endPt)
@@ -153,14 +153,21 @@ namespace gs
 
             AssertValidCurve(curve);
 
+            var oriented = OrientCurve(curve, currentPos2);
+
+            AppendTravel(currentPos2, oriented.Entry);
+
+            BuildCurve(oriented, SelectSpeed(oriented));
+        }
+
+        protected static FillCurve OrientCurve(FillCurve curve, Vector2d currentPos2)
+        {
             if (curve.Entry.DistanceSquared(currentPos2) > curve.Exit.DistanceSquared(currentPos2))
             {
-                curve = curve.Reversed();
+                return curve.Reversed();
             }
 
-            AppendTravel(currentPos2, curve.Entry);
-
-            BuildCurve(curve, SelectSpeed(curve));
+            return curve;
         }
 
         protected virtual void BuildCurve(FillCurve curve, double useSpeed)

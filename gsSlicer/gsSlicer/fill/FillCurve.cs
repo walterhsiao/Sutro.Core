@@ -12,8 +12,8 @@ namespace gs
         public abstract FillCurve TrimBack(double trimDistance);
         public abstract FillCurve TrimFrontAndBack(double trimDistanceFront, double? trimDistanceBack = null);
         public abstract IEnumerable<Vector2d> Vertices();
+        public abstract IEnumerable<Vector3d> Vertices3d();
         public abstract void Extend(FillCurve other, double vertexComparisonTolerance = 1e-6);
-
     }
 
     /// <summary>
@@ -135,6 +135,13 @@ namespace gs
             yield return elementsList.Elements[0].NodeStart.xy;
             foreach (var edge in elementsList.Elements)
                 yield return edge.NodeEnd.xy;
+        }
+
+        public override IEnumerable<Vector3d> Vertices3d()
+        {
+            yield return elementsList.Elements[0].NodeStart;
+            foreach (var edge in elementsList.Elements)
+                yield return edge.NodeEnd;
         }
 
         public override FillCurve Reversed()

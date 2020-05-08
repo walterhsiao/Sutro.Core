@@ -39,7 +39,7 @@ namespace gs
                     {
                         prop_other = other.GetType().GetProperty(prop_this.Name);
                     }
-                    catch (AmbiguousMatchException _)
+                    catch (AmbiguousMatchException)
                     {
                         prop_other = other.GetType().GetProperty(prop_this.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
                     }
@@ -73,7 +73,7 @@ namespace gs
                 {
                     field_other = other.GetType().GetField(field_this.Name);
                 }
-                catch (AmbiguousMatchException e)
+                catch (AmbiguousMatchException)
                 {
                     field_other = other.GetType().GetField(field_this.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
                 }
