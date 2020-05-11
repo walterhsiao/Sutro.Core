@@ -1,5 +1,4 @@
-﻿using Sutro.PathWorks.Plugins.API;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 
@@ -53,6 +52,7 @@ namespace gs
             }
             else if (line.type == GCodeLine.LType.Blank)
             {
+                outStream.WriteLine();
                 return;
             }
 

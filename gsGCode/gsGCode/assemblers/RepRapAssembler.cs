@@ -21,6 +21,8 @@ namespace gs
             OmitDuplicateE = true;
 
             HomeSequenceF = StandardHomeSequence;
+
+            UseFirmwareRetraction = settings.UseFirmwareRetraction;
         }
 
         //public override void BeginRetract(Vector3d pos, double feedRate, double extrudeDist, string comment = null) {
@@ -105,6 +107,12 @@ namespace gs
             Builder.BeginGLine(21, "units=mm");
             Builder.BeginGLine(90, "absolute positions");
             Builder.BeginMLine(82, "absolute extruder position");
+
+            // Setup Firmware Retraction
+            if (Settings.UseFirmwareRetraction)
+            {
+                Builder.BeginMLine(207, "configure firmware retraction").AppendF("S", Settings.RetractDistanceMM).AppendF("F", Settings.RetractSpeed).AppendF("Z", Settings.TravelLiftHeight);
+            }
 
             HeaderCustomizerF(HeaderState.BeforeHome, Builder);
 

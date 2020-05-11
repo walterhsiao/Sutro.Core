@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 
@@ -15,6 +16,7 @@ namespace gs
         public double PathSpacing = 0.4;
         public double AngleDeg = 45.0;
         public double PathShift = 0;
+        public double SpeedModifierX = 1;
 
         // [RMS] improve this...
         public double OverlapFactor = 0.0f;
@@ -22,8 +24,10 @@ namespace gs
         // if true, we inset half of tool-width from Polygon
         public bool InsetFromInputPolygon = true;
 
+        public IFillType FillType { get; }
+
         // fill paths
-        public List<FillCurveSet2d> FillCurves { get; set; }
+        public List<FillCurveSet2d> FillCurves { get; }
 
         public List<FillCurveSet2d> GetFillCurves()
         {
@@ -32,10 +36,11 @@ namespace gs
 
         //SegmentSet2d BoundaryPolygonCache;
 
-        public RasterFillPolygon(GeneralPolygon2d poly)
+        public RasterFillPolygon(GeneralPolygon2d poly, IFillType fillType)
         {
             Polygon = poly;
             FillCurves = new List<FillCurveSet2d>();
+            FillType = fillType;
         }
 
         public bool Compute()
@@ -80,12 +85,12 @@ namespace gs
             {
                 foreach (Segment2d seg in seglist)
                 {
-                    FillPolyline2d fill_seg = new FillPolyline2d()
+                    var fill_seg = new FillCurve<FillSegment>()
                     {
-                        TypeFlags = FillTypeFlags.SolidInfill
+                        FillType = FillType,
                     };
-                    fill_seg.AppendVertex(seg.P0);
-                    fill_seg.AppendVertex(seg.P1);
+                    fill_seg.BeginCurve(seg.P0);
+                    fill_seg.AddToCurve(seg.P1, new FillSegment());
                     paths.Append(fill_seg);
                 }
             }

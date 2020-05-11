@@ -1,5 +1,8 @@
 ﻿using g3;
+using gs.FillTypes;
+using gs.utility;
 using System;
+using System.Collections.Generic;
 
 namespace gs
 {
@@ -10,7 +13,7 @@ namespace gs
     {
     }
 
-    public interface ThreeAxisPrinterCompiler : ICNCCompiler
+    public interface IThreeAxisPrinterCompiler : ICNCCompiler
     {
         // current nozzle position
         Vector3d NozzlePosition { get; }
@@ -25,34 +28,30 @@ namespace gs
         void AppendComment(string comment);
 
         void End();
+
+        void AppendBlankLine();
+
+        IEnumerable<string> GenerateTotalExtrusionReport(SingleMaterialFFFSettings settings);
     }
 
-    public class SingleMaterialFFFCompiler : ThreeAxisPrinterCompiler
+    public class SingleMaterialFFFCompiler : IThreeAxisPrinterCompiler
     {
         private SingleMaterialFFFSettings Settings;
         private GCodeBuilder Builder;
-        private BaseDepositionAssembler Assembler;
+        protected BaseDepositionAssembler Assembler;
 
-        private AssemblerFactoryF AssemblerF;
+        protected AssemblerFactoryF AssemblerF;
 
         /// <summary>
         /// compiler will call this to emit status messages / etc
         /// </summary>
         public virtual Action<string> EmitMessageF { get; set; }
 
-        private FeatureTypeLabeler featureTypeLabeler;
-
         public SingleMaterialFFFCompiler(GCodeBuilder builder, SingleMaterialFFFSettings settings, AssemblerFactoryF AssemblerF)
         {
             Builder = builder;
             Settings = settings;
             this.AssemblerF = AssemblerF;
-            featureTypeLabeler = CreateFeatureTypeLabeler();
-        }
-
-        protected virtual FeatureTypeLabeler CreateFeatureTypeLabeler()
-        {
-            return FeatureTypeLabelerFFF.Value;
         }
 
         public Vector3d NozzlePosition
@@ -91,21 +90,60 @@ namespace gs
             Assembler.AppendFooter();
         }
 
+        public virtual void HandleDepositionPath(LinearToolpath path, SingleMaterialFFFSettings useSettings)
+        {
+            // end travel / retract if we are in that state
+            if (Assembler.InTravel)
+            {
+                if (Assembler.InRetract)
+                {
+                    Assembler.EndRetract(path[0].Position, useSettings.RetractSpeed, path[0].Extrusion.x);
+                }
+                Assembler.EndTravel();
+                Assembler.EnableFan();
+            }
+
+            AddFeatureTypeLabel(path.FillType);
+            AppendDimensions(path.Start.Dimensions);
+        }
+
+        public virtual void HandleTravelAndPlaneChangePath(LinearToolpath path, int pathIndex, SingleMaterialFFFSettings useSettings)
+        {
+            if (Assembler.InTravel == false)
+            {
+                Assembler.DisableFan();
+
+                // do retract cycle
+                if (path[0].Extrusion.x < Assembler.ExtruderA)
+                {
+                    if (Assembler.InRetract)
+                        throw new Exception("SingleMaterialFFFCompiler.AppendPaths: path " + pathIndex + ": already in retract!");
+                    Assembler.BeginRetract(path[0].Position, useSettings.RetractSpeed, path[0].Extrusion.x);
+                }
+                Assembler.BeginTravel();
+            }
+        }
+
+        public virtual void HandleDepositionEnd()
+        {
+        }
+
         /// <summary>
         /// Compile this set of toolpaths and pass to assembler.
         /// Settings are optional, pass null to ignore
         /// </summary>
-		public virtual void AppendPaths(ToolpathSet paths, SingleMaterialFFFSettings pathSettings)
+		public virtual void AppendPaths(ToolpathSet toolpathSet, SingleMaterialFFFSettings pathSettings)
         {
             Assembler.FlushQueues();
 
             SingleMaterialFFFSettings useSettings = (pathSettings == null) ? Settings : pathSettings;
 
-            CalculateExtrusion calc = new CalculateExtrusion(paths, useSettings);
+            var paths = toolpathSet.GetPaths<PrintVertex>();
+            var calc = new CalculateExtrusion<PrintVertex>(paths, useSettings);
             calc.Calculate(Assembler.NozzlePosition, Assembler.ExtruderA, Assembler.InRetract);
 
             int path_index = 0;
-            foreach (var gpath in paths)
+            foreach (var gpath in toolpathSet)
             {
                 path_index++;
 
@@ -121,51 +159,22 @@ namespace gs
                     throw new Exception("SingleMaterialFFFCompiler.AppendPaths: path " + path_index + ": Start of path is not same as end of previous path!");
 
                 int i = 0;
-                if ((p.Type == ToolpathTypes.Travel || p.Type == ToolpathTypes.PlaneChange) && Assembler.InTravel == false)
+                if (p.Type == ToolpathTypes.Travel || p.Type == ToolpathTypes.PlaneChange)
                 {
-                    //Assembler.DisableFan();
-
-                    // do retract cycle
-                    if (p[0].Extrusion.x < Assembler.ExtruderA)
-                    {
-                        if (Assembler.InRetract)
-                            throw new Exception("SingleMaterialFFFCompiler.AppendPaths: path " + path_index + ": already in retract!");
-                        Assembler.BeginRetract(p[0].Position, useSettings.RetractSpeed, p[0].Extrusion.x);
-                    }
-                    Assembler.BeginTravel();
+                    HandleTravelAndPlaneChangePath(p, path_index, useSettings);
                 }
                 else if (p.Type == ToolpathTypes.Deposition)
                 {
-                    // end travel / retract if we are in that state
-                    if (Assembler.InTravel)
-                    {
-                        if (Assembler.InRetract)
-                        {
-                            Assembler.EndRetract(p[0].Position, useSettings.RetractSpeed, p[0].Extrusion.x);
-                        }
-                        Assembler.EndTravel();
-                        //Assembler.EnableFan();
-                    }
+                    HandleDepositionPath(p, useSettings);
                 }
 
                 i = 1;      // do not need to emit code for first point of path,
                             // we are already at this pos
 
                 var currentDimensions = p[1].Dimensions;
-                if (p.Type == ToolpathTypes.Deposition)
-                {
-                    AddFeatureTypeLabel(p.TypeModifiers);
-                    AppendDimensions(currentDimensions);
-                }
 
                 for (; i < p.VertexCount; ++i)
                 {
-                    if (p.Type == ToolpathTypes.Deposition && !p[i].Dimensions.EpsilonEqual(currentDimensions, 1e-6))
-                    {
-                        currentDimensions = p[i].Dimensions;
-                        AppendDimensions(p[i].Dimensions);
-                    }
-
                     if (p.Type == ToolpathTypes.Travel)
                     {
                         Assembler.AppendMoveTo(p[i].Position, p[i].FeedRate, "Travel");
@@ -176,29 +185,49 @@ namespace gs
                     }
                     else
                     {
-                        Assembler.AppendExtrudeTo(p[i].Position, p[i].FeedRate, p[i].Extrusion.x);
+                        if (p.Type == ToolpathTypes.Deposition && !p[i].Dimensions.EpsilonEqual(currentDimensions, 1e-6))
+                        {
+                            currentDimensions = p[i].Dimensions;
+                            AppendDimensions(p[i].Dimensions);
+                        }
+                        Assembler.AppendExtrudeTo(p[i].Position, p[i].FeedRate, p[i].Extrusion.x, null);
                     }
                 }
             }
 
+            /*
+             * TODO: Should there be an EndTravel() call here?
+             */
+            HandleDepositionEnd();
             Assembler.FlushQueues();
         }
 
-        private void AddFeatureTypeLabel(FillTypeFlags typeModifier)
+        protected virtual void AddFeatureTypeLabel(IFillType fillType)
         {
-            var featureLabel = featureTypeLabeler.FeatureLabelFromFillTypeFlag(typeModifier);
+            AddFeatureTypeLabel(fillType.GetLabel());
+        }
 
+        protected virtual void AddFeatureTypeLabel(string featureLabel)
+        {
             Builder.AddExplicitLine("");
             Builder.AddCommentLine(" feature " + featureLabel);
         }
 
-        private void AppendDimensions(Vector2d dimensions)
+        public virtual void AppendBlankLine()
         {
-            if (dimensions.x == GCodeUtil.UnspecifiedDimensions.x)
-                dimensions.x = Settings.Machine.NozzleDiamMM;
-            if (dimensions.y == GCodeUtil.UnspecifiedDimensions.y)
-                dimensions.y = Settings.LayerHeightMM;
-            Assembler.AppendComment(" tool H" + dimensions.y + " W" + dimensions.x);
+            Builder.AddBlankLine();
+        }
+
+        protected virtual void AppendDimensions(Vector2d dimensions)
+        {
+            if (Settings.GCodeAppendBeadDimensions)
+            {
+                if (dimensions.x == GCodeUtil.UnspecifiedDimensions.x)
+                    dimensions.x = Settings.Machine.NozzleDiamMM;
+                if (dimensions.y == GCodeUtil.UnspecifiedDimensions.y)
+                    dimensions.y = Settings.LayerHeightMM;
+                Assembler.AppendComment(" tool H" + dimensions.y + " W" + dimensions.x);
+            }
         }
 
         public virtual void AppendComment(string comment)
@@ -243,6 +272,11 @@ namespace gs
         {
             if (EmitMessageF != null)
                 EmitMessageF(string.Format(text, args));
+        }
+
+        public IEnumerable<string> GenerateTotalExtrusionReport(SingleMaterialFFFSettings settings)
+        {
+            return Assembler.GenerateTotalExtrusionReport(settings);
         }
     }
 }

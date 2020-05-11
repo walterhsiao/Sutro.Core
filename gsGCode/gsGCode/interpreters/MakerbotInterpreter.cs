@@ -1,5 +1,4 @@
 ﻿using g3;
-using Sutro.PathWorks.Plugins.API;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,21 +13,21 @@ namespace gs
     /// </summary>
     public class MakerbotInterpreter : IGCodeInterpreter
     {
-        private IGCodeListener listener = null;
+        protected IGCodeListener listener = null;
 
-        private Dictionary<int, Action<GCodeLine>> GCodeMap = new Dictionary<int, Action<GCodeLine>>();
-        private Dictionary<int, Action<GCodeLine>> MCodeMap = new Dictionary<int, Action<GCodeLine>>();
+        protected Dictionary<int, Action<GCodeLine>> GCodeMap = new Dictionary<int, Action<GCodeLine>>();
+        protected Dictionary<int, Action<GCodeLine>> MCodeMap = new Dictionary<int, Action<GCodeLine>>();
 
-        private bool UseRelativePosition = false;
-        private bool UseRelativeExtruder = false;
+        protected bool UseRelativePosition = false;
+        protected bool UseRelativeExtruder = false;
 
-        private Vector3d CurPosition = Vector3d.Zero;
+        protected Vector3d CurPosition = Vector3d.Zero;
 
-        private double ExtrusionA = 0;
-        private double LastRetractA = 0;
-        private bool in_retract = false;
-        private bool in_travel = false;
-        private bool in_extrude = false;
+        protected double ExtrusionA = 0;
+        protected double LastRetractA = 0;
+        protected bool in_retract = false;
+        protected bool in_travel = false;
+        protected bool in_extrude = false;
 
         public MakerbotInterpreter()
         {
@@ -99,6 +98,11 @@ namespace gs
         }
 
         private void emit_linear(GCodeLine line)
+        {
+            EmitLinear(line);
+        }
+
+        protected virtual void EmitLinear(GCodeLine line)
         {
             Debug.Assert(line.code == 0 || line.code == 1);
 

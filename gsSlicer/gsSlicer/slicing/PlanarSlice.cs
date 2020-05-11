@@ -10,7 +10,7 @@ namespace gs
     /// </summary>
     public class PlanarSlice
     {
-        public static double MIN_AREA = 0.001;      // polygons/holes smaller than this are discarded
+        public readonly static double MIN_AREA = 0.001;      // polygons/holes smaller than this are discarded
 
         public int LayerIndex = 0;
         public double Z = 0;

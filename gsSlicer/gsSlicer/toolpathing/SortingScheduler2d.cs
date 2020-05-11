@@ -25,45 +25,45 @@ namespace gs
         /// <summary>
         /// Final point in the output paths, computed by SortAndAppendTo()
         /// </summary>
-        public Vector2d OutPoint;
+        public Vector2d CurrentPosition { get; private set; }
 
-        private class PathItem
+        protected class PathItem
         {
             public SchedulerSpeedHint speedHint;
         }
 
-        private class PathLoop : PathItem
+        protected class PathLoop : PathItem
         {
-            public FillPolygon2d curve;
+            public FillLoop loop;
             public bool reverse = false;
         }
 
-        private List<PathLoop> Loops = new List<PathLoop>();
+        protected List<PathLoop> Loops = new List<PathLoop>();
 
-        private class PathSpan : PathItem
+        protected class PathSpan : PathItem
         {
-            public FillPolyline2d curve;
+            public FillCurve curve;
             public bool reverse = false;
         }
 
-        private List<PathSpan> Spans = new List<PathSpan>();
+        protected List<PathSpan> Spans = new List<PathSpan>();
 
-        public void AppendCurveSets(List<FillCurveSet2d> paths)
+        public virtual void AppendCurveSets(List<FillCurveSet2d> paths)
         {
             foreach (FillCurveSet2d polySet in paths)
             {
-                foreach (FillPolygon2d loop in polySet.Loops)
-                    Loops.Add(new PathLoop() { curve = loop, speedHint = SpeedHint });
+                foreach (var loop in polySet.Loops)
+                    Loops.Add(new PathLoop() { loop = loop, speedHint = SpeedHint });
 
-                foreach (FillPolyline2d curve in polySet.Curves)
+                foreach (var curve in polySet.Curves)
                     Spans.Add(new PathSpan() { curve = curve, speedHint = SpeedHint });
             }
         }
 
-        public void SortAndAppendTo(Vector2d startPoint, IFillPathScheduler2d scheduler)
+        public virtual void SortAndAppendTo(Vector2d startPoint, IFillPathScheduler2d scheduler)
         {
             var saveHint = scheduler.SpeedHint;
-            OutPoint = startPoint;
+            CurrentPosition = startPoint;
 
             List<Index3i> sorted = find_short_path_v1(startPoint);
             foreach (Index3i idx in sorted)
@@ -77,30 +77,23 @@ namespace gs
                     pathHint = loop.speedHint;
                     if (idx.c != 0)
                     {
-                        int iStart = idx.c;
-                        FillPolygon2d o = new FillPolygon2d();
-                        int N = loop.curve.VertexCount;
-                        for (int i = 0; i < N; ++i)
-                        {
-                            o.AppendVertex(loop.curve[(i + iStart) % N]);
-                        }
-                        o.TypeFlags = loop.curve.TypeFlags;
-                        paths.Append(o);
-                        OutPoint = o.Vertices[0];
+                        var rolled = loop.loop.RollToVertex(idx.c);
+                        paths.Append(rolled);
+                        CurrentPosition = rolled.Entry;
                     }
                     else
                     {
-                        paths.Append(loop.curve);
-                        OutPoint = loop.curve.Vertices[0];
+                        paths.Append(loop.loop);
+                        CurrentPosition = loop.loop.Entry;
                     }
                 }
                 else
                 {  // span
                     PathSpan span = Spans[idx.b];
                     if (idx.c == 1)
-                        span.curve.Reverse();
+                        span.curve = span.curve.Reversed();
                     paths.Append(span.curve);
-                    OutPoint = span.curve.End;
+                    CurrentPosition = span.curve.Exit;
                     pathHint = span.speedHint;
                 }
 
@@ -117,7 +110,7 @@ namespace gs
         //DenseMatrix spanSS;
         //DenseMatrix spanSE;
 
-        private List<Index3i> find_short_path_v1(Vector2d vStart)
+        protected virtual List<Index3i> find_short_path_v1(Vector2d vStart)
         {
             int N = Spans.Count;
             int M = Loops.Count;
@@ -160,7 +153,7 @@ namespace gs
             return order;
         }
 
-        private Index3i find_nearest(Index3i from, HashSet<Index2i> remaining)
+        protected virtual Index3i find_nearest(Index3i from, HashSet<Index2i> remaining)
         {
             Vector2d pt = get_point(from);
 
@@ -171,24 +164,23 @@ namespace gs
                 if (idx.a == 0)
                 { // loop
                     PathLoop loop = Loops[idx.b];
-                    int iNearSeg; double nearSegT;
-                    double d_sqr = loop.curve.DistanceSquared(pt, out iNearSeg, out nearSegT);
+                    double d_sqr = loop.loop.FindClosestElementToPoint(pt, out var location);
                     if (d_sqr < nearest_sqr)
                     {
                         nearest_sqr = d_sqr;
-                        nearest_idx = new Index3i(idx.a, idx.b, iNearSeg);
+                        nearest_idx = new Index3i(idx.a, idx.b, location.Index);
                     }
                 }
                 else
                 {  // span
                     PathSpan span = Spans[idx.b];
-                    double start_d = span.curve.Start.DistanceSquared(pt);
+                    double start_d = span.curve.Entry.DistanceSquared(pt);
                     if (start_d < nearest_sqr)
                     {
                         nearest_sqr = start_d;
                         nearest_idx = new Index3i(idx.a, idx.b, 0);
                     }
-                    double end_d = span.curve.End.DistanceSquared(pt);
+                    double end_d = span.curve.Exit.DistanceSquared(pt);
                     if (end_d < nearest_sqr)
                     {
                         nearest_sqr = end_d;
@@ -200,7 +192,7 @@ namespace gs
             return nearest_idx;
         }
 
-        private Index3i find_nearest(Vector2d pt, HashSet<Index2i> remaining)
+        protected virtual Index3i find_nearest(Vector2d pt, HashSet<Index2i> remaining)
         {
             double nearest_sqr = double.MaxValue;
             Index3i nearest_idx = Index3i.Max;
@@ -209,24 +201,24 @@ namespace gs
                 if (idx.a == 0)
                 { // loop
                     PathLoop loop = Loops[idx.b];
-                    int iNearSeg; double nearSegT;
-                    double d_sqr = loop.curve.DistanceSquared(pt, out iNearSeg, out nearSegT);
+                    double d_sqr = GetLoopEntryPoint(pt, loop, out var location);
+
                     if (d_sqr < nearest_sqr)
                     {
                         nearest_sqr = d_sqr;
-                        nearest_idx = new Index3i(idx.a, idx.b, iNearSeg);
+                        nearest_idx = new Index3i(idx.a, idx.b, location.Index);
                     }
                 }
                 else
                 {  // span
                     PathSpan span = Spans[idx.b];
-                    double start_d = span.curve.Start.DistanceSquared(pt);
+                    double start_d = span.curve.Entry.DistanceSquared(pt);
                     if (start_d < nearest_sqr)
                     {
                         nearest_sqr = start_d;
                         nearest_idx = new Index3i(idx.a, idx.b, 0);
                     }
-                    double end_d = span.curve.End.DistanceSquared(pt);
+                    double end_d = span.curve.Exit.DistanceSquared(pt);
                     if (end_d < nearest_sqr)
                     {
                         nearest_sqr = end_d;
@@ -238,17 +230,33 @@ namespace gs
             return nearest_idx;
         }
 
-        private Vector2d get_point(Index3i idx)
+        private static double GetLoopEntryPoint(Vector2d startPoint, PathLoop loop,
+            out ElementLocation location)
+        {
+            if (loop.loop.FillType.IsEntryLocationSpecified())
+            {
+                location = new ElementLocation(0, 0);
+                return loop.loop.Entry.Distance(startPoint);
+            }
+            
+            return loop.loop.FindClosestElementToPoint(startPoint, out location);
+        }
+
+        protected virtual Vector2d get_point(Index3i idx)
         {
             if (idx.a == 0)
             { // loop
                 PathLoop loop = Loops[idx.b];
-                return loop.curve.Segment(idx.c).Center;
+                return loop.loop.GetSegment2d(idx.c).Center;
             }
             else
             {  // span
                 PathSpan span = Spans[idx.b];
-                return (idx.c == 0) ? span.curve.Start : span.curve.End;
+
+                // [GDM] Reversed this logic 2019.10.23; by my thinking:
+                // - if the curve ISN'T reversed, the exit point should be the end
+                // - if the curve IS reversed, the exit point should be the start
+                return (idx.c == 0) ? span.curve.Entry : span.curve.Exit;
             }
         }
 

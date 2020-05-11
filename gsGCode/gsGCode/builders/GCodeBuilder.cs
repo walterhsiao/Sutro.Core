@@ -1,5 +1,4 @@
-﻿using Sutro.PathWorks.Plugins.API;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace gs
@@ -49,6 +48,16 @@ namespace gs
         {
             AddLine(
                 new GCodeLine(next_line_number(), GCodeLine.LType.UnknownString, line));
+            return this;
+        }
+
+        /// <summary>
+        /// Add empty line to output.
+        /// </summary>
+        public virtual GCodeBuilder AddBlankLine()
+        {
+            AddLine(
+                new GCodeLine(next_line_number(), GCodeLine.LType.Blank));
             return this;
         }
 

@@ -20,9 +20,9 @@ namespace gs
 
         public IFillPathScheduler2d TargetScheduler;
 
-        private SortingScheduler2d CurrentSorter;
+        protected SortingScheduler2d CurrentSorter;
 
-        private Vector2d lastPoint;
+        protected Vector2d lastPoint;
 
         public Vector2d CurrentPosition
         {
@@ -54,7 +54,7 @@ namespace gs
             if (CurrentSorter != null)
             {
                 CurrentSorter.SortAndAppendTo(lastPoint, TargetScheduler);
-                lastPoint = CurrentSorter.OutPoint;
+                lastPoint = CurrentSorter.CurrentPosition;
                 CurrentSorter = null;
             }
         }

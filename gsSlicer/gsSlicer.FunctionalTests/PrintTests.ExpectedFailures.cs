@@ -61,7 +61,7 @@ namespace gsCore.FunctionalTests
         {
             // Arrange
             var resultGenerator = TestRunnerFactoryFFF.CreateResultGenerator(settings);
-            var resultAnalyzer = new ResultAnalyzer<FeatureInfo>(new FeatureInfoFactoryFFF());
+            var resultAnalyzer = new ResultAnalyzer<FeatureInfo>(new FeatureInfoFactoryFFF(), new ConsoleLogger());
             var print = new PrintTestRunner(CaseName, resultGenerator, resultAnalyzer);
 
             // Act

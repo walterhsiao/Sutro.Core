@@ -1,5 +1,4 @@
 ﻿using g3;
-using Sutro.PathWorks.Plugins.API;
 
 namespace gs
 {

@@ -32,18 +32,18 @@ namespace gs
             ActivePath = null;
         }
 
-        public void Begin()
+        public virtual void Begin()
         {
             PathSet = new ToolpathSet();
             ActivePath = new LinearToolpath();
         }
 
-        public void End()
+        public virtual void End()
         {
             push_active_path();
         }
 
-        public void BeginTravel()
+        public virtual void BeginTravel()
         {
             var newPath = new LinearToolpath();
             newPath.Type = ToolpathTypes.Travel;
@@ -57,7 +57,7 @@ namespace gs
             ActivePath = newPath;
         }
 
-        public void BeginDeposition()
+        public virtual void BeginDeposition()
         {
             var newPath = new LinearToolpath();
             newPath.Type = ToolpathTypes.Deposition;
@@ -71,7 +71,7 @@ namespace gs
             ActivePath = newPath;
         }
 
-        public void BeginCut()
+        public virtual void BeginCut()
         {
             var newPath = new LinearToolpath();
             newPath.Type = ToolpathTypes.Cut;
@@ -85,7 +85,7 @@ namespace gs
             ActivePath = newPath;
         }
 
-        public void LinearMoveToAbsolute3d(LinearMoveData move)
+        public virtual void LinearMoveToAbsolute3d(LinearMoveData move)
         {
             if (ActivePath == null)
                 throw new Exception("GCodeToLayerPaths.LinearMoveToAbsolute3D: ActivePath is null!");
@@ -104,7 +104,7 @@ namespace gs
             ActivePath.AppendVertex(vtx, TPVertexFlags.None);
         }
 
-        public void CustomCommand(int code, object o)
+        public virtual void CustomCommand(int code, object o)
         {
             if (code == (int)CustomListenerCommands.ResetExtruder)
             {
@@ -113,22 +113,22 @@ namespace gs
             }
         }
 
-        public void LinearMoveToRelative3d(LinearMoveData move)
+        public virtual void LinearMoveToRelative3d(LinearMoveData move)
         {
             throw new NotImplementedException();
         }
 
-        public void LinearMoveToAbsolute2d(LinearMoveData move)
+        public virtual void LinearMoveToAbsolute2d(LinearMoveData move)
         {
             throw new NotImplementedException();
         }
 
-        public void LinearMoveToRelative2d(LinearMoveData move)
+        public virtual void LinearMoveToRelative2d(LinearMoveData move)
         {
             throw new NotImplementedException();
         }
 
-        public void ArcToRelative2d(Vector2d pos, double radius, bool clockwise, double rate = 0)
+        public virtual void ArcToRelative2d(Vector2d pos, double radius, bool clockwise, double rate = 0)
         {
             throw new NotImplementedException();
         }

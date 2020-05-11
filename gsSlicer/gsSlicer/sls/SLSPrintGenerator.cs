@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 
@@ -13,7 +14,7 @@ namespace gs
         protected PrintMeshAssembly PrintMeshes;
 
         protected PlanarSliceStack Slices;
-        protected ThreeAxisLaserCompiler Compiler;
+        protected IThreeAxisLaserCompiler Compiler;
         public SingleMaterialFFFSettings Settings;      // public because you could modify
                                                         // this during process, ie in BeginLayerF
                                                         // to implement per-layer settings
@@ -42,7 +43,7 @@ namespace gs
         public SLSPrintGenerator(PrintMeshAssembly meshes,
                                        PlanarSliceStack slices,
                                        SingleMaterialFFFSettings settings,
-                                       ThreeAxisLaserCompiler compiler)
+                                       IThreeAxisLaserCompiler compiler)
         {
             Initialize(meshes, slices, settings, compiler);
         }
@@ -50,7 +51,7 @@ namespace gs
         public void Initialize(PrintMeshAssembly meshes,
                                PlanarSliceStack slices,
                                SingleMaterialFFFSettings settings,
-                               ThreeAxisLaserCompiler compiler)
+                               IThreeAxisLaserCompiler compiler)
         {
             PrintMeshes = meshes;
             Slices = slices;
@@ -129,7 +130,7 @@ namespace gs
 
                 // rest of code does not directly access path builder, instead if
                 // sends paths to scheduler.
-                SequentialScheduler2d scheduler = new SequentialScheduler2d(paths, Settings);
+                SequentialScheduler2d scheduler = new SequentialScheduler2d(paths, Settings, Slices[layer_i].LayerZSpan.b);
 
                 // a layer can contain multiple disjoint regions. Process each separately.
                 List<ShellsFillPolygon> layer_shells = LayerShells[layer_i];
@@ -181,10 +182,11 @@ namespace gs
             //   came from where. Would need to do loop above per-polygon
             if (bIsInfillAdjacent && Settings.InteriorSolidRegionShells > 0)
             {
-                ShellsFillPolygon interior_shells = new ShellsFillPolygon(solid_poly);
+                ShellsFillPolygon interior_shells = new ShellsFillPolygon(solid_poly, new SolidFillType(Settings.SolidFillSpeedX));
                 interior_shells.PathSpacing = Settings.SolidFillPathSpacingMM();
                 interior_shells.ToolWidth = Settings.Machine.NozzleDiamMM;
                 interior_shells.Layers = Settings.InteriorSolidRegionShells;
+                interior_shells.PreserveOuterShells = true;
                 interior_shells.InsetFromInputPolygonX = 0;
                 interior_shells.Compute();
                 scheduler.AppendCurveSets(interior_shells.Shells);
@@ -202,7 +204,7 @@ namespace gs
                 tiled_fill.TileFillGeneratorF = (tilePoly, index) =>
                 {
                     int odd = ((index.x + index.y) % 2 == 0) ? 1 : 0;
-                    RasterFillPolygon solid_gen = new RasterFillPolygon(tilePoly)
+                    RasterFillPolygon solid_gen = new RasterFillPolygon(tilePoly, new SolidFillType(Settings.SolidFillSpeedX))
                     {
                         InsetFromInputPolygon = false,
                         PathSpacing = Settings.SolidFillPathSpacingMM(),
@@ -231,9 +233,10 @@ namespace gs
 
                 foreach (GeneralPolygon2d shape in solids)
                 {
-                    ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape);
+                    ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape, new OuterPerimeterFillType(Settings), new InnerPerimeterFillType(Settings));
                     shells_gen.PathSpacing = Settings.SolidFillPathSpacingMM();
                     shells_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
+                    shells_gen.PreserveOuterShells = true;
                     shells_gen.Layers = Settings.Shells;
                     shells_gen.InsetInnerPolygons = false;
                     shells_gen.Compute();

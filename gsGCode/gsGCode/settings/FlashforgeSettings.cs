@@ -1,5 +1,4 @@
-﻿using Sutro.PathWorks.Plugins.API;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace gs.info
 {
@@ -20,11 +19,6 @@ namespace gs.info
     public class FlashforgeSettings : SingleMaterialFFFSettings, ISailfishSettings
     {
         public Flashforge.Models ModelEnum;
-
-        public override IProfile Clone()
-        {
-            return CloneAs<FlashforgeSettings>();
-        }
 
         public override AssemblerFactoryF AssemblerType()
         {

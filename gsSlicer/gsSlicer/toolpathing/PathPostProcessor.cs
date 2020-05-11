@@ -7,7 +7,7 @@ namespace gs
         void Process(PrintLayerData layerData, ToolpathSet layerPaths);
     }
 
-    public class LayerPathsPostProcessorSequence
+    public class LayerPathsPostProcessorSequence : ILayerPathsPostProcessor
     {
         public List<ILayerPathsPostProcessor> Posts = new List<ILayerPathsPostProcessor>();
 

@@ -1,18 +1,15 @@
-﻿using Sutro.PathWorks.Plugins.API;
-
-namespace gs.utility
+﻿namespace gs.utility
 {
     public static class GCodeLineUtil
     {
-        public static bool ExtractFillType(GCodeLine line, ref FillTypeFlags fillType)
+        public static bool ExtractFillType(GCodeLine line, ref string featureType)
         {
             if (line.comment != null)
             {
                 int indexOfFillType = line.comment.IndexOf("feature");
                 if (indexOfFillType >= 0)
                 {
-                    var featureName = line.comment.Substring(indexOfFillType + 8).Trim();
-                    fillType = FeatureTypeLabelerFFF.Value.FillTypeFlagFromFeatureLabel(featureName);
+                    featureType = line.comment.Substring(indexOfFillType + 8).Trim();
                     return true;
                 }
             }

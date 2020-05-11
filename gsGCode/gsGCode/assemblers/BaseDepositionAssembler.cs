@@ -1,5 +1,6 @@
 ﻿using g3;
 using System;
+using System.Collections.Generic;
 
 namespace gs
 {
@@ -69,12 +70,16 @@ namespace gs
         // Makerbot uses G1 for travel as well as extrude, so need to be able to override this
         public int TravelGCode = 0;
 
-        public bool OmitDuplicateZ = false;
-        public bool OmitDuplicateF = false;
-        public bool OmitDuplicateE = false;
+        public bool OmitDuplicateXY { get; set; } = false;
+        public bool OmitDuplicateZ { get; set; } = false;
+        public bool OmitDuplicateF { get; set; } = false;
+        public bool OmitDuplicateE { get; set; } = false;
+        public bool RelativeE { get; set; } = false;
 
         // threshold for omitting "duplicate" Z/F/E parameters
-        public double MoveEpsilon = 0.00001;
+        public static readonly double MoveEpsilon = 0.00001;
+
+        public bool UseFirmwareRetraction = false;
 
         public BaseDepositionAssembler(GCodeBuilder useBuilder, FFFMachineInfo machineInfo)
         {
@@ -160,6 +165,14 @@ namespace gs
             get { return extruderA; }
         }
 
+        // Total is accumulated + the current amount
+        private double accumulatedExtrusion = 0;
+
+        public double TotalExtrusion
+        {
+            get { return accumulatedExtrusion + ExtruderA; }
+        }
+
         protected bool in_retract;
         protected double retractA;
 
@@ -179,6 +192,8 @@ namespace gs
         {
             get { return InTravel == false; }
         }
+
+        public string ExtrudeParamString => ExtrudeParam == ExtrudeParamType.ExtrudeParamA ? "A" : "E";
 
         /*
          * Code below is all to support MinExtrudeStepDistance > 0
@@ -207,7 +222,6 @@ namespace gs
             public Vector3d toPos;
             public double feedRate;
             public double extruderA;
-            public char extrudeChar;
             public string comment;
 
             static public QueuedExtrude lerp(ref QueuedExtrude a, ref QueuedExtrude b, double t)
@@ -216,7 +230,6 @@ namespace gs
                 newp.toPos = Vector3d.Lerp(a.toPos, b.toPos, t);
                 newp.feedRate = Math.Max(a.feedRate, b.feedRate);
                 newp.extruderA = MathUtil.Lerp(a.extruderA, b.extruderA, t);
-                newp.extrudeChar = a.extrudeChar;
                 newp.comment = (a.comment == null) ? a.comment : b.comment;
                 return newp;
             }
@@ -247,24 +260,19 @@ namespace gs
             double write_x = toPos.x + PositionShift.x;
             double write_y = toPos.y + PositionShift.y;
 
-            Builder.BeginGLine(TravelGCode, comment).
-                   AppendF("X", write_x).AppendF("Y", write_y);
+            Builder.BeginGLine(TravelGCode, comment);
 
-            if (OmitDuplicateZ == false || MathUtil.EpsilonEqual(currentPos.z, toPos.z, MoveEpsilon) == false)
-            {
-                Builder.AppendF("Z", toPos.z);
-            }
-            if (OmitDuplicateF == false || MathUtil.EpsilonEqual(currentFeed, feedRate, MoveEpsilon) == false)
-            {
-                Builder.AppendF("F", feedRate);
-            }
+            BuildXParameter(toPos.x);
+            BuildYParameter(toPos.y);
+            BuildZParameter(toPos.z);
+            BuildFeedrateParameter(feedRate);
 
             currentPos = toPos;
             currentFeed = feedRate;
         }
 
         // push an extrude move onto queue
-        protected virtual void queue_extrude(Vector3d toPos, double feedRate, double e, char extrudeChar, string comment, bool bIsRetract)
+        protected virtual void queue_extrude(Vector3d toPos, double feedRate, double e, string comment, bool bIsRetract)
         {
             Util.gDevAssert(InExtrude || bIsRetract);
             if (EnableBoundsChecking && PositionBounds.Contains(toPos.xy) == false)
@@ -277,13 +285,17 @@ namespace gs
                 toPos = toPos,
                 feedRate = feedRate,
                 extruderA = e,
-                extrudeChar = extrudeChar,
                 comment = comment
             };
 
             // we cannot queue a retract, so flush queue and emit the retract/unretract
-            bool bForceEmit = (bIsRetract) || (toPos.z != NozzlePosition.z);
-            if (bForceEmit)
+            if (bIsRetract)
+            {
+                flush_extrude_queue();
+                emit_retract(p);
+                return;
+            }
+            else if (toPos.z != NozzlePosition.z)
             {
                 flush_extrude_queue();
                 emit_extrude(p);
@@ -325,37 +337,37 @@ namespace gs
 
             // now we re-submit last point. This pushes the remaining bit of the last segment
             // back onto the queue. (should we skip this if t > nearly-one?)
-            queue_extrude(last_p.toPos, last_p.feedRate, last_p.extruderA, last_p.extrudeChar, last_p.comment, false);
+            queue_extrude(last_p.toPos, last_p.feedRate, last_p.extruderA, last_p.comment, false);
         }
 
         protected virtual void queue_extrude_to(Vector3d toPos, double feedRate, double extrudeDist, string comment, bool bIsRetract)
         {
-            if (ExtrudeParam == ExtrudeParamType.ExtrudeParamA)
-                queue_extrude(toPos, feedRate, extrudeDist, 'A', comment, bIsRetract);
-            else
-                queue_extrude(toPos, feedRate, extrudeDist, 'E', comment, bIsRetract);
+            queue_extrude(toPos, feedRate, extrudeDist, comment, bIsRetract);
         }
 
         // emit gcode for an extrude move
         protected virtual void emit_extrude(QueuedExtrude p)
         {
-            double write_x = p.toPos.x + PositionShift.x;
-            double write_y = p.toPos.y + PositionShift.y;
-            Builder.BeginGLine(1, p.comment).
-                   AppendF("X", write_x).AppendF("Y", write_y);
+            Builder.BeginGLine(1, p.comment);
 
-            if (OmitDuplicateZ == false || MathUtil.EpsilonEqual(p.toPos.z, currentPos.z, MoveEpsilon) == false)
-            {
-                Builder.AppendF("Z", p.toPos.z);
-            }
-            if (OmitDuplicateF == false || MathUtil.EpsilonEqual(p.feedRate, currentFeed, MoveEpsilon) == false)
-            {
-                Builder.AppendF("F", p.feedRate);
-            }
-            if (OmitDuplicateE == false || MathUtil.EpsilonEqual(p.extruderA, extruderA, MoveEpsilon) == false)
-            {
-                Builder.AppendF(p.extrudeChar.ToString(), p.extruderA);
-            }
+            BuildXParameter(p.toPos.x);
+            BuildYParameter(p.toPos.y);
+            BuildZParameter(p.toPos.z);
+            BuildFeedrateParameter(p.feedRate);
+            BuildExtrudeParameter(p.extruderA);
+
+            currentPos = p.toPos;
+            currentFeed = p.feedRate;
+            extruderA = p.extruderA;
+        }
+
+        // emit static retraction move (no xyz movement)
+        protected virtual void emit_retract(QueuedExtrude p)
+        {
+            Builder.BeginGLine(1, p.comment);
+
+            BuildFeedrateParameter(p.feedRate);
+            BuildExtrudeParameter(p.extruderA);
 
             currentPos = p.toPos;
             currentFeed = p.feedRate;
@@ -384,6 +396,40 @@ namespace gs
             extrude_queue_len = 0;
         }
 
+        protected void BuildXParameter(double x)
+        {
+            if (!OmitDuplicateXY || !MathUtil.EpsilonEqual(currentPos.x, x, MoveEpsilon))
+                Builder.AppendF("X", x + PositionShift.x);
+        }
+
+        protected void BuildYParameter(double y)
+        {
+            if (!OmitDuplicateXY || !MathUtil.EpsilonEqual(currentPos.y, y, MoveEpsilon))
+                Builder.AppendF("Y", y + PositionShift.y);
+        }
+
+        protected void BuildZParameter(double z)
+        {
+            if (!OmitDuplicateZ || !MathUtil.EpsilonEqual(currentPos.z, z, MoveEpsilon))
+                Builder.AppendF("Z", z);
+        }
+
+        protected void BuildFeedrateParameter(double feedRate)
+        {
+            if (!OmitDuplicateF || !MathUtil.EpsilonEqual(currentFeed, feedRate, MoveEpsilon))
+            {
+                Builder.AppendF("F", feedRate);
+            }
+        }
+
+        protected void BuildExtrudeParameter(double extrude)
+        {
+            if (!OmitDuplicateE || MathUtil.EpsilonEqual(extrude, extruderA, MoveEpsilon) == false)
+            {
+                Builder.AppendF(ExtrudeParamString, RelativeE ? extrude - extruderA : extrude);
+            }
+        }
+
         /*
          * Assembler API that Compiler uses
          */
@@ -400,30 +446,17 @@ namespace gs
 
         public virtual void AppendExtrudeTo(Vector3d pos, double feedRate, double extrudeDist, string comment = null)
         {
-            if (ExtrudeParam == ExtrudeParamType.ExtrudeParamA)
-                AppendMoveToA(pos, feedRate, extrudeDist, comment);
-            else
-                AppendMoveToE(pos, feedRate, extrudeDist, comment);
+            AppendMoveToE(pos, feedRate, extrudeDist, comment);
         }
 
         protected virtual void AppendMoveToE(double x, double y, double z, double f, double e, string comment = null)
         {
-            queue_extrude(new Vector3d(x, y, z), f, e, 'E', comment, InRetract);
+            queue_extrude(new Vector3d(x, y, z), f, e, comment, InRetract);
         }
 
         protected virtual void AppendMoveToE(Vector3d pos, double f, double e, string comment = null)
         {
             AppendMoveToE(pos.x, pos.y, pos.z, f, e, comment);
-        }
-
-        protected virtual void AppendMoveToA(double x, double y, double z, double f, double a, string comment = null)
-        {
-            queue_extrude(new Vector3d(x, y, z), f, a, 'A', comment, false);
-        }
-
-        protected virtual void AppendMoveToA(Vector3d pos, double f, double a, string comment = null)
-        {
-            AppendMoveToA(pos.x, pos.y, pos.z, f, a, comment);
         }
 
         public virtual void BeginRetractRelativeDist(Vector3d pos, double feedRate, double extrudeDelta, string comment = null)
@@ -441,7 +474,14 @@ namespace gs
             // need to flush any pending extrudes here, so that extruderA is at actual last extrude value
             flush_extrude_queue();
             retractA = extruderA;
-            queue_extrude_to(pos, feedRate, extrudeDist, (comment == null) ? "Retract" : comment, true);
+            if (UseFirmwareRetraction)
+            {
+                Builder.BeginGLine(10, "firmware retract");
+            }
+            else
+            {
+                queue_extrude_to(pos, feedRate, extrudeDist, (comment == null) ? "Retract" : comment, true);
+            }
             in_retract = true;
         }
 
@@ -453,7 +493,15 @@ namespace gs
                 throw new Exception("BaseDepositionAssembler.EndRetract: restart position is not same as start of retract!");
             if (extrudeDist == -9999)
                 extrudeDist = retractA;
-            queue_extrude_to(pos, feedRate, extrudeDist, (comment == null) ? "End Retract" : comment, true);
+
+            if (UseFirmwareRetraction)
+            {
+                Builder.BeginGLine(11, "firmware end retract");
+            }
+            else
+            {
+                queue_extrude_to(pos, feedRate, extrudeDist, (comment == null) ? "End Retract" : comment, true);
+            }
             in_retract = false;
         }
 
@@ -495,6 +543,7 @@ namespace gs
                 throw new Exception("BaseDepositionAssembler.AppendResetExtrudedLength: cannot reset during retract!");
             flush_extrude_queue();
             Builder.BeginGLine(92, "reset extruded length").AppendI("E", 0);
+            accumulatedExtrusion += extruderA;
             extruderA = 0;
         }
 
@@ -516,7 +565,10 @@ namespace gs
             Builder.AddCommentLine("; Nozzle Diameter: " + Settings.Machine.NozzleDiamMM + "  Filament Diameter: " + Settings.Machine.FilamentDiamMM);
             Builder.AddCommentLine("; Extruder Temp: " + Settings.ExtruderTempC);
             Builder.AddCommentLine(string.Format("; Speeds Extrude: {0}  Travel: {1} Z: {2}", Settings.RapidExtrudeSpeed, Settings.RapidTravelSpeed, Settings.ZTravelSpeed));
-            Builder.AddCommentLine(string.Format("; Retract Distance: {0}  Speed: {1}", Settings.RetractDistanceMM, Settings.RetractSpeed));
+            if (Settings.EnableRetraction)
+            {
+                Builder.AddCommentLine(string.Format("; Retract Distance: {0}  Speed: {1}", Settings.RetractDistanceMM, Settings.RetractSpeed));
+            }
             Builder.AddCommentLine(string.Format("; Shells: {0}  InteriorShells: {1}", Settings.Shells, Settings.InteriorSolidRegionShells));
             Builder.AddCommentLine(string.Format("; RoofLayers: {0}  FloorLayers: {1}", Settings.RoofLayers, Settings.FloorLayers));
             Builder.AddCommentLine(string.Format("; InfillX: {0}", Settings.SparseLinearInfillStepX));
@@ -524,10 +576,32 @@ namespace gs
                 Settings.GenerateSupport, Settings.SupportOverhangAngleDeg, Settings.SupportSpacingStepX, Settings.EnableSupportShell, Settings.SupportSolidSpace, Settings.SupportVolumeScale));
             Builder.AddCommentLine(string.Format("; ClipOverlaps: {0}  Tolerance: {1}", Settings.ClipSelfOverlaps, Settings.SelfOverlapToleranceX));
             Builder.AddCommentLine(string.Format("; LayerRange: {0}-{1}", Settings.LayerRangeFilter.a, Settings.LayerRangeFilter.b));
+            Builder.AddCommentLine("; the following configures extrusion width and height display for Simplify3D's gcode viewer");
+            Builder.AddCommentLine(string.Format("; tool H{0} W{1}", Settings.LayerHeightMM, Settings.Machine.NozzleDiamMM));
+        }
+
+        public virtual List<string> GenerateTotalExtrusionReport(SingleMaterialFFFSettings settings)
+        {
+            double volume = TotalExtrusion * Math.PI * Math.Pow(settings.Machine.FilamentDiamMM / 2d, 2);
+            double mass = volume * settings.FilamentGramsPerCubicMM;
+            double cost = mass * settings.FilamentCostPerKG / 1000d;
+
+            List<string> result = new List<string>
+            {
+                "TOTAL EXTRUSION ESTIMATE:",
+                "    Length: " + TotalExtrusion.ToString("N2") + " mm",
+                "    Volume: " + volume.ToString("N2") + " mm^3",
+                "      Mass: " + mass.ToString("N2") + " g",
+                "      Cost: $" + cost.ToString("N2")
+            };
+
+            return result;
         }
 
         protected virtual void AddPrimeLine(SingleMaterialFFFSettings Settings)
         {
+            Builder.AddCommentLine(" ");
+            Builder.AddCommentLine("feature nozzle priming");
             Builder.AddCommentLine("---begin prime type=line");
 
             // extruder prime by drawing line across front of bed

@@ -1,6 +1,6 @@
 ﻿namespace gs
 {
-    public interface ThreeAxisLaserCompiler
+    public interface IThreeAxisLaserCompiler
     {
         void Begin();
 
@@ -9,7 +9,7 @@
         void End();
     }
 
-    public class SLSCompiler : ThreeAxisLaserCompiler
+    public class SLSCompiler : IThreeAxisLaserCompiler
     {
         private SingleMaterialFFFSettings Settings;
         private IPathsAssembler Assembler;

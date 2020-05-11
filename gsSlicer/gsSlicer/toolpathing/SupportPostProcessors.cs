@@ -41,7 +41,7 @@ namespace gs
                 LinearToolpath tp = toolpath as LinearToolpath;
                 if (tp == null)
                     continue;
-                if ((tp.TypeModifiers & FillTypeFlags.SupportMaterial) != 0)
+                if (!tp.FillType.IsPart())
                     continue;
 
                 int N = tp.VertexCount;

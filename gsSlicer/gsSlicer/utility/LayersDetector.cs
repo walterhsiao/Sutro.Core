@@ -12,6 +12,7 @@ namespace gs
         public int MinLayerCount = 4;
 
         public int RoundLayerToPrecision = 3;
+        public bool IgnoreTravelLayers = true;
 
         public Dictionary<double, int> LayersCounts;
         public List<double> LayerZ;
@@ -93,6 +94,11 @@ namespace gs
 
             Action<IToolpath> processPathF = (path) =>
             {
+                if (IgnoreTravelLayers)
+                {
+                    if (path.Type == ToolpathTypes.Travel || path.Type == ToolpathTypes.PlaneChange)
+                        return;
+                }
                 if (path.HasFinitePositions)
                 {
                     foreach (Vector3d v in path.AllPositionsItr())

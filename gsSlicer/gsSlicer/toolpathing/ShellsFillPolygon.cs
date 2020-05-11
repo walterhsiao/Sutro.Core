@@ -1,7 +1,9 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace gs
 {
@@ -34,8 +36,11 @@ namespace gs
         public double ToolWidth = 0.4;
         public double PathSpacing = 0.4;
 
-        public double DiscardTinyPerimterLengthMM = 1.0;
+        public double DiscardTinyPerimeterLengthMM = 1.0;
         public double DiscardTinyPolygonAreaMM2 = 1.0;
+
+        // Replace this to use a different inset distance calculations
+        public Func<int, double> InsetDistanceFactoryF;
 
         // When offsets collide, we try to find polyline paths that will "fit"
         // This is multiplier on ToolWidth, we discard path segments within
@@ -55,23 +60,16 @@ namespace gs
         // otherwise InnerPolygons lies on that Shell
         public bool InsetInnerPolygons = true;
 
-        // [RMS] hack that lets us know this is an 'internal' shell which may be processed differently
-        public enum ShellTypes
-        {
-            ExternalPerimeters,
-            InternalShell,
-            BridgeShell
-        }
-
-        public ShellTypes ShellType = ShellTypes.ExternalPerimeters;
-
         // if true, we try to filter out self-overlaps (is expensive)
         public bool FilterSelfOverlaps = false;
 
         public bool PreserveOuterShells = true;         // if true, we do not try to filter self-overlaps for shell 0
         public double SelfOverlapTolerance = 0.3;
 
-        public bool OuterShellLast = false;				// if true, outer shell is scheduled last
+        public bool OuterShellLast = false;             // if true, outer shell is scheduled last
+
+        private readonly IFillType fillType;
+        private readonly IFillType firstShellFillType;
 
         // Outputs
 
@@ -101,16 +99,26 @@ namespace gs
 
         // remaining interior polygons (to fill w/ other strategy, etc)
         public List<GeneralPolygon2d> InnerPolygons { get; set; }
-
         public List<GeneralPolygon2d> GetInnerPolygons()
         {
             return InnerPolygons;
         }
 
-        public ShellsFillPolygon(GeneralPolygon2d poly)
+        public ShellsFillPolygon(GeneralPolygon2d poly, IFillType fillType, IFillType firstShellFillType = null)
         {
             Polygon = poly;
             Shells = new List<FillCurveSet2d>();
+
+            InsetDistanceFactoryF = (shell_i) =>
+            {
+                if (shell_i == 0)
+                    return ToolWidth * InsetFromInputPolygonX;
+                else
+                    return PathSpacing;
+            };
+
+            this.fillType = fillType;
+            this.firstShellFillType = firstShellFillType;
         }
 
         public bool Compute()
@@ -145,17 +153,18 @@ namespace gs
             {
                 FillCurveSet2d paths = ShellPolysToPaths(current, i);
                 Shells.Add(paths);
+                double insetDistance = InsetDistanceFactoryF(i + 1);
 
                 List<GeneralPolygon2d> all_next = new List<GeneralPolygon2d>();
                 foreach (GeneralPolygon2d gpoly in current)
                 {
                     List<GeneralPolygon2d> offsets =
-                        ClipperUtil.ComputeOffsetPolygon(gpoly, -PathSpacing, true);
+                        ClipperUtil.ComputeOffsetPolygon(gpoly, -insetDistance, true);
 
                     List<GeneralPolygon2d> filtered = new List<GeneralPolygon2d>();
                     foreach (var v in offsets)
                     {
-                        bool bTooSmall = (v.Perimeter < DiscardTinyPerimterLengthMM ||
+                        bool bTooSmall = (v.Perimeter < DiscardTinyPerimeterLengthMM ||
                                           v.Area < DiscardTinyPolygonAreaMM2);
                         if (bTooSmall)
                             continue;
@@ -179,7 +188,7 @@ namespace gs
             // failedShells have no space for internal contours. But
             // we might be able to fit a single line...
             //foreach (GeneralPolygon2d gpoly in failedShells) {
-            //	if (gpoly.Perimeter < DiscardTinyPerimterLengthMM ||
+            //	if (gpoly.Perimeter < DiscardTinyPerimeterLengthMM ||
             //		 gpoly.Area < DiscardTinyPolygonAreaMM2)
             //		continue;
 
@@ -209,7 +218,7 @@ namespace gs
         protected virtual List<GeneralPolygon2d> ComputeInitialInsetPolygon(
             bool bForcePreserveTopology)
         {
-            double fInset = ToolWidth * InsetFromInputPolygonX;
+            double fInset = InsetDistanceFactoryF(0);
             List<GeneralPolygon2d> insetPolys =
                 ClipperUtil.MiterOffset(Polygon, -fInset);
 
@@ -292,18 +301,18 @@ namespace gs
         {
             FillCurveSet2d paths = new FillCurveSet2d();
 
-            FillTypeFlags flags = FillTypeFlags.PerimeterShell;
-            if (nShell == 0 && ShellType == ShellTypes.ExternalPerimeters)
-                flags = FillTypeFlags.OutermostShell;
-            else if (ShellType == ShellTypes.InternalShell)
-                flags = FillTypeFlags.InteriorShell;
-            else if (ShellType == ShellTypes.BridgeShell)
-                flags = FillTypeFlags.BridgeSupport;
+            IFillType currentFillType = nShell == 0 ? firstShellFillType ?? fillType : fillType;
 
             if (FilterSelfOverlaps == false)
             {
-                foreach (GeneralPolygon2d shell in shell_polys)
-                    paths.Append(shell, flags);
+                foreach (var shell in shell_polys)
+                {
+                    paths.Append(new FillLoop<FillSegment>(shell.Outer.Vertices) { FillType = currentFillType, PerimeterOrder = nShell });
+                    foreach (var hole in shell.Holes)
+                    {
+                        paths.Append(new FillLoop<FillSegment>(hole.Vertices) { FillType = currentFillType, PerimeterOrder = nShell, IsHoleShell = true }); ;
+                    }
+                }
                 return paths;
             }
 
@@ -318,32 +327,61 @@ namespace gs
                 // However in many cases internal holes are 'too close' to outer border.
                 // So we will still apply to those, but use edge filter to preserve outermost loop.
                 // [TODO] could we be smarter about this somehow?
-                if (PreserveOuterShells && nShell == 0 && ShellType == ShellTypes.ExternalPerimeters)
+                if (PreserveOuterShells && nShell == 0)
                     repair.PreserveEdgeFilterF = (eid) => { return repair.Graph.GetEdgeGroup(eid) == outer_shell_edgegroup; };
 
                 repair.Compute();
 
                 DGraph2Util.Curves c = DGraph2Util.ExtractCurves(repair.GetResultGraph());
 
-                foreach (var polygon in c.Loops)
+                #region Borrow nesting calculations from PlanarSlice to enforce winding direction
+
+                PlanarComplex complex = new PlanarComplex();
+                foreach (Polygon2d poly in c.Loops)
+                    complex.Add(poly);
+
+                PlanarComplex.FindSolidsOptions options
+                             = PlanarComplex.FindSolidsOptions.Default;
+                options.WantCurveSolids = false;
+                options.SimplifyDeviationTolerance = 0.001;
+                options.TrustOrientations = false;
+                options.AllowOverlappingHoles = false;
+
+                PlanarComplex.SolidRegionInfo solids = complex.FindSolidRegions(options);
+                foreach (var polygon in solids.Polygons)
                 {
-                    paths.Append(polygon, flags);
+                    polygon.EnforceCounterClockwise();
+                    paths.Append(new FillLoop<FillSegment>(polygon.Outer.Vertices) { 
+                        FillType = currentFillType, 
+                        PerimeterOrder = nShell });
+                    foreach (var hole in polygon.Holes)
+                    {
+                        paths.Append(new FillLoop<FillSegment>(hole.Vertices)
+                        {
+                            FillType = currentFillType,
+                            PerimeterOrder = nShell,
+                            IsHoleShell = true,
+                        });
+                    }
                 }
+
+                #endregion Borrow nesting calculations from PlanarSlice to enforce winding direction
+
                 foreach (var polyline in c.Paths)
                 {
-                    if (polyline.ArcLength < DiscardTinyPerimterLengthMM)
+                    if (polyline.ArcLength < DiscardTinyPerimeterLengthMM)
                         continue;
-                    if (polyline.Bounds.MaxDim < DiscardTinyPerimterLengthMM)
+                    if (polyline.Bounds.MaxDim < DiscardTinyPerimeterLengthMM)
                         continue;
-                    paths.Append(new FillPolyline2d(polyline) { TypeFlags = flags });
+                    paths.Append(new FillCurve<FillSegment>(polyline) { FillType = currentFillType, PerimeterOrder = nShell });
                 }
             }
             return paths;
         }
 
-        public List<FillPolyline2d> thin_offset(GeneralPolygon2d p)
+        public List<FillBase> thin_offset(GeneralPolygon2d p)
         {
-            List<FillPolyline2d> result = new List<FillPolyline2d>();
+            var result = new List<FillBase>();
 
             // to support non-hole thin offsets we need to return polylines
             if (p.Holes.Count == 0)
@@ -359,7 +397,7 @@ namespace gs
             double clip_dist = ToolWidth * ToolWidthClipMultiplier;
             foreach (GeneralPolygon2d offset_poly in offsets)
             {
-                List<FillPolyline2d> clipped = clip_to_band(offset_poly.Outer, p, clip_dist);
+                var clipped = clip_to_band(offset_poly.Outer, p, clip_dist);
                 result.AddRange(clipped);
             }
 
@@ -385,7 +423,7 @@ namespace gs
         // vertices are discarded if outside clipPoly, or within clip_dist
         // remaining polylines are returned
         // In all-pass case currently returns polyline w/ explicit first==last vertices
-        public List<FillPolyline2d> clip_to_band(Polygon2d insetpoly, GeneralPolygon2d clipPoly, double clip_dist)
+        public List<FillBase> clip_to_band(Polygon2d insetpoly, GeneralPolygon2d clipPoly, double clip_dist)
         {
             double clipSqr = clip_dist * clip_dist;
 
@@ -416,19 +454,18 @@ namespace gs
                 midline[i] = po;
             }
             if (nClipped == N)
-                return new List<FillPolyline2d>();
+                return new List<FillBase>();
             if (nClipped == 0)
             {
-                FillPolyline2d all = new FillPolyline2d(midline);
-                all.AppendVertex(all.Start);
-                return new List<FillPolyline2d>() { all };
+                var all = new FillCurve<FillSegment>(midline);
+                return new List<FillBase>() { all.CloseCurve() };
             }
 
             return find_polygon_spans(midline, clipped);
         }
 
         // extract set of spans from poly where clipped=false
-        private List<FillPolyline2d> find_polygon_spans(Vector2d[] poly, bool[] clipped)
+        private List<FillBase> find_polygon_spans(Vector2d[] poly, bool[] clipped)
         {
             // assumption: at least one vtx is clipped
             int iStart = 0;
@@ -444,21 +481,21 @@ namespace gs
                     iStart++;
             }
 
-            List<FillPolyline2d> result = new List<FillPolyline2d>();
+            var result = new List<FillBase>();
             int iCur = iStart;
             bool done = false;
 
             while (done == false)
             {
-                FillPolyline2d cur = new FillPolyline2d();
+                var vertices = new List<Vector2d>();
                 do
                 {
-                    cur.AppendVertex(poly[iCur]);
+                    vertices.Add(poly[iCur]);
                     iCur = (iCur + 1) % poly.Length;
                 } while (clipped[iCur] == false && iCur != iStart);
 
-                if (cur.VertexCount > 1)
-                    result.Add(cur);
+                if (vertices.Count > 1)
+                    result.Add(new FillCurve<FillSegment>(vertices));
 
                 while (clipped[iCur] && iCur != iStart)
                     iCur++;

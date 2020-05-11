@@ -1,5 +1,4 @@
 ﻿using g3;
-using gs;
 
 namespace gsCore.FunctionalTests.Models
 {
@@ -9,7 +8,7 @@ namespace gsCore.FunctionalTests.Models
         {
         }
 
-        public FillTypeFlags FillType { get; set; }
+        public string FillType { get; set; }
 
         public AxisAlignedBox2d BoundingBox = AxisAlignedBox2d.Empty;
         public Vector2d CenterOfMass => UnweightedCenterOfMass / Extrusion;
@@ -18,13 +17,13 @@ namespace gsCore.FunctionalTests.Models
         public double Distance { get; set; }
         public double Duration { get; set; }
 
-        protected static double boundingBoxTolerance = 1e-4;
-        protected double centerOfMassTolerance = 1e-4;
-        protected double extrusionTolerance = 1e-4;
-        protected double distanceTolerance = 1e-4;
-        protected double durationTolerance = 1e-4;
+        protected static double boundingBoxTolerance = 1e-1;
+        protected double centerOfMassTolerance = 1e-1;
+        protected double extrusionTolerance = 1e-1;
+        protected double distanceTolerance = 1e-1;
+        protected double durationTolerance = 1e-1;
 
-        public FeatureInfo(FillTypeFlags fillType)
+        public FeatureInfo(string fillType)
         {
             FillType = fillType;
         }
@@ -39,17 +38,17 @@ namespace gsCore.FunctionalTests.Models
                 "\r\nExtrusion Time:\t" + Duration;
         }
 
-        public void Add(IFeatureInfo other)
+        public virtual void Add(IFeatureInfo other)
         {
             Add((FeatureInfo)other);
         }
 
-        public void AssertEqualsExpected(IFeatureInfo other)
+        public virtual void AssertEqualsExpected(IFeatureInfo other)
         {
             AssertEqualsExpected((FeatureInfo)other);
         }
 
-        public void AssertEqualsExpected(FeatureInfo expected)
+        public virtual void AssertEqualsExpected(FeatureInfo expected)
         {
             if (!BoundingBox.Equals(expected.BoundingBox, boundingBoxTolerance))
                 throw new FeatureBoundingBoxMismatch($"Bounding boxes aren't equal; expected {expected.BoundingBox}, got {BoundingBox}");
@@ -67,7 +66,7 @@ namespace gsCore.FunctionalTests.Models
                 throw new FeatureCenterOfMassMismatch($"Centers of mass aren't equal; expected {expected.CenterOfMass}, got {CenterOfMass}");
         }
 
-        public void Add(FeatureInfo other)
+        public virtual void Add(FeatureInfo other)
         {
             BoundingBox.Contain(other.BoundingBox);
             Extrusion += other.Extrusion;

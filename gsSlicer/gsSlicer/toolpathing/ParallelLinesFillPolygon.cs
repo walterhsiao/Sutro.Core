@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,8 +47,7 @@ namespace gs
 
         public SimplificationLevel SimplifyAmount = SimplificationLevel.Minor;
 
-        // this flag is set on all Paths
-        public FillTypeFlags TypeFlags = FillTypeFlags.SolidInfill;
+        public IFillType FillType { get; }
 
         // fill paths
         public List<FillCurveSet2d> FillCurves { get; set; }
@@ -61,10 +61,11 @@ namespace gs
         // [TODO] replace with GeneralPolygon2dBoxTree (currently does not have intersection test!)
         //SegmentSet2d BoundaryPolygonCache;
 
-        public ParallelLinesFillPolygon(GeneralPolygon2d poly)
+        public ParallelLinesFillPolygon(GeneralPolygon2d poly, IFillType fillType)
         {
             Polygon = poly;
             FillCurves = new List<FillCurveSet2d>();
+            FillType = fillType;
         }
 
         public bool Compute()
@@ -143,9 +144,9 @@ namespace gs
                 int vid = start_vid;
                 int eid = pathGraph.GetVtxEdges(vid)[0];
 
-                FillPolyline2d path = new FillPolyline2d() { TypeFlags = this.TypeFlags };
+                var path = new FillCurve<FillSegment>() { FillType = this.FillType };
 
-                path.AppendVertex(pathGraph.GetVertex(vid));
+                path.BeginCurve(pathGraph.GetVertex(vid));
                 while (true)
                 {
                     Index2i next = DGraph2Util.NextEdgeAndVtx(eid, vid, pathGraph);
@@ -154,11 +155,11 @@ namespace gs
                     int gid = pathGraph.GetEdgeGroup(eid);
                     if (gid < 0)
                     {
-                        path.AppendVertex(pathGraph.GetVertex(vid), TPVertexFlags.IsConnector);
+                        path.AddToCurve(pathGraph.GetVertex(vid), new FillSegment(true));
                     }
                     else
                     {
-                        path.AppendVertex(pathGraph.GetVertex(vid));
+                        path.AddToCurve(pathGraph.GetVertex(vid));
                     }
 
                     if (boundaries.Contains(vid))
@@ -169,16 +170,16 @@ namespace gs
                 }
 
                 // discard paths that are too short
-                if (path.ArcLength < MinPathLengthMM)
+                if (path.TotalLength() < MinPathLengthMM)
                     continue;
 
                 // run polyline simplification to get rid of unneccesary detail in connectors
                 // [TODO] we could do this at graph level...)
-                // [TODO] maybe should be checkign for collisions? we could end up creating
+                // [TODO] maybe should be checking for collisions? we could end up creating
                 //  non-trivial overlaps here...
-                if (SimplifyAmount != SimplificationLevel.None && path.VertexCount > 2)
+                if (SimplifyAmount != SimplificationLevel.None && path.Elements.Count > 1)
                 {
-                    PolySimplification2 simp = new PolySimplification2(path);
+                    var simp = new PolySimplification2(new PolyLine2d(path.Vertices()));
                     switch (SimplifyAmount)
                     {
                         default:
@@ -190,7 +191,7 @@ namespace gs
                             simp.SimplifyDeviationThreshold = ToolWidth / 2; break;
                     }
                     simp.Simplify();
-                    path = new FillPolyline2d(simp.Result.ToArray()) { TypeFlags = this.TypeFlags };
+                    path = new FillCurve<FillSegment>(simp.Result.ToArray()) { FillType = this.FillType };
                 }
 
                 paths.Append(path);

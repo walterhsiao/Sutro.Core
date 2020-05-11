@@ -9,14 +9,15 @@ namespace gsSlicer.FunctionalTests.Utility
         public static PrintTestRunner CreateTestRunner(string caseName, SingleMaterialFFFSettings settings)
         {
             var resultGenerator = CreateResultGenerator(settings);
-            var resultAnalyzer = new ResultAnalyzer<FeatureInfo>(new FeatureInfoFactoryFFF());
+            var resultAnalyzer = new ResultAnalyzer<FeatureInfo>(new FeatureInfoFactoryFFF(), new ConsoleLogger());
             return new PrintTestRunner(caseName, resultGenerator, resultAnalyzer);
         }
 
         public static ResultGenerator<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings> CreateResultGenerator(SingleMaterialFFFSettings settings)
         {
+            var logger = new ConsoleLogger();
             return new ResultGenerator<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>(
-                new SinglePartGenerator<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>(), settings, new ConsoleLogger());
+                new PrintGeneratorManager<SingleMaterialFFFPrintGenerator, SingleMaterialFFFSettings>(settings, "", "", logger), logger);
         }
     }
 }

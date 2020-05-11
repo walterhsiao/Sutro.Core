@@ -1,5 +1,4 @@
-﻿using Sutro.PathWorks.Plugins.API;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace gs.info
 {
@@ -25,11 +24,6 @@ namespace gs.info
     public class MakerbotSettings : SingleMaterialFFFSettings, ISailfishSettings
     {
         public Makerbot.Models ModelEnum;
-
-        public override IProfile Clone()
-        {
-            return CloneAs<MakerbotSettings>();
-        }
 
         public override AssemblerFactoryF AssemblerType()
         {
