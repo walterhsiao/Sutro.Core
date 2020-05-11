@@ -365,7 +365,7 @@ namespace gs
                 // make path-accumulator for this layer
                 pathAccum.Initialize(Compiler.NozzlePosition);
                 // layer-up (ie z-change)
-                pathAccum.AppendZChange(layerSettings.LayerHeightMM, Settings.ZTravelSpeed);
+                pathAccum.AppendMoveToZ(layerdata.Slice.LayerZSpan.b, Settings.ZTravelSpeed);
 
                 // do skirt first
                 {
@@ -1870,7 +1870,9 @@ namespace gs
         /// </summary>
         protected virtual IFillPathScheduler2d get_layer_scheduler(PrintLayerData layer_data)
         {
-            SequentialScheduler2d scheduler = new SequentialScheduler2d(layer_data.PathAccum, layer_data.Settings);
+            SequentialScheduler2d scheduler = new SequentialScheduler2d(
+                layer_data.PathAccum, layer_data.Settings, layer_data.Slice.LayerZSpan.b);
+
             scheduler.SpeedHint = GetSchedulerSpeedHint(layer_data);
             return scheduler;
         }

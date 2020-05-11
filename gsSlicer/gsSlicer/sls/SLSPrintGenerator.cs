@@ -130,7 +130,7 @@ namespace gs
 
                 // rest of code does not directly access path builder, instead if
                 // sends paths to scheduler.
-                SequentialScheduler2d scheduler = new SequentialScheduler2d(paths, Settings);
+                SequentialScheduler2d scheduler = new SequentialScheduler2d(paths, Settings, Slices[layer_i].LayerZSpan.b);
 
                 // a layer can contain multiple disjoint regions. Process each separately.
                 List<ShellsFillPolygon> layer_shells = LayerShells[layer_i];

@@ -31,13 +31,16 @@ namespace gs
         public bool ExtrudeOnShortTravels = false;
         public double ShortTravelDistance = 0;
 
+        public double LayerZ { get; }
+
         // optional function we will call when curve sets are appended
         public Action<List<FillCurveSet2d>, SequentialScheduler2d> OnAppendCurveSetsF = null;
 
-        public SequentialScheduler2d(ToolpathSetBuilder builder, SingleMaterialFFFSettings settings)
+        public SequentialScheduler2d(ToolpathSetBuilder builder, SingleMaterialFFFSettings settings, double layerZ)
         {
             Builder = builder;
             Settings = settings;
+            LayerZ = layerZ;
         }
 
         public virtual SchedulerSpeedHint SpeedHint { get; set; } = SchedulerSpeedHint.Default;
@@ -135,9 +138,9 @@ namespace gs
             else if (Settings.TravelLiftEnabled &&
                 travelDistance > Settings.TravelLiftDistanceThreshold)
             {
-                Builder.AppendZChange(Settings.TravelLiftHeight, Settings.ZTravelSpeed, ToolpathTypes.Travel);
+                Builder.AppendMoveToZ(LayerZ + Settings.TravelLiftHeight, Settings.ZTravelSpeed, ToolpathTypes.Travel);
                 Builder.AppendTravel(endPt, Settings.RapidTravelSpeed);
-                Builder.AppendZChange(-Settings.TravelLiftHeight, Settings.ZTravelSpeed, ToolpathTypes.Travel);
+                Builder.AppendMoveToZ(LayerZ, Settings.ZTravelSpeed, ToolpathTypes.Travel);
             }
             else
             {
