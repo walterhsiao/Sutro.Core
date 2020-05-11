@@ -4,10 +4,14 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Git LFS pull
         run: git lfs pull
-      - name: Build & test project
-        run: dotnet test -c Release
+      - name: Build solution
+        run: dotnet build -c Release
+      - name: Unit tests
+        run: dotnet test -c Release Sutro.Core.UnitTests/Sutro.Core.UnitTests.csproj --no-build
+      - name: Functional tests
+        run: dotnet test -c Release Sutro.Core.FunctionalTests/Sutro.Core.FunctionalTests.csproj --no-build
