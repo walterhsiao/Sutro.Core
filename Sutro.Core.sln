@@ -3,17 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gsSlicer", "gsSlicer\gsSlicer\gsSlicer.csproj", "{1F862827-28FF-46E2-B003-5F2BE2F92FF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sutro.Core.FunctionalTests", "Sutro.Core.FunctionalTests\Sutro.Core.FunctionalTests.csproj", "{95EA8B47-B932-4C17-8782-3D5A55ABC7F2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gsSlicer.UnitTests", "gsSlicer\gsSlicer.UnitTests\gsSlicer.UnitTests.csproj", "{2ECFBCD0-0DA8-427E-BAE6-2E9EEB48B767}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sutro.Core", "Sutro.Core\Sutro.Core.csproj", "{AC281F29-810B-4080-AA15-CEED23900996}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gsSlicer.FunctionalTests", "gsSlicer\gsSlicer.FunctionalTests\gsSlicer.FunctionalTests.csproj", "{95EA8B47-B932-4C17-8782-3D5A55ABC7F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sutro.Core.UnitTests", "Sutro.Core.UnitTests\Sutro.Core.UnitTests.csproj", "{E9B79552-21B6-4940-918E-9FFD7883644B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gsGCode", "gsGCode\gsGCode\gsGCode.csproj", "{658D2F7E-D7D6-4B35-A8E2-8EFB21FB2DE4}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "gsGCode.Tests", "gsGCode\gsGCode.Tests\gsGCode.Tests.csproj", "{363A01F0-74C5-458C-A2FD-8CF5CD04A72B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gsSlicer.CLI", "gsSlicer\gsSlicer.CLI\gsSlicer.CLI.csproj", "{069BC99C-E9CE-4E3B-BE00-BEFAB88F0B39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sutro.Core.CLI", "Sutro.Core.CLI\Sutro.Core.CLI.csproj", "{81753227-DC58-43FE-8D9A-407CEF8659EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,38 +17,27 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1F862827-28FF-46E2-B003-5F2BE2F92FF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1F862827-28FF-46E2-B003-5F2BE2F92FF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1F862827-28FF-46E2-B003-5F2BE2F92FF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1F862827-28FF-46E2-B003-5F2BE2F92FF5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2ECFBCD0-0DA8-427E-BAE6-2E9EEB48B767}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2ECFBCD0-0DA8-427E-BAE6-2E9EEB48B767}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2ECFBCD0-0DA8-427E-BAE6-2E9EEB48B767}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2ECFBCD0-0DA8-427E-BAE6-2E9EEB48B767}.Release|Any CPU.Build.0 = Release|Any CPU
 		{95EA8B47-B932-4C17-8782-3D5A55ABC7F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{95EA8B47-B932-4C17-8782-3D5A55ABC7F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95EA8B47-B932-4C17-8782-3D5A55ABC7F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95EA8B47-B932-4C17-8782-3D5A55ABC7F2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{658D2F7E-D7D6-4B35-A8E2-8EFB21FB2DE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{658D2F7E-D7D6-4B35-A8E2-8EFB21FB2DE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{658D2F7E-D7D6-4B35-A8E2-8EFB21FB2DE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{658D2F7E-D7D6-4B35-A8E2-8EFB21FB2DE4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{363A01F0-74C5-458C-A2FD-8CF5CD04A72B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{363A01F0-74C5-458C-A2FD-8CF5CD04A72B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{363A01F0-74C5-458C-A2FD-8CF5CD04A72B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{363A01F0-74C5-458C-A2FD-8CF5CD04A72B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{069BC99C-E9CE-4E3B-BE00-BEFAB88F0B39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{069BC99C-E9CE-4E3B-BE00-BEFAB88F0B39}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{069BC99C-E9CE-4E3B-BE00-BEFAB88F0B39}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{069BC99C-E9CE-4E3B-BE00-BEFAB88F0B39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC281F29-810B-4080-AA15-CEED23900996}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC281F29-810B-4080-AA15-CEED23900996}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC281F29-810B-4080-AA15-CEED23900996}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC281F29-810B-4080-AA15-CEED23900996}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9B79552-21B6-4940-918E-9FFD7883644B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9B79552-21B6-4940-918E-9FFD7883644B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9B79552-21B6-4940-918E-9FFD7883644B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9B79552-21B6-4940-918E-9FFD7883644B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81753227-DC58-43FE-8D9A-407CEF8659EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81753227-DC58-43FE-8D9A-407CEF8659EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81753227-DC58-43FE-8D9A-407CEF8659EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81753227-DC58-43FE-8D9A-407CEF8659EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CD398D96-A819-45DC-BF76-4132DFA051F4}
-	EndGlobalSection
-	GlobalSection(NDepend) = preSolution
-		Project = ".\Sutro.Core.ndproj"
 	EndGlobalSection
 EndGlobal

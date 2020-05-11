@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\gsSlicer\gsSlicer.csproj" />
+    <ProjectReference Include="..\Sutro.Core\Sutro.Core.csproj" />
   </ItemGroup>
 
 </Project>
