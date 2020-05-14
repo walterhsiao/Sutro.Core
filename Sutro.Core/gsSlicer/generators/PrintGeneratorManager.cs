@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,13 +43,46 @@ namespace gs
 
         public GCodeFile GCodeFromMesh(DMesh3 mesh, out IEnumerable<string> generationReport)
         {
-            return GCodeFromMeshes(new DMesh3[] { mesh }, out generationReport);
+            return GCodeFromMesh(mesh, out generationReport, null);
         }
 
-        public GCodeFile GCodeFromMeshes(IEnumerable<DMesh3> meshes, out IEnumerable<string> generationReport)
+        public GCodeFile GCodeFromMesh(DMesh3 mesh, out IEnumerable<string> generationReport, TPrintSettings settings = null)
+        {
+            return GCodeFromMeshes(new DMesh3[] { mesh }, out generationReport, settings);
+        }
+
+        public GCodeFile GCodeFromMeshes(IEnumerable<DMesh3> meshes, out IEnumerable<string> generationReport, TPrintSettings settings = null)
         {
             var printMeshAssembly = PrintMeshAssemblyFromMeshes(meshes);
             return GCodeFromPrintMeshAssembly(printMeshAssembly, out generationReport);
+        }
+
+        public GCodeFile GCodeFromPrintMeshAssembly(PrintMeshAssembly printMeshAssembly, out IEnumerable<string> generationReport, TPrintSettings settings = null)
+        {
+            PlanarSliceStack slices = null;
+
+            if (AcceptsParts)
+            {
+                SliceMesh(printMeshAssembly, out slices);
+            }
+
+            var globalSettings = settings ?? settingsBuilder.Settings;
+
+            // Run the print generator
+            logger.WriteLine("Running print generator...");
+            var printGenerator = new TPrintGenerator();
+            AssemblerFactoryF overrideAssemblerF = globalSettings.AssemblerType();
+            printGenerator.Initialize(printMeshAssembly, slices, globalSettings, overrideAssemblerF);
+
+            if (printGenerator.Generate())
+            {
+                generationReport = printGenerator.GenerationReport;
+                return printGenerator.Result;
+            }
+            else
+            {
+                throw new Exception("PrintGenerator failed to generate gcode!");
+            }
         }
 
         private PrintMeshAssembly PrintMeshAssemblyFromMeshes(IEnumerable<DMesh3> meshes)
@@ -60,32 +94,6 @@ namespace gs
                 return printMeshAssembly;
             }
             return null;
-        }
-
-        public GCodeFile GCodeFromPrintMeshAssembly(PrintMeshAssembly printMeshAssembly, out IEnumerable<string> generationReport)
-        {
-            PlanarSliceStack slices = null;
-
-            if (AcceptsParts)
-            {
-                SliceMesh(printMeshAssembly, out slices);
-            }
-
-            // Run the print generator
-            logger.WriteLine("Running print generator...");
-            var printGenerator = new TPrintGenerator();
-            AssemblerFactoryF overrideAssemblerF = Settings.AssemblerType();
-            printGenerator.Initialize(printMeshAssembly, slices, Settings, overrideAssemblerF);
-
-            if (printGenerator.Generate())
-            {
-                generationReport = printGenerator.GenerationReport;
-                return printGenerator.Result;
-            }
-            else
-            {
-                throw new Exception("PrintGenerator failed to generate gcode!");
-            }
         }
 
         private void SliceMesh(PrintMeshAssembly meshes, out PlanarSliceStack slices)
