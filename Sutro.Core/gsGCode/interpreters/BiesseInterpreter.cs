@@ -1,4 +1,5 @@
 using g3;
+using Sutro.Core.Models.GCode;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,10 +32,10 @@ namespace gs
 
             foreach (GCodeLine line in lines_enum)
             {
-                if (line.type == GCodeLine.LType.GCode)
+                if (line.Type == GCodeLine.LType.GCode)
                 {
                     Action<GCodeLine> parseF;
-                    if (GCodeMap.TryGetValue(line.code, out parseF))
+                    if (GCodeMap.TryGetValue(line.Code, out parseF))
                         parseF(line);
                 }
             }
@@ -44,11 +45,11 @@ namespace gs
 
         private void emit_linear(GCodeLine line)
         {
-            Debug.Assert(line.code == 1);
+            Debug.Assert(line.Code == 1);
 
             double dx = 0, dy = 0;
-            bool brelx = GCodeUtil.TryFindParamNum(line.parameters, "XI", ref dx);
-            bool brely = GCodeUtil.TryFindParamNum(line.parameters, "YI", ref dy);
+            bool brelx = GCodeUtil.TryFindParamNum(line.Parameters, "XI", ref dx);
+            bool brely = GCodeUtil.TryFindParamNum(line.Parameters, "YI", ref dy);
 
             LinearMoveData move = new LinearMoveData(new Vector2d(dx, dy));
 
@@ -59,8 +60,8 @@ namespace gs
             }
 
             double x = 0, y = 0;
-            bool absx = GCodeUtil.TryFindParamNum(line.parameters, "X", ref x);
-            bool absy = GCodeUtil.TryFindParamNum(line.parameters, "Y", ref y);
+            bool absx = GCodeUtil.TryFindParamNum(line.Parameters, "X", ref x);
+            bool absy = GCodeUtil.TryFindParamNum(line.Parameters, "Y", ref y);
             if (absx && absy)
             {
                 listener.LinearMoveToAbsolute2d(move);
@@ -87,12 +88,12 @@ namespace gs
             double dx = 0, dy = 0;
 
             // either of these might be missing...
-            bool brelx = GCodeUtil.TryFindParamNum(line.parameters, "XI", ref dx);
-            bool brely = GCodeUtil.TryFindParamNum(line.parameters, "YI", ref dy);
+            bool brelx = GCodeUtil.TryFindParamNum(line.Parameters, "XI", ref dx);
+            bool brely = GCodeUtil.TryFindParamNum(line.Parameters, "YI", ref dy);
             Debug.Assert(brelx == true && brely == true);
 
             double r = 0;
-            bool br = GCodeUtil.TryFindParamNum(line.parameters, "R", ref r);
+            bool br = GCodeUtil.TryFindParamNum(line.Parameters, "R", ref r);
             Debug.Assert(br == true);
 
             // [RMS] seems like G5 always has negative radius and G4 positive ??

@@ -1,5 +1,6 @@
 ﻿using gs;
 using gsCore.FunctionalTests.Models;
+using Sutro.Core.Models.GCode;
 
 namespace gsCore.FunctionalTests.Utility
 {

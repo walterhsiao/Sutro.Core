@@ -1,4 +1,5 @@
 ﻿using g3;
+using Sutro.Core.Models.GCode;
 using System;
 
 namespace gs
@@ -18,7 +19,7 @@ namespace gs
         static public int TryFindParam(GCodeParam[] paramList, string identifier)
         {
             for (int i = 0; i < paramList.Length; ++i)
-                if (paramList[i].identifier == identifier)
+                if (paramList[i].Identifier == identifier)
                     return i;
             return -1;
         }
@@ -29,16 +30,16 @@ namespace gs
                 return false;
             for (int i = 0; i < paramList.Length; ++i)
             {
-                if (paramList[i].identifier == identifier)
+                if (paramList[i].Identifier == identifier)
                 {
-                    if (paramList[i].type == GCodeParam.PType.DoubleValue)
+                    if (paramList[i].Type == GCodeParamTypes.DoubleValue)
                     {
-                        d = paramList[i].doubleValue;
+                        d = paramList[i].DoubleValue;
                         return true;
                     }
-                    else if (paramList[i].type == GCodeParam.PType.IntegerValue)
+                    else if (paramList[i].Type == GCodeParamTypes.IntegerValue)
                     {
-                        d = paramList[i].intValue;
+                        d = paramList[i].IntegerValue;
                         return true;
                     }
                     else

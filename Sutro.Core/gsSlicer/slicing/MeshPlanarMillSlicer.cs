@@ -1,4 +1,5 @@
 ﻿using g3;
+using Sutro.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,7 +76,7 @@ namespace gs
         /// How should open paths be handled. Is overriden by
         /// PrintMeshOptions.OpenPathsModes for specific meshes
         /// </summary>
-        public PrintMeshOptions.OpenPathsModes DefaultOpenPathMode = PrintMeshOptions.OpenPathsModes.Clipped;
+        public OpenPathsModes DefaultOpenPathMode = OpenPathsModes.Clipped;
 
         /// <summary>
         /// If this is set, all incoming polygons are clipped against it
@@ -103,7 +104,7 @@ namespace gs
 
         public int AddMesh(DMesh3 mesh)
         {
-            return AddMesh(mesh, PrintMeshOptions.Default());
+            return AddMesh(mesh, PrintMeshOptionsFactory.Default());
         }
 
         public bool Add(PrintMeshAssembly assy)
@@ -217,7 +218,7 @@ namespace gs
                 bool is_crop = mesh_options.IsCropRegion;
                 bool is_support = mesh_options.IsSupport;
                 bool is_closed = (mesh_options.IsOpen) ? false : mesh.IsClosed();
-                var useOpenMode = (mesh_options.OpenPathMode == PrintMeshOptions.OpenPathsModes.Default) ?
+                var useOpenMode = (mesh_options.OpenPathMode == OpenPathsModes.Default) ?
                     DefaultOpenPathMode : mesh_options.OpenPathMode;
 
                 if (is_crop || is_support)
@@ -351,7 +352,7 @@ namespace gs
                 // (possibly this entire thing should be done at slicer level, except we need clip_slice!)
                 FilterHoles(solid_polygons, 1.1 * ToolDiameter);
 
-                add_solid_polygons(horz_slices[k], solid_polygons, PrintMeshOptions.Default());
+                add_solid_polygons(horz_slices[k], solid_polygons, PrintMeshOptionsFactory.Default());
             }
 
             // resolve planar intersections, etc
@@ -432,7 +433,7 @@ namespace gs
                 bool is_crop = mesh_options.IsCropRegion;
                 bool is_support = mesh_options.IsSupport;
                 bool is_closed = (mesh_options.IsOpen) ? false : mesh.IsClosed();
-                var useOpenMode = (mesh_options.OpenPathMode == PrintMeshOptions.OpenPathsModes.Default) ?
+                var useOpenMode = (mesh_options.OpenPathMode == OpenPathsModes.Default) ?
                     DefaultOpenPathMode : mesh_options.OpenPathMode;
                 if (is_crop || is_support)
                     throw new Exception("Not supported!");

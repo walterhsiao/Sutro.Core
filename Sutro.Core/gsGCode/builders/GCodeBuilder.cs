@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sutro.Core.Models.GCode;
+using System;
 using System.Collections.Generic;
 
 namespace gs
@@ -18,12 +19,12 @@ namespace gs
             if (bClone)
             {
                 GCodeLine clone = line.Clone();
-                clone.lineNumber = next_line_number();
+                clone.LineNumber = next_line_number();
                 Target.AddLine(clone);
             }
             else
             {
-                line.lineNumber = next_line_number();
+                line.LineNumber = next_line_number();
                 Target.AddLine(line);
             }
             return this;
@@ -67,9 +68,9 @@ namespace gs
         public virtual GCodeBuilder BeginGLine(int Gcode, string comment = null)
         {
             begin_new_line(GCodeLine.LType.GCode);
-            next_line.code = Gcode;
+            next_line.Code = Gcode;
             if (comment != null)
-                next_line.comment = comment;
+                next_line.Comment = comment;
             return this;
         }
 
@@ -79,9 +80,9 @@ namespace gs
         public virtual GCodeBuilder BeginMLine(int Mcode, string comment = null)
         {
             begin_new_line(GCodeLine.LType.MCode);
-            next_line.code = Mcode;
+            next_line.Code = Mcode;
             if (comment != null)
-                next_line.comment = comment;
+                next_line.Comment = comment;
             return this;
         }
 
@@ -98,7 +99,7 @@ namespace gs
         {
             if (next_line == null)
                 throw new Exception("GCodeBuilder.AppendComment: next_line was null!?");
-            next_line.comment = comment;
+            next_line.Comment = comment;
             return this;
         }
 
@@ -109,9 +110,9 @@ namespace gs
         {
             GCodeParam p = new GCodeParam()
             {
-                type = GCodeParam.PType.IntegerValue,
-                identifier = identifier,
-                intValue = value
+                Type = GCodeParamTypes.IntegerValue,
+                Identifier = identifier,
+                IntegerValue = value
             };
             next_params.Add(p);
             return this;
@@ -124,9 +125,9 @@ namespace gs
         {
             GCodeParam p = new GCodeParam()
             {
-                type = GCodeParam.PType.DoubleValue,
-                identifier = identifier,
-                doubleValue = value
+                Type = GCodeParamTypes.DoubleValue,
+                Identifier = identifier,
+                DoubleValue = value
             };
             next_params.Add(p);
             return this;
@@ -140,9 +141,9 @@ namespace gs
         {
             GCodeParam p = new GCodeParam()
             {
-                type = GCodeParam.PType.TextValue,
-                identifier = identifier,
-                textValue = value
+                Type = GCodeParamTypes.TextValue,
+                Identifier = identifier,
+                TextValue = value
             };
             next_params.Add(p);
             return this;
@@ -156,8 +157,8 @@ namespace gs
         {
             GCodeParam p = new GCodeParam()
             {
-                type = GCodeParam.PType.NoValue,
-                identifier = identifier
+                Type = GCodeParamTypes.NoValue,
+                Identifier = identifier
             };
             next_params.Add(p);
             return this;
@@ -178,7 +179,7 @@ namespace gs
             if (next_line != null)
             {
                 if (next_params.Count > 0)
-                    next_line.parameters = next_params.ToArray();
+                    next_line.Parameters = next_params.ToArray();
                 Target.AddLine(next_line);
                 next_line = null;
             }

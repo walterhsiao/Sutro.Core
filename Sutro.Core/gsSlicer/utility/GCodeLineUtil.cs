@@ -1,15 +1,17 @@
-﻿namespace gs.utility
+﻿using Sutro.Core.Models.GCode;
+
+namespace gs.utility
 {
     public static class GCodeLineUtil
     {
         public static bool ExtractFillType(GCodeLine line, ref string featureType)
         {
-            if (line.comment != null)
+            if (line.Comment != null)
             {
-                int indexOfFillType = line.comment.IndexOf("feature");
+                int indexOfFillType = line.Comment.IndexOf("feature");
                 if (indexOfFillType >= 0)
                 {
-                    featureType = line.comment.Substring(indexOfFillType + 8).Trim();
+                    featureType = line.Comment.Substring(indexOfFillType + 8).Trim();
                     return true;
                 }
             }

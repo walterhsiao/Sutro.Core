@@ -1,6 +1,7 @@
 ﻿using g3;
 using gs;
 using gsCore.FunctionalTests.Models;
+using Sutro.Core.Models.GCode;
 using System.Collections.Generic;
 
 namespace gsCore.FunctionalTests.Utility
@@ -29,28 +30,28 @@ namespace gsCore.FunctionalTests.Utility
 
         public virtual void ObserveGcodeLine(GCodeLine line)
         {
-            if (line.type != GCodeLine.LType.GCode)
+            if (line.Type != GCodeLine.LType.GCode)
                 return;
 
             double x = VertexPrevious.Position.x;
             double y = VertexPrevious.Position.y;
 
-            GCodeUtil.TryFindParamNum(line.parameters, "X", ref x);
-            GCodeUtil.TryFindParamNum(line.parameters, "Y", ref y);
+            GCodeUtil.TryFindParamNum(line.Parameters, "X", ref x);
+            GCodeUtil.TryFindParamNum(line.Parameters, "Y", ref y);
 
             VertexCurrent.Position = new Vector3d(x, y, 0);
 
             double f = GCodeUtil.UnspecifiedValue;
-            if (GCodeUtil.TryFindParamNum(line.parameters, "F", ref f))
+            if (GCodeUtil.TryFindParamNum(line.Parameters, "F", ref f))
                 VertexCurrent.FeedRate = f;
 
             double extrusionAmount = GCodeUtil.UnspecifiedValue;
-            bool featureActive = GCodeUtil.TryFindParamNum(line.parameters, "E", ref extrusionAmount) &&
+            bool featureActive = GCodeUtil.TryFindParamNum(line.Parameters, "E", ref extrusionAmount) &&
                                  extrusionAmount > VertexPrevious.Extrusion.x &&
                                  currentFeatureInfo != null;
 
             foreach (var s in endFeatureComments)
-                if (!string.IsNullOrWhiteSpace(line.comment) && line.comment.ToLower().Contains(s))
+                if (!string.IsNullOrWhiteSpace(line.Comment) && line.Comment.ToLower().Contains(s))
                     featureActive = false;
 
             if (featureActive)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sutro.Core.Models.GCode;
+using System;
 using System.IO;
 using System.Linq;
 
@@ -94,7 +95,7 @@ namespace gs
             }
 
             if (comment != null)
-                gcode.comment = comment;
+                gcode.Comment = comment;
 
             return gcode;
         }
@@ -109,7 +110,7 @@ namespace gs
                 eType = GCodeLine.LType.MCode;
 
             GCodeLine l = new GCodeLine(nLineNum, eType);
-            l.orig_string = line;
+            l.OriginalString = line;
 
             bool valid = int.TryParse(tokens[0].Substring(1), out l.N);
 
@@ -121,13 +122,13 @@ namespace gs
             if (eType == GCodeLine.LType.UnknownCode)
             {
                 if (tokens.Length > 1)
-                    l.parameters = parse_parameters(tokens, 1);
+                    l.Parameters = parse_parameters(tokens, 1);
             }
             else
             {
-                l.code = int.Parse(tokens[0].Substring(1));
+                l.Code = int.Parse(tokens[0].Substring(1));
                 if (tokens.Length > 1)
-                    l.parameters = parse_parameters(tokens, 1);
+                    l.Parameters = parse_parameters(tokens, 1);
             }
 
             return l;
@@ -143,7 +144,7 @@ namespace gs
                 eType = GCodeLine.LType.MCode;
 
             GCodeLine l = new GCodeLine(nLineNum, eType);
-            l.orig_string = line;
+            l.OriginalString = line;
 
             bool valid = int.TryParse(tokens[0].Substring(1), out l.N);
 
@@ -155,13 +156,13 @@ namespace gs
             if (eType == GCodeLine.LType.UnknownCode)
             {
                 if (tokens.Length > 1)
-                    l.parameters = parse_parameters(tokens, 1);
+                    l.Parameters = parse_parameters(tokens, 1);
             }
             else
             {
-                l.code = int.Parse(tokens[1].Substring(1));
+                l.Code = int.Parse(tokens[1].Substring(1));
                 if (tokens.Length > 2)
-                    l.parameters = parse_parameters(tokens, 2);
+                    l.Parameters = parse_parameters(tokens, 2);
             }
 
             return l;
@@ -171,7 +172,7 @@ namespace gs
         virtual protected GCodeLine make_string_line(string line, int nLineNum)
         {
             GCodeLine l = new GCodeLine(nLineNum, GCodeLine.LType.UnknownString);
-            l.orig_string = line;
+            l.OriginalString = line;
             return l;
         }
 
@@ -189,10 +190,10 @@ namespace gs
                 eType = GCodeLine.LType.EndIf;
 
             GCodeLine l = new GCodeLine(nLineNum, eType);
-            l.orig_string = line;
+            l.OriginalString = line;
 
             if (tokens.Length > 1)
-                l.parameters = parse_parameters(tokens, 1);
+                l.Parameters = parse_parameters(tokens, 1);
 
             return l;
         }
@@ -202,9 +203,9 @@ namespace gs
         {
             GCodeLine l = new GCodeLine(nLineNum, GCodeLine.LType.Comment);
 
-            l.orig_string = line;
+            l.OriginalString = line;
             int iStart = line.IndexOf(';');
-            l.comment = line.Substring(iStart);
+            l.Comment = line.Substring(iStart);
             return l;
         }
 
@@ -244,15 +245,15 @@ namespace gs
                 }
                 else if (tokens[ti].Length == 1)
                 {
-                    paramList[pi].type = GCodeParam.PType.NoValue;
-                    paramList[pi].identifier = tokens[ti];
+                    paramList[pi].Type = GCodeParamTypes.NoValue;
+                    paramList[pi].Identifier = tokens[ti];
                     bHandled = true;
                 }
 
                 if (!bHandled)
                 {
-                    paramList[pi].type = GCodeParam.PType.TextValue;
-                    paramList[pi].textValue = tokens[ti];
+                    paramList[pi].Type = GCodeParamTypes.TextValue;
+                    paramList[pi].TextValue = tokens[ti];
                 }
             }
 
@@ -261,13 +262,13 @@ namespace gs
 
         virtual protected bool parse_code_parameter(string token, ref GCodeParam param)
         {
-            param.type = GCodeParam.PType.Code;
-            param.identifier = token.Substring(0, 1);
+            param.Type = GCodeParamTypes.Code;
+            param.Identifier = token.Substring(0, 1);
 
             string value = token.Substring(1);
             GCodeUtil.NumberType numType = GCodeUtil.GetNumberType(value);
             if (numType == GCodeUtil.NumberType.Integer)
-                param.intValue = int.Parse(value);
+                param.IntegerValue = int.Parse(value);
 
             return true;
         }
@@ -313,7 +314,7 @@ namespace gs
 
         virtual protected bool parse_value_param(string token, int split, int skip, ref GCodeParam param)
         {
-            param.identifier = token.Substring(0, split);
+            param.Identifier = token.Substring(0, split);
 
             string value = token.Substring(split + skip, token.Length - (split + skip));
 
@@ -322,14 +323,14 @@ namespace gs
                 GCodeUtil.NumberType numType = GCodeUtil.GetNumberType(value);
                 if (numType == GCodeUtil.NumberType.Decimal)
                 {
-                    param.type = GCodeParam.PType.DoubleValue;
-                    param.doubleValue = double.Parse(value);
+                    param.Type = GCodeParamTypes.DoubleValue;
+                    param.DoubleValue = double.Parse(value);
                     return true;
                 }
                 else if (numType == GCodeUtil.NumberType.Integer)
                 {
-                    param.type = GCodeParam.PType.IntegerValue;
-                    param.intValue = int.Parse(value);
+                    param.Type = GCodeParamTypes.IntegerValue;
+                    param.IntegerValue = int.Parse(value);
                     return true;
                 }
             }
@@ -338,8 +339,8 @@ namespace gs
                 // just continue on and do generic string param
             }
 
-            param.type = GCodeParam.PType.TextValue;
-            param.textValue = value;
+            param.Type = GCodeParamTypes.TextValue;
+            param.TextValue = value;
             return true;
         }
     }

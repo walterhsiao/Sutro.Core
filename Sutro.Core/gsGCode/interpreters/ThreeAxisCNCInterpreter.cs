@@ -1,4 +1,5 @@
 ﻿using g3;
+using Sutro.Core.Models.GCode;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -46,14 +47,14 @@ namespace gs
             foreach (GCodeLine line in lines_enum)
             {
                 Action<GCodeLine> parseF;
-                if (line.type == GCodeLine.LType.GCode)
+                if (line.Type == GCodeLine.LType.GCode)
                 {
-                    if (GCodeMap.TryGetValue(line.code, out parseF))
+                    if (GCodeMap.TryGetValue(line.Code, out parseF))
                         parseF(line);
                 }
-                else if (line.type == GCodeLine.LType.MCode)
+                else if (line.Type == GCodeLine.LType.MCode)
                 {
-                    if (MCodeMap.TryGetValue(line.code, out parseF))
+                    if (MCodeMap.TryGetValue(line.Code, out parseF))
                         parseF(line);
                 }
             }
@@ -72,10 +73,10 @@ namespace gs
 
             foreach (GCodeLine line in lines_enum)
             {
-                if (line.type == GCodeLine.LType.GCode)
+                if (line.Type == GCodeLine.LType.GCode)
                 {
                     Action<GCodeLine> parseF;
-                    if (GCodeMap.TryGetValue(line.code, out parseF))
+                    if (GCodeMap.TryGetValue(line.Code, out parseF))
                     {
                         parseF(line);
                         yield return true;
@@ -90,14 +91,14 @@ namespace gs
 
         private void emit_linear(GCodeLine line)
         {
-            Debug.Assert(line.code == 0 || line.code == 1);
+            Debug.Assert(line.Code == 0 || line.Code == 1);
 
             double x = GCodeUtil.UnspecifiedValue,
                 y = GCodeUtil.UnspecifiedValue,
                 z = GCodeUtil.UnspecifiedValue;
-            bool found_x = GCodeUtil.TryFindParamNum(line.parameters, "X", ref x);
-            bool found_y = GCodeUtil.TryFindParamNum(line.parameters, "Y", ref y);
-            bool found_z = GCodeUtil.TryFindParamNum(line.parameters, "Z", ref z);
+            bool found_x = GCodeUtil.TryFindParamNum(line.Parameters, "X", ref x);
+            bool found_y = GCodeUtil.TryFindParamNum(line.Parameters, "Y", ref y);
+            bool found_z = GCodeUtil.TryFindParamNum(line.Parameters, "Z", ref z);
             Vector3d newPos = (UseRelativePosition) ? Vector3d.Zero : CurPosition;
             if (found_x)
                 newPos.x = x;
@@ -112,13 +113,13 @@ namespace gs
 
             // F is feed rate (this changes?)
             double f = 0;
-            bool haveF = GCodeUtil.TryFindParamNum(line.parameters, "F", ref f);
+            bool haveF = GCodeUtil.TryFindParamNum(line.Parameters, "F", ref f);
 
             LinearMoveData move = new LinearMoveData(
                 newPos,
                 (haveF) ? f : GCodeUtil.UnspecifiedValue);
 
-            bool is_travel = (line.code == 0);
+            bool is_travel = (line.Code == 0);
 
             if (is_travel)
             {
@@ -149,15 +150,15 @@ namespace gs
         private void set_position(GCodeLine line)
         {
             double x = 0, y = 0, z = 0;
-            if (GCodeUtil.TryFindParamNum(line.parameters, "X", ref x))
+            if (GCodeUtil.TryFindParamNum(line.Parameters, "X", ref x))
             {
                 CurPosition.x = x;
             }
-            if (GCodeUtil.TryFindParamNum(line.parameters, "Y", ref y))
+            if (GCodeUtil.TryFindParamNum(line.Parameters, "Y", ref y))
             {
                 CurPosition.y = y;
             }
-            if (GCodeUtil.TryFindParamNum(line.parameters, "Z", ref z))
+            if (GCodeUtil.TryFindParamNum(line.Parameters, "Z", ref z))
             {
                 CurPosition.z = z;
             }

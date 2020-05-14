@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using CommandLine.Text;
 using g3;
+using Sutro.Core.Models.GCode;
 using System;
 using System.Collections.Generic;
 using System.IO;

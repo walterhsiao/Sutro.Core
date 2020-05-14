@@ -1,4 +1,5 @@
 ﻿using g3;
+using Sutro.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -89,9 +90,9 @@ namespace gs
 
         /// <summary>
         /// How should open paths be handled. Is overriden by
-        /// PrintMeshOptions.OpenPathsModes for specific meshes
+        /// OpenPathsModes for specific meshes
         /// </summary>
-        public PrintMeshOptions.OpenPathsModes DefaultOpenPathMode = PrintMeshOptions.OpenPathsModes.Clipped;
+        public OpenPathsModes DefaultOpenPathMode = OpenPathsModes.Clipped;
 
         /// <summary>
         /// If this is set, all incoming polygons are clipped against it
@@ -127,7 +128,7 @@ namespace gs
 
         public int AddMesh(DMesh3 mesh)
         {
-            return AddMesh(mesh, PrintMeshOptions.Default());
+            return AddMesh(mesh, PrintMeshOptionsFactory.Default());
         }
 
         public bool Add(PrintMeshAssembly assy)
@@ -211,7 +212,7 @@ namespace gs
                 bool is_crop = mesh_options.IsCropRegion;
                 bool is_support = mesh_options.IsSupport;
                 bool is_closed = (mesh_options.IsOpen) ? false : mesh.IsClosed();
-                var useOpenMode = (mesh_options.OpenPathMode == PrintMeshOptions.OpenPathsModes.Default) ?
+                var useOpenMode = (mesh_options.OpenPathMode == OpenPathsModes.Default) ?
                     DefaultOpenPathMode : mesh_options.OpenPathMode;
 
                 // each layer is independent so we can do in parallel
@@ -263,7 +264,7 @@ namespace gs
                         else
                             add_solid_polygons(slices[i], solid_polygons, mesh_options);
                     }
-                    else if (useOpenMode != PrintMeshOptions.OpenPathsModes.Ignored)
+                    else if (useOpenMode != OpenPathsModes.Ignored)
                     {
                         // [TODO]
                         //   - does not really handle clipped polygons properly, there will be an extra break somewhere...
@@ -274,7 +275,7 @@ namespace gs
                         List<PolyLine2d> open_polylines = ApplyValidRegions(all_paths);
                         foreach (PolyLine2d pline in open_polylines)
                         {
-                            if (useOpenMode == PrintMeshOptions.OpenPathsModes.Embedded)
+                            if (useOpenMode == OpenPathsModes.Embedded)
                                 slices[i].AddEmbeddedPath(pline);
                             else
                                 slices[i].AddClippedPath(pline);

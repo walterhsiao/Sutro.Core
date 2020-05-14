@@ -2,6 +2,7 @@ using gs;
 using gs.FillTypes;
 using gs.utility;
 using gsCore.FunctionalTests.Models;
+using Sutro.Core.Models.GCode;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -50,7 +51,7 @@ namespace gsCore.FunctionalTests.Utility
 
         public virtual bool LineIsNewLayer(GCodeLine line)
         {
-            return NewLayerPattern.Match(line?.comment ?? "").Success;
+            return NewLayerPattern.Match(line?.Comment ?? "").Success;
         }
 
         protected virtual Regex NewLayerPattern => new Regex(@"layer [0-9]+");

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sutro.Core.Models.GCode;
+using System;
 using System.IO;
 using System.Text;
 
@@ -29,39 +30,39 @@ namespace gs
 
         public override void WriteLine(GCodeLine line, TextWriter outStream)
         {
-            if (line.type == GCodeLine.LType.Comment)
+            if (line.Type == GCodeLine.LType.Comment)
             {
                 if (CommentStyle == CommentStyles.Semicolon)
                 {
-                    if (line.comment[0] != ';')
+                    if (line.Comment[0] != ';')
                         outStream.Write(";");
-                    outStream.WriteLine(line.comment);
+                    outStream.WriteLine(line.Comment);
                 }
                 else
                 {
                     outStream.Write("(");
-                    outStream.Write(line.comment);
+                    outStream.Write(line.Comment);
                     outStream.WriteLine(")");
                 }
                 return;
             }
-            else if (line.type == GCodeLine.LType.UnknownString)
+            else if (line.Type == GCodeLine.LType.UnknownString)
             {
-                outStream.WriteLine(line.orig_string);
+                outStream.WriteLine(line.OriginalString);
                 return;
             }
-            else if (line.type == GCodeLine.LType.Blank)
+            else if (line.Type == GCodeLine.LType.Blank)
             {
                 outStream.WriteLine();
                 return;
             }
 
             StringBuilder b = new StringBuilder();
-            if (line.type == GCodeLine.LType.MCode)
+            if (line.Type == GCodeLine.LType.MCode)
             {
                 b.Append('M');
             }
-            else if (line.type == GCodeLine.LType.GCode)
+            else if (line.Type == GCodeLine.LType.GCode)
             {
                 b.Append('G');
             }
@@ -70,38 +71,38 @@ namespace gs
                 throw new Exception("StandardGCodeWriter.WriteLine: unsupported line type");
             }
 
-            b.Append(line.code);
+            b.Append(line.Code);
             b.Append(' ');
 
-            if (line.parameters != null)
+            if (line.Parameters != null)
             {
-                foreach (GCodeParam p in line.parameters)
+                foreach (GCodeParam p in line.Parameters)
                 {
-                    if (p.type == GCodeParam.PType.Code)
+                    if (p.Type == GCodeParamTypes.Code)
                     {
                         //
                     }
-                    else if (p.type == GCodeParam.PType.IntegerValue)
+                    else if (p.Type == GCodeParamTypes.IntegerValue)
                     {
-                        b.Append(p.identifier);
-                        b.Append(p.intValue);
+                        b.Append(p.Identifier);
+                        b.Append(p.IntegerValue);
                         b.Append(' ');
                     }
-                    else if (p.type == GCodeParam.PType.DoubleValue)
+                    else if (p.Type == GCodeParamTypes.DoubleValue)
                     {
-                        b.Append(p.identifier);
-                        b.AppendFormat(float_format, p.doubleValue);
+                        b.Append(p.Identifier);
+                        b.AppendFormat(float_format, p.DoubleValue);
                         b.Append(' ');
                     }
-                    else if (p.type == GCodeParam.PType.TextValue)
+                    else if (p.Type == GCodeParamTypes.TextValue)
                     {
-                        b.Append(p.identifier);
-                        b.Append(p.textValue);
+                        b.Append(p.Identifier);
+                        b.Append(p.TextValue);
                         b.Append(' ');
                     }
-                    else if (p.type == GCodeParam.PType.NoValue)
+                    else if (p.Type == GCodeParamTypes.NoValue)
                     {
-                        b.Append(p.identifier);
+                        b.Append(p.Identifier);
                         b.Append(' ');
                     }
                     else
@@ -111,18 +112,18 @@ namespace gs
                 }
             }
 
-            if (line.comment != null && line.comment.Length > 0)
+            if (line.Comment != null && line.Comment.Length > 0)
             {
                 if (CommentStyle == CommentStyles.Semicolon)
                 {
-                    if (line.comment[0] != '(' && line.comment[0] != ';')
+                    if (line.Comment[0] != '(' && line.Comment[0] != ';')
                         b.Append(';');
-                    b.Append(line.comment);
+                    b.Append(line.Comment);
                 }
                 else
                 {
                     b.Append("(");
-                    b.Append(line.comment);
+                    b.Append(line.Comment);
                     b.Append(")");
                 }
             }

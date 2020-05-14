@@ -1,5 +1,6 @@
 ﻿using g3;
 using gs.FillTypes;
+using Sutro.Core.Models.GCode;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -90,7 +91,7 @@ namespace gs
             if (AcceptsParts)
             {
                 var printMeshAssembly = new PrintMeshAssembly();
-                printMeshAssembly.AddMeshes(meshes, PrintMeshOptions.Default());
+                printMeshAssembly.AddMeshes(meshes, PrintMeshOptionsFactory.Default());
                 return printMeshAssembly;
             }
             return null;

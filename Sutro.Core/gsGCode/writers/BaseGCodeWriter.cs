@@ -1,4 +1,5 @@
 ﻿using g3;
+using Sutro.Core.Models.GCode;
 using System;
 using System.Globalization;
 using System.IO;
