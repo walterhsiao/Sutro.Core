@@ -2,8 +2,8 @@ name: Publish NuGet Package
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - 1.*
 
 jobs:
   publish:
@@ -22,5 +22,6 @@ jobs:
         run: dotnet pack Sutro.Core/Sutro.Core.csproj -c Release --include-source --include-symbols
       - name: Push package
         run: dotnet nuget push **/*.nupkg 
+               --skip-duplicate
                --api-key ${{ secrets.NUGET_API_KEY }}
                --source https://api.nuget.org/v3/index.json

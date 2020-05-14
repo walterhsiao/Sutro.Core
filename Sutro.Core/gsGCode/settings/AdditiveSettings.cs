@@ -1,102 +1,20 @@
 ﻿using g3;
 using Newtonsoft.Json;
+using Sutro.Core.Models;
+using Sutro.Core.Models.Profiles;
 using System;
 using System.Collections.Generic;
 
 namespace gs
 {
-    public enum MachineClass
-    {
-        Unknown,
-        PlasticFFFPrinter,
-        MetalSLSPrinter
-    }
-
-    public abstract class MachineInfo : SettingsPrototype
-    {
-        protected readonly static string UnknownUUID = "00000000-0000-0000-0000-000000000000";
-
-        public string ManufacturerName = "Unknown";
-        public string ManufacturerUUID = UnknownUUID;
-        public string ModelIdentifier = "Machine";
-        public string ModelUUID = UnknownUUID;
-        public MachineClass Class = MachineClass.Unknown;
-
-        public double BedSizeXMM = 100;
-        public double BedSizeYMM = 100;
-        public double MaxHeightMM = 100;
-
-        // These factors define the output coordinate system
-
-        // BedOriginFactorX:
-        // 0   : the origin is at the left of the build plate
-        // 0.5 : the origin is at the middle of the build plate
-        // 1   : the origin is at the right of the build plate
-
-        // BedOriginFactorY:
-        // 0   : the origin is at the front of the build plate
-        // 0.5 : the origin is at the middle of the build plate
-        // 1   : the origin is at the back of the build plate
-
-        public double BedOriginFactorX = 0;
-        public double BedOriginFactorY = 0;
-    }
-
-    public class FFFMachineInfo : MachineInfo
-    {
-        /*
-         * printer mechanics
-         */
-        public double NozzleDiamMM = 0.4;
-        public double FilamentDiamMM = 1.75;
-
-        public double MinLayerHeightMM = 0.2;
-        public double MaxLayerHeightMM = 0.2;
-
-        /*
-         * Temperatures
-         */
-
-        public int MinExtruderTempC = 20;
-        public int MaxExtruderTempC = 230;
-
-        public bool HasHeatedBed = false;
-        public int MinBedTempC = 0;
-        public int MaxBedTempC = 0;
-
-        /*
-         * All units are mm/min = (mm/s * 60)
-         */
-        public int MaxExtrudeSpeedMMM = 50 * 60;
-        public int MaxTravelSpeedMMM = 100 * 60;
-        public int MaxZTravelSpeedMMM = 20 * 60;
-        public int MaxRetractSpeedMMM = 20 * 60;
-
-        /*
-         *  bed levelling
-         */
-        public bool HasAutoBedLeveling = false;
-        public bool EnableAutoBedLeveling = false;
-
-        /*
-         * Hacks?
-         */
-
-        public double MinPointSpacingMM = 0.1;          // Avoid emitting gcode extrusion points closer than this spacing.
-                                                        // This is a workaround for the fact that many printers do not gracefully
-                                                        // handle very tiny sequential extrusion steps. This setting could be
-                                                        // configured using CalibrationModelGenerator.MakePrintStepSizeTest() with
-                                                        // all other cleanup steps disabled.
-                                                        // [TODO] this is actually speed-dependent...
-    }
-
-    public interface IPlanarAdditiveSettings
+    public interface IPlanarAdditiveSettings : IProfile
     {
         double LayerHeightMM { get; }
 
         AssemblerFactoryF AssemblerType();
-    }
 
+        MachineInfo BaseMachine { get; set; }
+    }
     public abstract class PlanarAdditiveSettings : SettingsPrototype, IPlanarAdditiveSettings
     {
         /// <summary>
@@ -108,7 +26,33 @@ namespace gs
 
         public abstract MachineInfo BaseMachine { get; set; }
 
+        public string ManufacturerName { get => BaseMachine.ManufacturerName; set => BaseMachine.ManufacturerName = value; }
+        public string ModelIdentifier { get => BaseMachine.ModelIdentifier; set => BaseMachine.ModelIdentifier = value; }
+        public double MachineBedSizeXMM { get => BaseMachine.BedSizeXMM; set => BaseMachine.BedSizeXMM = value; }
+        public double MachineBedSizeYMM { get => BaseMachine.BedSizeYMM; set => BaseMachine.BedSizeYMM = value; }
+        public double MachineBedSizeZMM { get => BaseMachine.MaxHeightMM; set => BaseMachine.MaxHeightMM = value; }
+
+        public MachineBedOriginLocationX OriginX 
+        {
+            get => MachineBedOriginLocationUtility.LocationXFromScalar(BaseMachine.BedOriginFactorX);
+            set => BaseMachine.BedOriginFactorX = MachineBedOriginLocationUtility.LocationXFromEnum(value);
+        }
+
+        public MachineBedOriginLocationY OriginY
+        {
+            get => MachineBedOriginLocationUtility.LocationYFromScalar(BaseMachine.BedOriginFactorY);
+            set => BaseMachine.BedOriginFactorY = MachineBedOriginLocationUtility.LocationYFromEnum(value);
+        }
+
+        public abstract string MaterialName { get; set; }
+        public abstract string ProfileName { get; set; }
+
         public abstract AssemblerFactoryF AssemblerType();
+
+        public IMachineProfile Clone()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class SingleMaterialFFFSettings : PlanarAdditiveSettings
@@ -146,7 +90,11 @@ namespace gs
         public string MaterialType { get; set; } = "PLA";
         public string MaterialColor { get; set; } = "Blue";
 
-        public string MaterialName => $"{MaterialSource} {MaterialType} - {MaterialColor}";
+        public override string MaterialName
+        {
+            get => $"{MaterialSource} {MaterialType} - {MaterialColor}";
+            set { }
+        }
 
         #endregion Material
 
@@ -204,17 +152,6 @@ namespace gs
 
         public double TravelLiftHeight { get; set; } = 0.2;
         public double TravelLiftDistanceThreshold { get; set; } = 5d;
-
-        // Wrap some properties to satisfy the IProfile interface
-        public string ManufacturerName { get => Machine.ManufacturerName; set => Machine.ManufacturerName = value; }
-
-        public string ModelIdentifier { get => Machine.ModelIdentifier; set => Machine.ModelIdentifier = value; }
-        public string ProfileName { get => Identifier; set => Identifier = value; }
-        public double MachineBedSizeXMM => Machine.BedSizeXMM;
-        public double MachineBedSizeYMM => Machine.BedSizeYMM;
-        public double MachineBedSizeZMM => Machine.MaxHeightMM;
-        public double MachineBedOriginFactorX => Machine.BedOriginFactorX;
-        public double MachineBedOriginFactorY => Machine.BedOriginFactorY;
 
         /*
          * Shells
@@ -316,7 +253,9 @@ namespace gs
 
         public bool RepairMesh = true;                  // run a mesh auto-repair after it's been loaded
 
-        public bool GCodeAppendBeadDimensions { get; set; } = true; 
+        public bool GCodeAppendBeadDimensions { get; set; } = true;
+
+        public override string ProfileName { get; set; } = "Default";
 
         /*
          * functions that calculate derived values
