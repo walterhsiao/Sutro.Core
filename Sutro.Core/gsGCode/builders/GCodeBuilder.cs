@@ -38,7 +38,7 @@ namespace gs
             //if ( comment[0] != ';' && comment[0] != '(' )
             //	comment = ";" + comment;
             AddLine(
-                new GCodeLine(next_line_number(), GCodeLine.LType.Comment, comment));
+                new GCodeLine(next_line_number(), LineType.Comment, comment));
             return this;
         }
 
@@ -48,7 +48,7 @@ namespace gs
         public virtual GCodeBuilder AddExplicitLine(string line)
         {
             AddLine(
-                new GCodeLine(next_line_number(), GCodeLine.LType.UnknownString, line));
+                new GCodeLine(next_line_number(), LineType.UnknownString, line));
             return this;
         }
 
@@ -58,7 +58,7 @@ namespace gs
         public virtual GCodeBuilder AddBlankLine()
         {
             AddLine(
-                new GCodeLine(next_line_number(), GCodeLine.LType.Blank));
+                new GCodeLine(next_line_number(), LineType.Blank));
             return this;
         }
 
@@ -67,7 +67,7 @@ namespace gs
         /// </summary>
         public virtual GCodeBuilder BeginGLine(int Gcode, string comment = null)
         {
-            begin_new_line(GCodeLine.LType.GCode);
+            begin_new_line(LineType.GCode);
             next_line.Code = Gcode;
             if (comment != null)
                 next_line.Comment = comment;
@@ -79,7 +79,7 @@ namespace gs
         /// </summary>
         public virtual GCodeBuilder BeginMLine(int Mcode, string comment = null)
         {
-            begin_new_line(GCodeLine.LType.MCode);
+            begin_new_line(LineType.MCode);
             next_line.Code = Mcode;
             if (comment != null)
                 next_line.Comment = comment;
@@ -108,12 +108,7 @@ namespace gs
         /// </summary>
         public virtual GCodeBuilder AppendI(string identifier, int value)
         {
-            GCodeParam p = new GCodeParam()
-            {
-                Type = GCodeParamTypes.IntegerValue,
-                Identifier = identifier,
-                IntegerValue = value
-            };
+            GCodeParam p = GCodeParam.Integer(value, identifier);
             next_params.Add(p);
             return this;
         }
@@ -123,12 +118,7 @@ namespace gs
         /// </summary>
         public virtual GCodeBuilder AppendF(string identifier, double value)
         {
-            GCodeParam p = new GCodeParam()
-            {
-                Type = GCodeParamTypes.DoubleValue,
-                Identifier = identifier,
-                DoubleValue = value
-            };
+            GCodeParam p = GCodeParam.Double(value, identifier);
             next_params.Add(p);
             return this;
         }
@@ -139,12 +129,7 @@ namespace gs
         /// </summary>
         public virtual GCodeBuilder AppendS(string identifier, string value)
         {
-            GCodeParam p = new GCodeParam()
-            {
-                Type = GCodeParamTypes.TextValue,
-                Identifier = identifier,
-                TextValue = value
-            };
+            GCodeParam p = GCodeParam.Text(value, identifier);
             next_params.Add(p);
             return this;
         }
@@ -155,11 +140,7 @@ namespace gs
         /// <param name="identifier">Identifier.</param>
         public virtual GCodeBuilder AppendL(string identifier)
         {
-            GCodeParam p = new GCodeParam()
-            {
-                Type = GCodeParamTypes.NoValue,
-                Identifier = identifier
-            };
+            GCodeParam p = GCodeParam.NoValue(identifier);
             next_params.Add(p);
             return this;
         }
@@ -185,7 +166,7 @@ namespace gs
             }
         }
 
-        protected virtual void begin_new_line(GCodeLine.LType type)
+        protected virtual void begin_new_line(LineType type)
         {
             if (next_line != null)
                 close_current_line();

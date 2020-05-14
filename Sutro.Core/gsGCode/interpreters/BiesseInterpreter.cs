@@ -32,7 +32,7 @@ namespace gs
 
             foreach (GCodeLine line in lines_enum)
             {
-                if (line.Type == GCodeLine.LType.GCode)
+                if (line.Type == LineType.GCode)
                 {
                     Action<GCodeLine> parseF;
                     if (GCodeMap.TryGetValue(line.Code, out parseF))

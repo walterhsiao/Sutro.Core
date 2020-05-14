@@ -34,6 +34,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="ReportGenerator" Version="4.5.0" />
     <PackageReference Include="Sutro.Clipper" Version="1.1.0" />
+    <PackageReference Include="Sutro.Core.Models" Version="1.0.0" />
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
   </ItemGroup>
 
@@ -43,11 +44,6 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Sutro.Core.Models\Sutro.Core.Models\Sutro.Core.Models.csproj" />
   </ItemGroup>
 
 </Project>

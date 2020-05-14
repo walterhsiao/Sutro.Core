@@ -5,13 +5,13 @@ namespace gs
 {
     public struct InterpretArgs
     {
-        public GCodeLine.LType eTypeFilter;
+        public LineType eTypeFilter;
 
-        public bool HasTypeFilter { get { return eTypeFilter != GCodeLine.LType.Blank; } }
+        public bool HasTypeFilter { get { return eTypeFilter != LineType.Blank; } }
 
         public static readonly InterpretArgs Default = new InterpretArgs()
         {
-            eTypeFilter = GCodeLine.LType.Blank
+            eTypeFilter = LineType.Blank
         };
     }
 

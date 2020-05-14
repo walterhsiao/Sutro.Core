@@ -30,7 +30,7 @@ namespace gs
 
         public override void WriteLine(GCodeLine line, TextWriter outStream)
         {
-            if (line.Type == GCodeLine.LType.Comment)
+            if (line.Type == LineType.Comment)
             {
                 if (CommentStyle == CommentStyles.Semicolon)
                 {
@@ -46,23 +46,23 @@ namespace gs
                 }
                 return;
             }
-            else if (line.Type == GCodeLine.LType.UnknownString)
+            else if (line.Type == LineType.UnknownString)
             {
                 outStream.WriteLine(line.OriginalString);
                 return;
             }
-            else if (line.Type == GCodeLine.LType.Blank)
+            else if (line.Type == LineType.Blank)
             {
                 outStream.WriteLine();
                 return;
             }
 
             StringBuilder b = new StringBuilder();
-            if (line.Type == GCodeLine.LType.MCode)
+            if (line.Type == LineType.MCode)
             {
                 b.Append('M');
             }
-            else if (line.Type == GCodeLine.LType.GCode)
+            else if (line.Type == LineType.GCode)
             {
                 b.Append('G');
             }

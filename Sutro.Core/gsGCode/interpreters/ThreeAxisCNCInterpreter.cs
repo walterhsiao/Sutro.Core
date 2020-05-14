@@ -47,12 +47,12 @@ namespace gs
             foreach (GCodeLine line in lines_enum)
             {
                 Action<GCodeLine> parseF;
-                if (line.Type == GCodeLine.LType.GCode)
+                if (line.Type == LineType.GCode)
                 {
                     if (GCodeMap.TryGetValue(line.Code, out parseF))
                         parseF(line);
                 }
-                else if (line.Type == GCodeLine.LType.MCode)
+                else if (line.Type == LineType.MCode)
                 {
                     if (MCodeMap.TryGetValue(line.Code, out parseF))
                         parseF(line);
@@ -73,7 +73,7 @@ namespace gs
 
             foreach (GCodeLine line in lines_enum)
             {
-                if (line.Type == GCodeLine.LType.GCode)
+                if (line.Type == LineType.GCode)
                 {
                     Action<GCodeLine> parseF;
                     if (GCodeMap.TryGetValue(line.Code, out parseF))

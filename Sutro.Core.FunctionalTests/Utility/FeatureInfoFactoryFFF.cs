@@ -30,7 +30,7 @@ namespace gsCore.FunctionalTests.Utility
 
         public virtual void ObserveGcodeLine(GCodeLine line)
         {
-            if (line.Type != GCodeLine.LType.GCode)
+            if (line.Type != LineType.GCode)
                 return;
 
             double x = VertexPrevious.Position.x;
