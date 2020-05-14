@@ -42,17 +42,40 @@ namespace gs
 
         public GCodeFile GCodeFromMesh(DMesh3 mesh, out IEnumerable<string> generationReport)
         {
-            PrintMeshAssembly meshes = null;
+            return GCodeFromMeshes(new DMesh3[] { mesh }, out generationReport);
+        }
+
+        public GCodeFile GCodeFromMeshes(IEnumerable<DMesh3> meshes, out IEnumerable<string> generationReport)
+        {
+            var printMeshAssembly = PrintMeshAssemblyFromMeshes(meshes);
+            return GCodeFromPrintMeshAssembly(printMeshAssembly, out generationReport);
+        }
+
+        private PrintMeshAssembly PrintMeshAssemblyFromMeshes(IEnumerable<DMesh3> meshes)
+        {
+            if (AcceptsParts)
+            {
+                var printMeshAssembly = new PrintMeshAssembly();
+                printMeshAssembly.AddMeshes(meshes, PrintMeshOptions.Default());
+                return printMeshAssembly;
+            }
+            return null;
+        }
+
+        public GCodeFile GCodeFromPrintMeshAssembly(PrintMeshAssembly printMeshAssembly, out IEnumerable<string> generationReport)
+        {
             PlanarSliceStack slices = null;
 
             if (AcceptsParts)
-                SliceMesh(mesh, out meshes, out slices);
+            {
+                SliceMesh(printMeshAssembly, out slices);
+            }
 
             // Run the print generator
             logger.WriteLine("Running print generator...");
             var printGenerator = new TPrintGenerator();
             AssemblerFactoryF overrideAssemblerF = Settings.AssemblerType();
-            printGenerator.Initialize(meshes, slices, Settings, overrideAssemblerF);
+            printGenerator.Initialize(printMeshAssembly, slices, Settings, overrideAssemblerF);
 
             if (printGenerator.Generate())
             {
@@ -65,12 +88,8 @@ namespace gs
             }
         }
 
-        private void SliceMesh(DMesh3 mesh, out PrintMeshAssembly meshes, out PlanarSliceStack slices)
+        private void SliceMesh(PrintMeshAssembly meshes, out PlanarSliceStack slices)
         {
-            // Create print mesh set
-            meshes = new PrintMeshAssembly();
-            meshes.AddMesh(mesh, PrintMeshOptions.Default());
-
             logger?.WriteLine("Slicing...");
 
             // Do slicing
