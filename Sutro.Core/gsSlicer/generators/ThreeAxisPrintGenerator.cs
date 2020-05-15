@@ -518,7 +518,7 @@ namespace gs
         /// </summary>
         protected virtual SingleMaterialFFFSettings MakeLayerSettings(int layer_i)
         {
-            SingleMaterialFFFSettings layerSettings = Settings.CloneAs<SingleMaterialFFFSettings>();
+            var layerSettings = (SingleMaterialFFFSettings)Settings.Clone();
             PlanarSlice slice = Slices[layer_i];
             // override standard layer height with slice ZSpan
             layerSettings.LayerHeightMM = slice.LayerZSpan.Length;

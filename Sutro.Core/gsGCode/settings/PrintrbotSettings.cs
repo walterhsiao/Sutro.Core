@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Sutro.Core.Models.Profiles;
+using System.Collections.Generic;
 
 namespace gs.info
 {
@@ -23,6 +24,11 @@ namespace gs.info
         public override AssemblerFactoryF AssemblerType()
         {
             return MakePrintrbotAssembler;
+        }
+
+        public override IProfile Clone()
+        {
+            return CloneAs<PrintrbotSettings>();
         }
 
         public PrintrbotSettings()

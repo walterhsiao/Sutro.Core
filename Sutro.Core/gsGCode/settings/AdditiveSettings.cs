@@ -49,10 +49,7 @@ namespace gs
 
         public abstract AssemblerFactoryF AssemblerType();
 
-        public IMachineProfile Clone()
-        {
-            throw new NotImplementedException();
-        }
+        public abstract IProfile Clone();
     }
 
     public class SingleMaterialFFFSettings : PlanarAdditiveSettings
@@ -62,6 +59,11 @@ namespace gs
         public override AssemblerFactoryF AssemblerType()
         {
             throw new NotImplementedException($"{GetType()}.AssemblerType() not provided");
+        }
+
+        public override IProfile Clone()
+        {
+            return CloneAs<SingleMaterialFFFSettings>();
         }
 
         protected FFFMachineInfo machineInfo;
@@ -284,6 +286,11 @@ namespace gs
         public override AssemblerFactoryF AssemblerType()
         {
             return RepRapAssembler.Factory;
+        }
+
+        public override IProfile Clone()
+        {
+            return CloneAs<GenericRepRapSettings>();
         }
     }
 }

@@ -1,10 +1,17 @@
-﻿namespace gs.info
+﻿using Sutro.Core.Models.Profiles;
+
+namespace gs.info
 {
     public class GenericPrinterSettings : GenericRepRapSettings
     {
         public override AssemblerFactoryF AssemblerType()
         {
             return RepRapAssembler.Factory;
+        }
+
+        public override IProfile Clone()
+        {
+            return CloneAs<GenericPrinterSettings>();
         }
 
         public string ManufacturerUUID;

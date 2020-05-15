@@ -105,7 +105,7 @@ namespace gs.UnitTests.Fill
         public void CloneBare()
         {
             // Arrange
-            var settings = new SingleMaterialFFFSettings();
+            var settings = new GenericRepRapSettings();
             var curve = new FillCurve<FillSegment>()
             {
                 FillType = new OuterPerimeterFillType(settings),
