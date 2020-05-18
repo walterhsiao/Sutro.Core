@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace gsCore.FunctionalTests.Utility
+namespace Sutro.Core.FunctionalTest
 {
     public static class TestDataPaths
     {

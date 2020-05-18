@@ -1,8 +1,7 @@
 ﻿using gs;
-using gsCore.FunctionalTests.Utility;
 using System.Collections.Generic;
 
-namespace gsCore.FunctionalTests.Models
+namespace Sutro.Core.FunctionalTest
 {
     public class LayerInfo<TFeatureInfo> where TFeatureInfo : IFeatureInfo
     {

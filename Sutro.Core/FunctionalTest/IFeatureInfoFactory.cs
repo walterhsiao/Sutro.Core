@@ -1,8 +1,6 @@
-﻿using gs;
-using gsCore.FunctionalTests.Models;
-using Sutro.Core.Models.GCode;
+﻿using Sutro.Core.Models.GCode;
 
-namespace gsCore.FunctionalTests.Utility
+namespace Sutro.Core.FunctionalTest
 {
     public interface IFeatureInfoFactory<out TFeatureInfo> where TFeatureInfo : IFeatureInfo
     {

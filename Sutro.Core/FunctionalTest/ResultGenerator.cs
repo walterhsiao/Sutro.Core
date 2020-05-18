@@ -1,10 +1,9 @@
 ﻿using g3;
 using gs;
 using Sutro.Core.Models.GCode;
-using System;
 using System.IO;
 
-namespace gsCore.FunctionalTests.Utility
+namespace Sutro.Core.FunctionalTest
 {
     public class ResultGenerator<TGenerator, TSettings> : IResultGenerator
         where TGenerator : IPrintGenerator<TSettings>, new()

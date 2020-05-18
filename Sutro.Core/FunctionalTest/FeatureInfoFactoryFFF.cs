@@ -1,10 +1,9 @@
 ﻿using g3;
 using gs;
-using gsCore.FunctionalTests.Models;
 using Sutro.Core.Models.GCode;
 using System.Collections.Generic;
 
-namespace gsCore.FunctionalTests.Utility
+namespace Sutro.Core.FunctionalTest
 {
     public class FeatureInfoFactoryFFF : IFeatureInfoFactory<FeatureInfo>
     {

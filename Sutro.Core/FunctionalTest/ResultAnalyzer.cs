@@ -1,13 +1,12 @@
 using gs;
 using gs.FillTypes;
 using gs.utility;
-using gsCore.FunctionalTests.Models;
 using Sutro.Core.Models.GCode;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace gsCore.FunctionalTests.Utility
+namespace Sutro.Core.FunctionalTest
 {
     public class ResultAnalyzer<TFeatureInfo> : IResultAnalyzer where TFeatureInfo : IFeatureInfo, new()
     {

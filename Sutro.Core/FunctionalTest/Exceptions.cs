@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace gsCore.FunctionalTests.Models
+namespace Sutro.Core.FunctionalTest
 {
     public class FeatureCumulativeExtrusionMismatch : Exception
     {

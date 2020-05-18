@@ -1,4 +1,4 @@
-﻿namespace gsCore.FunctionalTests.Utility
+﻿namespace Sutro.Core.FunctionalTest
 {
     public interface IResultGenerator
     {

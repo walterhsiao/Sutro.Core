@@ -1,6 +1,6 @@
 ﻿using g3;
 
-namespace gsCore.FunctionalTests.Models
+namespace Sutro.Core.FunctionalTest
 {
     public class FeatureInfo : IFeatureInfo
     {

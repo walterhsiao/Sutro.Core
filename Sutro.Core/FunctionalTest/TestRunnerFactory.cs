@@ -1,8 +1,6 @@
 ﻿using gs;
-using gsCore.FunctionalTests.Models;
-using gsCore.FunctionalTests.Utility;
 
-namespace gsSlicer.FunctionalTests.Utility
+namespace Sutro.Core.FunctionalTest
 {
     public static class TestRunnerFactoryFFF
     {

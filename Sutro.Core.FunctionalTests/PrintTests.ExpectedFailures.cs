@@ -1,8 +1,6 @@
 ﻿using gs;
-using gsCore.FunctionalTests.Models;
-using gsCore.FunctionalTests.Utility;
-using gsSlicer.FunctionalTests.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sutro.Core.FunctionalTest;
 using System;
 
 namespace gsCore.FunctionalTests

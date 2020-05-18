@@ -1,6 +1,6 @@
 ﻿using gs.info;
-using gsSlicer.FunctionalTests.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Sutro.Core.FunctionalTest;
 
 namespace gsCore.FunctionalTests
 {

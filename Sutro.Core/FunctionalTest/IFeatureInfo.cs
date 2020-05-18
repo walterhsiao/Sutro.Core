@@ -1,6 +1,4 @@
-﻿using gs;
-
-namespace gsCore.FunctionalTests.Models
+﻿namespace Sutro.Core.FunctionalTest
 {
     public interface IFeatureInfo
     {
