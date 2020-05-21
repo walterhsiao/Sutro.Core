@@ -13,29 +13,30 @@ namespace gs
         public GeneralPolygon2d Polygon { get; set; }
 
         // parameters
-        public double ToolWidth = 0.4;
+        public double ToolWidth { get; set; } = 0.4;
 
-        public double PathSpacing = 0.4;
-        public double AngleDeg = 45.0;
-        public double PathShift = 0;
+        public double PathSpacing { get; set; } = 0.4;
+        public double AngleDeg { get; set; } = 45.0;
+        public double PathShift { get; set; } = 0;
 
         // if true, we will nudge PathSpacing up/down to ensure that
         // we don't leave pathwidth-gap at end of span
-        public bool AdjustSpacingToMaximizeFill = true;
+        public bool AdjustSpacingToMaximizeFill { get; set; } = true;
 
         // TODO: implement support for this
-        public double MaxOverfillRatio = 0.0;
+        public double MaxOverfillRatio { get; set; } = 0.0;
 
         // paths shorter than this are discarded
-        public double MinPathLengthMM = 2.0;
+        public double MinPathLengthMM { get; set; } = 2.0;
 
         // if true, we inset half of tool-width from Polygon
-        public bool InsetFromInputPolygon = true;
+        public bool InsetFromInputPolygon { get; set; } = true;
+        public double InsetFromInputPolygonX { get; set; } = 0.5;
 
         // if true, we clip fill lines so that we don't have any that are too close (not usually necessary?)
-        public bool FilterSelfOverlaps = false;
+        public bool FilterSelfOverlaps { get; set; } = false;
 
-        public double SelfOverlapToolWidthX = 0.25;
+        public double SelfOverlapToolWidthX { get; set; } = 0.25;
 
         public enum SimplificationLevel
         {
@@ -72,9 +73,9 @@ namespace gs
         {
             if (InsetFromInputPolygon)
             {
-                //BoundaryPolygonCache = new SegmentSet2d(Polygon);
-                List<GeneralPolygon2d> current = ClipperUtil.ComputeOffsetPolygon(Polygon, -ToolWidth / 2, true);
-                foreach (GeneralPolygon2d poly in current)
+                double inset = ToolWidth * InsetFromInputPolygonX;
+                var current = ClipperUtil.ComputeOffsetPolygon(Polygon, -inset, true);
+                foreach (var poly in current)
                 {
                     FillCurveSet2d fillPaths = ComputeFillPaths(poly);
                     if (fillPaths != null)
@@ -83,8 +84,6 @@ namespace gs
             }
             else
             {
-                List<GeneralPolygon2d> boundary = ClipperUtil.ComputeOffsetPolygon(Polygon, ToolWidth / 2, true);
-                //BoundaryPolygonCache = new SegmentSet2d(boundary);
                 FillCurveSet2d fillPaths = ComputeFillPaths(Polygon);
                 if (fillPaths != null)
                     FillCurves.Add(fillPaths);

@@ -68,8 +68,8 @@ namespace gs
 
         public bool OuterShellLast = false;             // if true, outer shell is scheduled last
 
-        private readonly IFillType fillType;
-        private readonly IFillType firstShellFillType;
+        protected readonly IFillType fillType;
+        protected readonly IFillType firstShellFillType;
 
         // Outputs
 

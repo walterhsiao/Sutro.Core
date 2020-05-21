@@ -11,18 +11,17 @@ namespace gs
         public GeneralPolygon2d Polygon { get; set; }
 
         // parameters
-        public double ToolWidth = 0.4;
-
-        public double PathSpacing = 0.4;
-        public double AngleDeg = 45.0;
-        public double PathShift = 0;
-        public double SpeedModifierX = 1;
+        public double ToolWidth { get; set; } = 0.4;
+        public double PathSpacing { get; set; } = 0.4;
+        public double AngleDeg { get; set; } = 45.0;
+        public double PathShift { get; set; } = 0;
+        public double MinPathLengthMM = 0;
 
         // [RMS] improve this...
-        public double OverlapFactor = 0.0f;
+        public double OverlapFactor { get; set; } = 0.0f;
 
-        // if true, we inset half of tool-width from Polygon
-        public bool InsetFromInputPolygon = true;
+        public bool InsetFromInputPolygon { get; set; } = true;
+        public double InsetFromInputPolygonX { get; set; } = 0.5;
 
         public IFillType FillType { get; }
 
@@ -48,7 +47,7 @@ namespace gs
             if (InsetFromInputPolygon)
             {
                 //BoundaryPolygonCache = new SegmentSet2d(Polygon);
-                List<GeneralPolygon2d> current = ClipperUtil.ComputeOffsetPolygon(Polygon, -ToolWidth / 2, true);
+                List<GeneralPolygon2d> current = ClipperUtil.ComputeOffsetPolygon(Polygon, -ToolWidth / InsetFromInputPolygonX, true);
                 foreach (GeneralPolygon2d poly in current)
                 {
                     SegmentSet2d polyCache = new SegmentSet2d(poly);
@@ -69,22 +68,21 @@ namespace gs
 
         protected FillCurveSet2d ComputeFillPaths(GeneralPolygon2d poly, SegmentSet2d polyCache)
         {
-            List<List<Segment2d>> StepSpans = ComputeSegments(poly, polyCache);
-            int N = StepSpans.Count;
-
-            //double hard_max_dist = 5 * PathSpacing;
+            var stepSpans = ComputeSegments(poly, polyCache);
 
             // [TODO] need a pathfinder here, that can chain segments efficiently
-
             // (for now just do dumb things?)
 
             FillCurveSet2d paths = new FillCurveSet2d();
-            //FillPolyline2d cur = new FillPolyline2d();
 
-            foreach (var seglist in StepSpans)
+            foreach (var seglist in stepSpans)
             {
                 foreach (Segment2d seg in seglist)
                 {
+                    // Discard paths that are too short
+                    if (seg.Length < MinPathLengthMM)
+                        continue;
+
                     var fill_seg = new FillCurve<FillSegment>()
                     {
                         FillType = FillType,
