@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System.Collections.Generic;
 
 namespace gs
@@ -20,7 +21,7 @@ namespace gs
     /// </summary>
     public class SortingScheduler2d : IFillPathScheduler2d
     {
-        public SchedulerSpeedHint SpeedHint { get; set; }
+        public SpeedHint SpeedHint { get; set; }
 
         /// <summary>
         /// Final point in the output paths, computed by SortAndAppendTo()
@@ -29,7 +30,7 @@ namespace gs
 
         protected class PathItem
         {
-            public SchedulerSpeedHint speedHint;
+            public SpeedHint speedHint;
         }
 
         protected class PathLoop : PathItem
@@ -70,7 +71,7 @@ namespace gs
             {
                 FillCurveSet2d paths = new FillCurveSet2d();
 
-                SchedulerSpeedHint pathHint = SchedulerSpeedHint.Default;
+                SpeedHint pathHint = SpeedHint.Default;
                 if (idx.a == 0)
                 { // loop
                     PathLoop loop = Loops[idx.b];

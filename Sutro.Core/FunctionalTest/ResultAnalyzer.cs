@@ -26,7 +26,7 @@ namespace Sutro.Core.FunctionalTest
 
             if (actual.Count != expected.Count)
             {
-                throw new LayerCountMismatch($"Expected {expected.Count} layers but the result has {actual.Count}.");
+                throw new LayerCountMismatchException($"Expected {expected.Count} layers but the result has {actual.Count}.");
             }
 
             for (int layerIndex = 0; layerIndex < actual.Count; layerIndex++)

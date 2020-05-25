@@ -7,16 +7,11 @@ using System.Linq;
 
 namespace gs
 {
-    public enum SchedulerSpeedHint
-    {
-        Careful, Default, Rapid, MaxSpeed
-    }
-
     public interface IFillPathScheduler2d
     {
         void AppendCurveSets(List<FillCurveSet2d> paths);
 
-        SchedulerSpeedHint SpeedHint { get; set; }
+        SpeedHint SpeedHint { get; set; }
 
         Vector2d CurrentPosition { get; }
 
@@ -43,7 +38,7 @@ namespace gs
             LayerZ = layerZ;
         }
 
-        public virtual SchedulerSpeedHint SpeedHint { get; set; } = SchedulerSpeedHint.Default;
+        public virtual SpeedHint SpeedHint { get; set; } = SpeedHint.Default;
 
         public Vector2d CurrentPosition => Builder.Position.xy;
 
@@ -224,7 +219,7 @@ namespace gs
         //       (currently this is only set on first layer)
         public virtual double SelectSpeed(FillBase pathCurve)
         {
-            double speed = SpeedHint == SchedulerSpeedHint.Careful ?
+            double speed = SpeedHint == SpeedHint.Careful ?
                 Settings.CarefulExtrudeSpeed : Settings.RapidExtrudeSpeed;
 
             return pathCurve.FillType.ModifySpeed(speed, SpeedHint);

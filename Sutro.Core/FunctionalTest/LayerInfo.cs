@@ -19,11 +19,11 @@ namespace Sutro.Core.FunctionalTest
         {
             foreach (var key in perFeatureInfo.Keys)
                 if (!expected.perFeatureInfo.ContainsKey(key))
-                    throw new MissingFeature($"Result has unexpected feature {key}");
+                    throw new MissingFeatureException($"Result has unexpected feature {key}");
 
             foreach (var key in expected.perFeatureInfo.Keys)
                 if (!perFeatureInfo.ContainsKey(key))
-                    throw new MissingFeature($"Result was missing expected feature {key}");
+                    throw new MissingFeatureException($"Result was missing expected feature {key}");
 
             foreach (var fillType in perFeatureInfo.Keys)
             {

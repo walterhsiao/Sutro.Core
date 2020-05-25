@@ -356,7 +356,7 @@ namespace gs.UnitTests.Fill
             // Arrange
             var settings = new SingleMaterialFFFSettings();
             var loop = FillFactory.CreateTriangleCCW();
-            loop.FillType = new OuterPerimeterFillType(settings);
+            loop.FillType = settings.FillTypeFactory.OuterPerimeter();
             loop.PerimeterOrder = 100;
             loop.IsHoleShell = true;
             loop.FillThickness = 3;
@@ -377,7 +377,7 @@ namespace gs.UnitTests.Fill
             // Arrange
             var settings = new SingleMaterialFFFSettings();
             var loop = FillFactory.CreateTriangleCCW();
-            loop.FillType = new OuterPerimeterFillType(settings);
+            loop.FillType = settings.FillTypeFactory.OuterPerimeter();
             loop.PerimeterOrder = 100;
             loop.IsHoleShell = true;
             loop.FillThickness = 3;

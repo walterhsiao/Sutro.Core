@@ -54,6 +54,12 @@ namespace gs
 
     public class SingleMaterialFFFSettings : PlanarAdditiveSettings
     {
+        public SingleMaterialFFFSettings()
+        {
+            FillTypeFactory = new FillTypeFactory(this);
+        }
+
+
         // This is a bit of an odd place for this, but settings are where we actually
         // know what assembler we should be using...
         public override AssemblerFactoryF AssemblerType()
@@ -85,6 +91,8 @@ namespace gs
                     throw new Exception("SingleMaterialFFFSettings.Machine.set: type is not FFFMachineInfo!");
             }
         }
+
+        public FillTypeFactory FillTypeFactory { get; }
 
         #region Material
 

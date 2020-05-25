@@ -1,4 +1,5 @@
 ﻿using g3;
+using gs.FillTypes;
 using System;
 using System.Collections.Generic;
 
@@ -12,7 +13,7 @@ namespace gs
     /// </summary>
     public class GroupScheduler2d : IFillPathScheduler2d
     {
-        public SchedulerSpeedHint SpeedHint
+        public SpeedHint SpeedHint
         {
             get { return TargetScheduler.SpeedHint; }
             set { TargetScheduler.SpeedHint = value; }
@@ -63,6 +64,8 @@ namespace gs
         {
             get { return CurrentSorter != null; }
         }
+
+        SpeedHint IFillPathScheduler2d.SpeedHint { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public virtual void AppendCurveSets(List<FillCurveSet2d> paths)
         {

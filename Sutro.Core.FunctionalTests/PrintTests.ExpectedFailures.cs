@@ -25,25 +25,25 @@ namespace gsCore.FunctionalTests
         [TestMethod]
         public void WrongLayerHeight()
         {
-            ExpectFailure<LayerCountMismatch>(new GenericRepRapSettings() { LayerHeightMM = 0.3 });
+            ExpectFailure<LayerCountMismatchException>(new GenericRepRapSettings() { LayerHeightMM = 0.3 });
         }
 
         [TestMethod]
         public void WrongShells()
         {
-            ExpectFailure<FeatureCumulativeExtrusionMismatch>(new GenericRepRapSettings() { Shells = 3 });
+            ExpectFailure<FeatureCumulativeExtrusionMismatchException>(new GenericRepRapSettings() { Shells = 3 });
         }
 
         [TestMethod]
         public void WrongFloorLayers()
         {
-            ExpectFailure<MissingFeature>(new GenericRepRapSettings() { FloorLayers = 0 });
+            ExpectFailure<MissingFeatureException>(new GenericRepRapSettings() { FloorLayers = 0 });
         }
 
         [TestMethod]
         public void WrongRoofLayers()
         {
-            ExpectFailure<MissingFeature>(new GenericRepRapSettings() { FloorLayers = 3 });
+            ExpectFailure<MissingFeatureException>(new GenericRepRapSettings() { FloorLayers = 3 });
         }
 
         [TestMethod]
@@ -52,7 +52,7 @@ namespace gsCore.FunctionalTests
             var settings = new GenericRepRapSettings();
             settings.Machine.BedOriginFactorX = 0.5;
             settings.Machine.BedOriginFactorY = 0.5;
-            ExpectFailure<FeatureBoundingBoxMismatch>(settings);
+            ExpectFailure<FeatureBoundingBoxMismatchException>(settings);
         }
 
         public void ExpectFailure<ExceptionType>(GenericRepRapSettings settings) where ExceptionType : Exception

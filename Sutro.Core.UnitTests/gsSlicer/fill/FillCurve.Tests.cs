@@ -108,7 +108,7 @@ namespace gs.UnitTests.Fill
             var settings = new GenericRepRapSettings();
             var curve = new FillCurve<FillSegment>()
             {
-                FillType = new OuterPerimeterFillType(settings),
+                FillType = settings.FillTypeFactory.OuterPerimeter(),
                 PerimeterOrder = 100,
                 IsHoleShell = true,
                 FillThickness = 3

@@ -2,6 +2,8 @@
 {
     public class SupportFillType : BaseFillType
     {
+        private readonly double carefulSpeedScale;
+
         public static string Label => "support";
 
         public override string GetLabel()
@@ -9,22 +11,15 @@
             return Label;
         }
 
-        private readonly SingleMaterialFFFSettings settings;
-
-        public SupportFillType(SingleMaterialFFFSettings settings)
+        public SupportFillType(double volumeScale, double carefulSpeedScale) : base(volumeScale)
         {
-            this.settings = settings;
+            this.carefulSpeedScale = carefulSpeedScale;
         }
 
-        public override double AdjustVolume(double volume)
+        public override double ModifySpeed(double speed, SpeedHint speedHint = SpeedHint.Default)
         {
-            return volume * settings.SupportVolumeScale;
-        }
-
-        public override double ModifySpeed(double speed, SchedulerSpeedHint speedHint = SchedulerSpeedHint.Default)
-        {
-            if (speedHint == SchedulerSpeedHint.Careful)
-                return speed * settings.OuterPerimeterSpeedX;
+            if (speedHint == SpeedHint.Careful)
+                return speed * carefulSpeedScale;
             else
                 return speed;
         }

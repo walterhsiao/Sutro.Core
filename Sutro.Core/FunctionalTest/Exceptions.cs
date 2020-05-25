@@ -2,51 +2,51 @@
 
 namespace Sutro.Core.FunctionalTest
 {
-    public class FeatureCumulativeExtrusionMismatch : Exception
+    public class FeatureCumulativeExtrusionMismatchException : Exception
     {
-        public FeatureCumulativeExtrusionMismatch(string s) : base(s)
+        public FeatureCumulativeExtrusionMismatchException(string s) : base(s)
         {
         }
     }
 
-    public class FeatureCumulativeDistanceMismatch : Exception
+    public class FeatureCumulativeDistanceMismatchException : Exception
     {
-        public FeatureCumulativeDistanceMismatch(string s) : base(s)
+        public FeatureCumulativeDistanceMismatchException(string s) : base(s)
         {
         }
     }
 
-    public class FeatureCumulativeDurationMismatch : Exception
+    public class FeatureCumulativeDurationMismatchException : Exception
     {
-        public FeatureCumulativeDurationMismatch(string s) : base(s)
+        public FeatureCumulativeDurationMismatchException(string s) : base(s)
         {
         }
     }
 
-    public class FeatureCenterOfMassMismatch : Exception
+    public class FeatureCenterOfMassMismatchException : Exception
     {
-        public FeatureCenterOfMassMismatch(string s) : base(s)
+        public FeatureCenterOfMassMismatchException(string s) : base(s)
         {
         }
     }
 
-    public class FeatureBoundingBoxMismatch : Exception
+    public class FeatureBoundingBoxMismatchException : Exception
     {
-        public FeatureBoundingBoxMismatch(string s) : base(s)
+        public FeatureBoundingBoxMismatchException(string s) : base(s)
         {
         }
     }
 
-    public class MissingFeature : Exception
+    public class MissingFeatureException : Exception
     {
-        public MissingFeature(string s) : base(s)
+        public MissingFeatureException(string s) : base(s)
         {
         }
     }
 
-    public class LayerCountMismatch : Exception
+    public class LayerCountMismatchException : Exception
     {
-        public LayerCountMismatch(string s) : base(s)
+        public LayerCountMismatchException(string s) : base(s)
         {
         }
     }
