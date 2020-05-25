@@ -140,5 +140,18 @@ namespace gs
             });
             return new List<double>(Zs);
         }
+
+        public List<LinearToolpath3<T>> GetPaths<T>() where T : IToolpathVertex
+        {
+            var paths = new List<LinearToolpath3<T>>();
+
+            foreach (var path in this)
+            {
+                if (path is LinearToolpath3<T> toolpath)
+                    paths.Add(toolpath);
+            }
+
+            return paths;
+        }
     }
 }
