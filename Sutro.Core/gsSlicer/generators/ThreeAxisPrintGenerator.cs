@@ -99,13 +99,16 @@ namespace gs
         {
             get
             {
-                foreach (var s in TotalPrintTimeStatistics.ToStringList())
-                    yield return s;
+                if (Result != null)
+                {
+                    foreach (var s in TotalPrintTimeStatistics.ToStringList())
+                        yield return s;
 
-                yield return "";
+                    yield return "";
 
-                foreach (var s in TotalExtrusionReport)
-                    yield return s;
+                    foreach (var s in TotalExtrusionReport)
+                        yield return s;
+                }
             }
         }
 

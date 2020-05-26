@@ -91,13 +91,26 @@ namespace gs
             MeshTransforms.Translate(mesh, new Vector3d(0, 0, mesh.CachedBounds.Extents.z - mesh.CachedBounds.Center.z));
         }
 
-        protected void GenerateGCode(DMesh3 mesh, out GCodeFile gcode, out IEnumerable<string> generationReport)
+        protected bool GenerateGCode(DMesh3 mesh, out GCodeFile gcode, out IEnumerable<string> generationReport)
         {
             ConsoleWriteSeparator();
             logger.WriteLine($"GENERATION");
             logger.WriteLine();
 
-            gcode = printGeneratorManager.GCodeFromMesh(mesh, out generationReport);
+            gcode = null;
+            generationReport = null;
+
+            try
+            {
+                gcode = printGeneratorManager.GCodeFromMesh(mesh, out generationReport);
+                return true;
+            }
+            catch (Exception e) when (!Env.Debugging)
+            {
+                logger.WriteLine("Exception:");
+                logger.WriteLine(e.Message);
+            }
+            return false;
         }
 
         protected virtual void LoadMesh(CommandLineOptions o, out DMesh3 mesh)
@@ -139,6 +152,9 @@ namespace gs
 
         protected virtual void OutputGenerationReport(IEnumerable<string> generationReport)
         {
+            if (generationReport == null)
+                return;
+
             ConsoleWriteSeparator();
 
             foreach (var s in generationReport)
@@ -147,7 +163,6 @@ namespace gs
             }
 
             logger.WriteLine();
-            logger.WriteLine("Print generation complete.");
         }
 
         protected virtual void OutputVersionInfo()
@@ -178,7 +193,8 @@ namespace gs
 
             GenerateGCode(mesh, out var gcode, out var generationReport);
 
-            WriteGCodeToFile(o.GCodeFilePath, gcode);
+            if (gcode != null)
+                WriteGCodeToFile(o.GCodeFilePath, gcode);
 
             OutputGenerationReport(generationReport);
         }

@@ -76,15 +76,14 @@ namespace gs
             AssemblerFactoryF overrideAssemblerF = globalSettings.AssemblerType();
             printGenerator.Initialize(printMeshAssembly, slices, globalSettings, overrideAssemblerF);
 
-            if (printGenerator.Generate())
+            bool success = printGenerator.Generate();
+            generationReport = printGenerator.GenerationReport;
+
+            if (success)
             {
-                generationReport = printGenerator.GenerationReport;
                 return printGenerator.Result;
             }
-            else
-            {
-                throw new Exception("PrintGenerator failed to generate gcode!");
-            }
+            return null;
         }
 
         private PrintMeshAssembly PrintMeshAssemblyFromMeshes(IEnumerable<DMesh3> meshes)
