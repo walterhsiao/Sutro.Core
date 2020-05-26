@@ -1,6 +1,7 @@
 ﻿using gs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sutro.Core.FunctionalTest;
+using Sutro.Core.Logging;
 using System;
 
 namespace gsCore.FunctionalTests

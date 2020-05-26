@@ -1,5 +1,6 @@
 ﻿using g3;
 using gs.FillTypes;
+using Sutro.Core.Logging;
 using Sutro.Core.Models.GCode;
 using System;
 using System.Collections.Generic;
