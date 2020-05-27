@@ -1,10 +1,12 @@
 ﻿using CommandLine;
 using CommandLine.Text;
 using g3;
+using Sutro.Core;
 using Sutro.Core.Logging;
 using Sutro.Core.Models.GCode;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace gs
@@ -12,14 +14,15 @@ namespace gs
     public class CommandLineInterface
     {
         protected readonly ILogger logger;
+        private readonly bool debugging;
         protected readonly Dictionary<string, IPrintGeneratorManager> printGeneratorDict;
 
         protected IPrintGeneratorManager printGeneratorManager;
 
-        public CommandLineInterface(ILogger logger, IEnumerable<IPrintGeneratorManager> printGenerators)
+        public CommandLineInterface(ILogger logger, IEnumerable<IPrintGeneratorManager> printGenerators, bool debugging)
         {
             this.logger = logger;
-
+            this.debugging = debugging;
             printGeneratorDict = new Dictionary<string, IPrintGeneratorManager>();
             foreach (var printGenerator in printGenerators)
                 printGeneratorDict.Add(printGenerator.Id, printGenerator);
@@ -91,26 +94,12 @@ namespace gs
             MeshTransforms.Translate(mesh, new Vector3d(0, 0, mesh.CachedBounds.Extents.z - mesh.CachedBounds.Center.z));
         }
 
-        protected bool GenerateGCode(DMesh3 mesh, out GCodeFile gcode, out IEnumerable<string> generationReport)
+        protected GenerationResult GenerateGCode(DMesh3 mesh)
         {
             ConsoleWriteSeparator();
             logger.WriteLine($"GENERATION");
             logger.WriteLine();
-
-            gcode = null;
-            generationReport = null;
-
-            try
-            {
-                gcode = printGeneratorManager.GCodeFromMesh(mesh, out generationReport);
-                return true;
-            }
-            catch (Exception e) when (!Env.Debugging)
-            {
-                logger.WriteLine("Exception:");
-                logger.WriteLine(e.Message);
-            }
-            return false;
+            return printGeneratorManager.GCodeFromMesh(mesh, debugging);
         }
 
         protected virtual void LoadMesh(CommandLineOptions o, out DMesh3 mesh)
@@ -165,6 +154,15 @@ namespace gs
             logger.WriteLine();
         }
 
+        protected virtual void OutputLog(GenerationResult result, int verbosity)
+        {
+            if (verbosity < 0)
+                return;
+
+            ConsoleWriteSeparator();
+        }
+
+
         protected virtual void OutputVersionInfo()
         {
             ConsoleWriteSeparator();
@@ -191,12 +189,28 @@ namespace gs
 
             LoadMesh(o, out var mesh);
 
-            GenerateGCode(mesh, out var gcode, out var generationReport);
+            var result = GenerateGCode(mesh);
 
-            if (gcode != null)
-                WriteGCodeToFile(o.GCodeFilePath, gcode);
+            OutputLog(result, o.Verbosity);
 
-            OutputGenerationReport(generationReport);
+            switch (result.Status)
+            {
+                default:
+                case GenerationResultStatus.Failure:
+                    logger.WriteLine("Print generation failed.", ConsoleColor.Red);
+                    break;
+                case GenerationResultStatus.Canceled:
+                    logger.WriteLine("Print generation canceled.", ConsoleColor.Red);
+                    break;
+                case GenerationResultStatus.Success:
+                    if (result.Status == GenerationResultStatus.Success)
+                    {
+                        logger.WriteLine("Print generation succeeded.", ConsoleColor.Green);
+                        WriteGCodeToFile(o.GCodeFilePath, result.GCode);
+                        OutputGenerationReport(result.Report);
+                    }
+                    break;
+            }
         }
 
         protected virtual void HandleInvalidGeneratorId(string id)

@@ -17,7 +17,7 @@ namespace gsCore.FunctionalTests
             });
 
             // Act
-            print.GenerateFile();
+            print.GenerateFile(true);
 
             // Assert
             print.CompareResults();
@@ -34,7 +34,7 @@ namespace gsCore.FunctionalTests
             });
 
             // Act
-            print.GenerateFile();
+            print.GenerateFile(true);
 
             // Assert
             print.CompareResults();
@@ -50,7 +50,7 @@ namespace gsCore.FunctionalTests
             });
 
             // Act
-            print.GenerateFile();
+            print.GenerateFile(true);
 
             // Assert
             print.CompareResults();
@@ -66,7 +66,7 @@ namespace gsCore.FunctionalTests
             });
 
             // Act
-            print.GenerateFile();
+            print.GenerateFile(true);
 
             // Assert
             print.CompareResults();
@@ -82,7 +82,7 @@ namespace gsCore.FunctionalTests
             });
 
             // Act
-            print.GenerateFile();
+            print.GenerateFile(true);
 
             // Assert
             print.CompareResults();
@@ -101,7 +101,7 @@ namespace gsCore.FunctionalTests
             });
 
             // Act
-            print.GenerateFile();
+            print.GenerateFile(true);
 
             // Assert
             print.CompareResults();

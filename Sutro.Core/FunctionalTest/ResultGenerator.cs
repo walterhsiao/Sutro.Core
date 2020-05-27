@@ -26,11 +26,12 @@ namespace Sutro.Core.FunctionalTest
             generator.SaveGCodeToFile(streamWriter, gcode);
         }
 
-        public void GenerateResultFile(string meshFilePath, string outputFilePath)
+        public GenerationResult GenerateResultFile(string meshFilePath, string outputFilePath, bool debugging)
         {
             var mesh = StandardMeshReader.ReadMesh(meshFilePath);
-            var gcode = generator.GCodeFromMesh(mesh, out _);
-            SaveGCode(outputFilePath, gcode);
+            var result = generator.GCodeFromMesh(mesh, debugging);
+            SaveGCode(outputFilePath, result.GCode);
+            return result;
         }
     }
 }

@@ -1,5 +1,6 @@
 using g3;
 using gs.FillTypes;
+using Sutro.Core;
 using Sutro.Core.Models.GCode;
 using System;
 using System.Collections.Generic;
@@ -57,11 +58,7 @@ namespace gs
             TPrintSettings settings,
             AssemblerFactoryF overrideAssemblerF);
 
-        bool Generate();
-
-        GCodeFile Result { get; }
-
-        IEnumerable<string> GenerationReport { get; }
+        GenerationResult Generate(bool debugging);
     }
 
     /// <summary>
@@ -79,12 +76,6 @@ namespace gs
                                                         // this during process, ie in BeginLayerF
                                                         // to implement per-layer settings
 
-        // available after calling Generate()
-        public GCodeFile Result { get; protected set; }
-
-        public List<string> LoggedErrors { get; private set; } = new List<string>();
-        public List<string> LoggedWarnings { get; private set; } = new List<string>();
-
         // Generally we discard the paths at each layer as we generate them. If you
         // would like to analyze, set this to true, and then AccumulatedPaths will
         // be available after calling Generate(). The list AccumulatedPaths.Paths will
@@ -93,24 +84,9 @@ namespace gs
 
         public ToolpathSet AccumulatedPaths = null;
 
+        public GenerationResult generationResult = null;
+
         public PrintTimeStatistics TotalPrintTimeStatistics { get; private set; } = new PrintTimeStatistics();
-
-        public virtual IEnumerable<string> GenerationReport
-        {
-            get
-            {
-                if (Result != null)
-                {
-                    foreach (var s in TotalPrintTimeStatistics.ToStringList())
-                        yield return s;
-
-                    yield return "";
-
-                    foreach (var s in TotalExtrusionReport)
-                        yield return s;
-                }
-            }
-        }
 
         /*
 		 * Customizable functions you can use to configure/modify slicer behavior
@@ -119,7 +95,7 @@ namespace gs
         // replace this with your own error message handler
         public Action<string, string> ErrorF = (message, stack_trace) =>
         {
-            System.Console.WriteLine("[EXCEPTION] ThreeAxisPrintGenerator: " + message + "\nSTACK TRACE: " + stack_trace);
+            Console.WriteLine("[EXCEPTION] ThreeAxisPrintGenerator: " + message + "\nSTACK TRACE: " + stack_trace);
         };
 
         // use this to cancel slicer
@@ -225,19 +201,20 @@ namespace gs
                 PathFilterF = (pline) => { return pline.TotalLength() < 3 * Settings.Machine.NozzleDiamMM; };
         }
 
-        public virtual bool Generate()
+        public virtual GenerationResult Generate(bool debugging = false)
         {
+            var result = new GenerationResult();
             try
             {
-                generate_result();
-                Result = extract_result();
+                generate_result(result);
+                result.Status = GenerationResultStatus.Success;
             }
-            catch (Exception e)
+            catch (Exception e) when (!debugging)
             {
-                ErrorF(e.Message, e.StackTrace);
-                return false;
+                result.LogMessage(Sutro.Core.Logging.LoggingLevel.Error, e.GetType().ToString() + ": " + e.Message);
+                result.Status = GenerationResultStatus.Failure;
             }
-            return true;
+            return result;
         }
 
         public virtual void GetProgress(out int curProgress, out int maxProgress)
@@ -285,8 +262,10 @@ namespace gs
         /// <summary>
         /// This is the main driver of the slicing process
         /// </summary>
-        protected virtual void generate_result()
+        protected virtual void generate_result(GenerationResult result)
         {
+            generationResult = result;
+
             SetupGeneration();
             if (Cancelled()) return;
 
@@ -371,8 +350,7 @@ namespace gs
             }
 
             FinishGeneration();
-
-            // TODO: May need to force Build.EndLine() somehow if losing the end
+            result.GCode = extract_result();
         }
 
         private void EnforceMinimumLayerTime(SingleMaterialFFFSettings layerSettings, ToolpathSetBuilder pathAccum)

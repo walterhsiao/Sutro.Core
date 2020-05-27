@@ -20,7 +20,8 @@ namespace gsCore.FunctionalTests
 
             generator.GenerateResultFile(
                 TestDataPaths.GetMeshFilePath(directory),
-                TestDataPaths.GetExpectedFilePath(directory));
+                TestDataPaths.GetExpectedFilePath(directory),
+                Env.Debugging);
         }
 
         [TestMethod]
@@ -64,7 +65,7 @@ namespace gsCore.FunctionalTests
             var print = new PrintTestRunner(CaseName, resultGenerator, resultAnalyzer);
 
             // Act
-            print.GenerateFile();
+            var result = print.GenerateFile(true);
 
             // Assert
             Assert.ThrowsException<ExceptionType>(() =>
