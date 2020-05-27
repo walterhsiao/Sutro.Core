@@ -208,13 +208,24 @@ namespace gs
             {
                 generate_result(result);
                 result.Status = GenerationResultStatus.Success;
+                result.GCode = extract_result();
+                result.Report = CreateReport();
             }
             catch (Exception e) when (!debugging)
             {
-                result.LogMessage(Sutro.Core.Logging.LoggingLevel.Error, e.GetType().ToString() + ": " + e.Message);
+                result.AddLog(Sutro.Core.Logging.LoggingLevel.Error, e.GetType().ToString() + ": " + e.Message);
                 result.Status = GenerationResultStatus.Failure;
             }
             return result;
+        }
+
+        protected virtual List<string> CreateReport()
+        {
+            var report = new List<string>();
+            report.AddRange(TotalExtrusionReport);
+            report.Add(string.Empty);
+            report.AddRange(TotalPrintTimeStatistics.ToStringList());
+            return report;
         }
 
         public virtual void GetProgress(out int curProgress, out int maxProgress)
@@ -350,7 +361,6 @@ namespace gs
             }
 
             FinishGeneration();
-            result.GCode = extract_result();
         }
 
         private void EnforceMinimumLayerTime(SingleMaterialFFFSettings layerSettings, ToolpathSetBuilder pathAccum)

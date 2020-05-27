@@ -2,26 +2,24 @@
 using Sutro.Core.Models.GCode;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Sutro.Core
 {
-    public enum GenerationResultStatus
-    {
-        Success,
-        Failure,
-        Canceled
-    }
-
     public class GenerationResult
     {
         public GCodeFile GCode { get; set; }
-        public List<Tuple<LoggingLevel, string>> Log { get; } = new List<Tuple<LoggingLevel, string>>();
-        public List<string> Report { get; } = new List<string>();
+
+
+        private List<LogEntry> logEntries = new List<LogEntry>();
+        public ReadOnlyCollection<LogEntry> LogEntries => logEntries.AsReadOnly();
+
+        public List<string> Report { get; set; } = new List<string>();
         public GenerationResultStatus Status { get; set; } = GenerationResultStatus.Failure;
 
-        public void LogMessage(LoggingLevel level, string message)
+        public void AddLog(LoggingLevel warning, string message)
         {
-            Log.Add(Tuple.Create(level, message));
+            logEntries.Add(new LogEntry(warning, message));
         }
     }
 }
