@@ -5,7 +5,7 @@ using System.Text;
 
 namespace gs
 {
-    public class StandardGCodeWriter : BaseGCodeWriter
+    public class StandardGCodeWriter : GCodeWriterBase
     {
         private int float_precision = 5;
         private string float_format = "{0:0.#####}";

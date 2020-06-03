@@ -2,8 +2,6 @@
 {
     public class InnerPerimeterFillType : BaseFillType
     {
-        private double speedModifier;
-
         public static string Label => "inner perimeter";
 
         public override string GetLabel()
@@ -11,14 +9,8 @@
             return Label;
         }
 
-        public InnerPerimeterFillType(SingleMaterialFFFSettings settings)
+        public InnerPerimeterFillType(double volumeScale = 1, double speedScale = 1) : base(volumeScale, speedScale)
         {
-            speedModifier = settings.InnerPerimeterSpeedX;
-        }
-
-        public override double ModifySpeed(double speed, SchedulerSpeedHint speedHint)
-        {
-            return speedModifier * speed;
         }
 
         public override bool IsPartShell()

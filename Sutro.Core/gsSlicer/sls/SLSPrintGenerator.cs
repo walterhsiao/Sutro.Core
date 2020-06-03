@@ -182,7 +182,7 @@ namespace gs
             //   came from where. Would need to do loop above per-polygon
             if (bIsInfillAdjacent && Settings.InteriorSolidRegionShells > 0)
             {
-                ShellsFillPolygon interior_shells = new ShellsFillPolygon(solid_poly, new SolidFillType(Settings.SolidFillSpeedX));
+                ShellsFillPolygon interior_shells = new ShellsFillPolygon(solid_poly, Settings.FillTypeFactory.Solid());
                 interior_shells.PathSpacing = Settings.SolidFillPathSpacingMM();
                 interior_shells.ToolWidth = Settings.Machine.NozzleDiamMM;
                 interior_shells.Layers = Settings.InteriorSolidRegionShells;
@@ -204,7 +204,7 @@ namespace gs
                 tiled_fill.TileFillGeneratorF = (tilePoly, index) =>
                 {
                     int odd = ((index.x + index.y) % 2 == 0) ? 1 : 0;
-                    RasterFillPolygon solid_gen = new RasterFillPolygon(tilePoly, new SolidFillType(Settings.SolidFillSpeedX))
+                    RasterFillPolygon solid_gen = new RasterFillPolygon(tilePoly, Settings.FillTypeFactory.Solid())
                     {
                         InsetFromInputPolygon = false,
                         PathSpacing = Settings.SolidFillPathSpacingMM(),
@@ -233,7 +233,10 @@ namespace gs
 
                 foreach (GeneralPolygon2d shape in solids)
                 {
-                    ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape, new OuterPerimeterFillType(Settings), new InnerPerimeterFillType(Settings));
+                    ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape, 
+                        Settings.FillTypeFactory.InnerPerimeter(),
+                        Settings.FillTypeFactory.OuterPerimeter());
+
                     shells_gen.PathSpacing = Settings.SolidFillPathSpacingMM();
                     shells_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
                     shells_gen.PreserveOuterShells = true;

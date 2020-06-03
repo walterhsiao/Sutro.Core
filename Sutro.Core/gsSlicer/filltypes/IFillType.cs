@@ -2,7 +2,7 @@
 {
     public interface IFillType
     {
-        double ModifySpeed(double speed, SchedulerSpeedHint speedHint);
+        double ModifySpeed(double speed, SpeedHint speedHint);
 
         double AdjustVolume(double volume);
 

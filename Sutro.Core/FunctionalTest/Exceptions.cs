@@ -1,52 +1,52 @@
 ﻿using System;
 
-namespace Sutro.Core.FunctionalTest
+namespace Sutro.Core.FunctionalTest.FeatureMismatchExceptions
 {
-    public class FeatureCumulativeExtrusionMismatch : Exception
+    public class CumulativeExtrusionException : Exception
     {
-        public FeatureCumulativeExtrusionMismatch(string s) : base(s)
+        public CumulativeExtrusionException(string s) : base(s)
         {
         }
     }
 
-    public class FeatureCumulativeDistanceMismatch : Exception
+    public class CumulativeDistanceException : Exception
     {
-        public FeatureCumulativeDistanceMismatch(string s) : base(s)
+        public CumulativeDistanceException(string s) : base(s)
         {
         }
     }
 
-    public class FeatureCumulativeDurationMismatch : Exception
+    public class CumulativeDurationException : Exception
     {
-        public FeatureCumulativeDurationMismatch(string s) : base(s)
+        public CumulativeDurationException(string s) : base(s)
         {
         }
     }
 
-    public class FeatureCenterOfMassMismatch : Exception
+    public class CenterOfMassException : Exception
     {
-        public FeatureCenterOfMassMismatch(string s) : base(s)
+        public CenterOfMassException(string s) : base(s)
         {
         }
     }
 
-    public class FeatureBoundingBoxMismatch : Exception
+    public class BoundingBoxException : Exception
     {
-        public FeatureBoundingBoxMismatch(string s) : base(s)
+        public BoundingBoxException(string s) : base(s)
         {
         }
     }
 
-    public class MissingFeature : Exception
+    public class MissingFeatureException : Exception
     {
-        public MissingFeature(string s) : base(s)
+        public MissingFeatureException(string s) : base(s)
         {
         }
     }
 
-    public class LayerCountMismatch : Exception
+    public class LayerCountException : Exception
     {
-        public LayerCountMismatch(string s) : base(s)
+        public LayerCountException(string s) : base(s)
         {
         }
     }

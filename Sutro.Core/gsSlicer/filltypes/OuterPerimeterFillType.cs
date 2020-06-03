@@ -1,4 +1,6 @@
-﻿namespace gs.FillTypes
+﻿using System.Security.Cryptography;
+
+namespace gs.FillTypes
 {
     public class OuterPerimeterFillType : BaseFillType
     {
@@ -9,16 +11,8 @@
             return Label;
         }
 
-        private double speedModifier;
-
-        public OuterPerimeterFillType(SingleMaterialFFFSettings settings)
+        public OuterPerimeterFillType(double volumeScale = 1, double speedScale = 1) : base(volumeScale, speedScale)
         {
-            speedModifier = settings.OuterPerimeterSpeedX;
-        }
-
-        public override double ModifySpeed(double speed, SchedulerSpeedHint speedHint)
-        {
-            return speedModifier * speed;
         }
 
         public override bool IsEntryLocationSpecified()

@@ -668,7 +668,7 @@ namespace gs
 
             if (nShells > 0)
             {
-                ShellsFillPolygon shells_gen = new ShellsFillPolygon(support_poly, new SupportFillType(Settings));
+                ShellsFillPolygon shells_gen = new ShellsFillPolygon(support_poly, Settings.FillTypeFactory.Support());
                 shells_gen.PathSpacing = shell_spacing;
                 shells_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
                 shells_gen.Layers = nShells;
@@ -686,7 +686,7 @@ namespace gs
                 // may need to create sub-fill types for support shells
                 foreach (var fillpath in shell_fill_curves)
                 {
-                    fillpath.SetFillType(new SupportFillType(Settings));
+                    fillpath.SetFillType(Settings.FillTypeFactory.Support());
                 }
                 scheduler.AppendCurveSets(shell_fill_curves);
 
@@ -815,7 +815,7 @@ namespace gs
 
         protected virtual void fill_solid_region(PrintLayerData layer_data, GeneralPolygon2d fillPoly, IFillPathScheduler2d scheduler)
         {
-            ICurvesFillPolygon solid_gen = new ParallelLinesFillPolygon(fillPoly, new SolidFillType(Settings.SolidFillSpeedX))
+            ICurvesFillPolygon solid_gen = new ParallelLinesFillPolygon(fillPoly, Settings.FillTypeFactory.Solid())
             {
                 InsetFromInputPolygon = false,
                 PathSpacing = Settings.SolidFillPathSpacingMM(),
@@ -880,7 +880,7 @@ namespace gs
 
                 GeneralPolygon2d gp = new GeneralPolygon2d(polypart);
 
-                ShellsFillPolygon shells_fill = new ShellsFillPolygon(gp, new BridgeFillType(Settings));
+                ShellsFillPolygon shells_fill = new ShellsFillPolygon(gp, Settings.FillTypeFactory.Bridge());
                 shells_fill.PathSpacing = Settings.SolidFillPathSpacingMM();
                 shells_fill.ToolWidth = Settings.Machine.NozzleDiamMM;
                 shells_fill.Layers = 1;
@@ -1125,7 +1125,10 @@ namespace gs
         /// </summary>
         protected virtual IShellsFillPolygon compute_shells_for_shape(GeneralPolygon2d shape, int layer_i)
         {
-            ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape, new InnerPerimeterFillType(Settings), new OuterPerimeterFillType(Settings));
+            ShellsFillPolygon shells_gen = new ShellsFillPolygon(shape, 
+                Settings.FillTypeFactory.InnerPerimeter(),
+                Settings.FillTypeFactory.OuterPerimeter());
+
             shells_gen.PathSpacing = Settings.ShellsFillPathSpacingMM();
             shells_gen.ToolWidth = Settings.Machine.NozzleDiamMM;
             shells_gen.Layers = Settings.Shells;
@@ -1878,10 +1881,10 @@ namespace gs
             return scheduler;
         }
 
-        protected virtual SchedulerSpeedHint GetSchedulerSpeedHint(PrintLayerData layer_data)
+        protected virtual SpeedHint GetSchedulerSpeedHint(PrintLayerData layer_data)
         {
             return (layer_data.layer_i == CurStartLayer) ?
-                            SchedulerSpeedHint.Careful : SchedulerSpeedHint.Rapid;
+                            SpeedHint.Careful : SpeedHint.Rapid;
         }
 
         protected virtual void count_progress_step()

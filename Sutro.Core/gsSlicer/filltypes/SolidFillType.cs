@@ -2,11 +2,8 @@
 {
     public class SolidFillType : BaseFillType
     {
-        private double solidFillSpeedX;
-
-        public SolidFillType(double solidFillSpeedX)
+        public SolidFillType(double volumeScale = 1, double speedScale = 1) : base(volumeScale, speedScale)
         {
-            this.solidFillSpeedX = solidFillSpeedX;
         }
 
         public static string Label => "solid layer";
@@ -14,11 +11,6 @@
         public override string GetLabel()
         {
             return Label;
-        }
-
-        public override double ModifySpeed(double speed, SchedulerSpeedHint speedHint)
-        {
-            return speed * solidFillSpeedX;
         }
     }
 }

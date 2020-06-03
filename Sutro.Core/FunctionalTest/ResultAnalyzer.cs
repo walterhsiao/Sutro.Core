@@ -1,6 +1,7 @@
 using gs;
 using gs.FillTypes;
 using gs.utility;
+using Sutro.Core.FunctionalTest.FeatureMismatchExceptions;
 using Sutro.Core.Models.GCode;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +27,7 @@ namespace Sutro.Core.FunctionalTest
 
             if (actual.Count != expected.Count)
             {
-                throw new LayerCountMismatch($"Expected {expected.Count} layers but the result has {actual.Count}.");
+                throw new LayerCountException($"Expected {expected.Count} layers but the result has {actual.Count}.");
             }
 
             for (int layerIndex = 0; layerIndex < actual.Count; layerIndex++)

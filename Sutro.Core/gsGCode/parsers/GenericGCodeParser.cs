@@ -5,26 +5,9 @@ using System.Linq;
 
 namespace gs
 {
-    public class GenericGCodeParser
+    public class GenericGCodeParser : GCodeParserBase
     {
         public Func<string, bool> IsMacroF = (token) => { return false; };
-
-        public GCodeFile Parse(TextReader input)
-        {
-            GCodeFile file = new GCodeFile();
-
-            int lines = 0;
-            while (input.Peek() >= 0)
-            {
-                string line = input.ReadLine();
-                int nLineNum = lines++;
-
-                GCodeLine l = ParseLine(line, nLineNum);
-                file.AppendLine(l);
-            }
-
-            return file;
-        }
 
         // removes the comment from the input line (the line is modified) and returns the comment, including the semicolon
         virtual protected string removeComment(ref string line)
@@ -47,7 +30,7 @@ namespace gs
             return comment;
         }
 
-        virtual protected GCodeLine ParseLine(string line, int nLineNum)
+        public override GCodeLine ParseLine(string line, int nLineNum)
         {
             if (line.Length == 0)
                 return make_blank(nLineNum);

@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace gs
 {
-    public abstract class BaseGCodeWriter
+    public abstract class GCodeWriterBase
     {
         /// <summary>
         /// If the mesh format we are writing is text, then the OS will write in the number style

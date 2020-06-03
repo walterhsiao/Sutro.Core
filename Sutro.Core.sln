@@ -40,4 +40,7 @@ Global
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CD398D96-A819-45DC-BF76-4132DFA051F4}
 	EndGlobalSection
+	GlobalSection(NDepend) = preSolution
+		Project = ".\Sutro.Core.ndproj"
+	EndGlobalSection
 EndGlobal

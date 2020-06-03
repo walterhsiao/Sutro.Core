@@ -2,11 +2,11 @@
 {
     public class BridgeFillType : BaseFillType
     {
-        private readonly SingleMaterialFFFSettings settings;
+        private readonly double bridgeSpeed;
 
-        public BridgeFillType(SingleMaterialFFFSettings settings)
+        public BridgeFillType(double volumeScale = 1, double speed = 1) : base(volumeScale)
         {
-            this.settings = settings;
+            bridgeSpeed = speed;
         }
 
         public static string Label => "bridge";
@@ -16,29 +16,9 @@
             return Label;
         }
 
-        public override double AdjustVolume(double volume)
+        public override double ModifySpeed(double speed, SpeedHint speedHint)
         {
-            return volume * settings.BridgeVolumeScale;
-        }
-
-        public override double ModifySpeed(double speed, SchedulerSpeedHint speedHint = SchedulerSpeedHint.Default)
-        {
-            return settings.CarefulExtrudeSpeed * settings.BridgeExtrudeSpeedX;
-        }
-    }
-
-    public class SkirtBrimFillType : BaseFillType
-    {
-        public static string Label => "skirt";
-
-        public override string GetLabel()
-        {
-            return Label;
-        }
-
-        public override bool IsEntryLocationSpecified()
-        {
-            return true;
+            return bridgeSpeed;
         }
     }
 }

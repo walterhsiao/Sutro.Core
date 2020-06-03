@@ -19,7 +19,7 @@ namespace gs
     /// </summary>
     public class SupportLinesFillPolygon : ParallelLinesFillPolygon
     {
-        public SupportLinesFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings) : base(poly, new SupportFillType(settings))
+        public SupportLinesFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings) : base(poly, settings.FillTypeFactory.Support())
         {
             SimplifyAmount = SimplificationLevel.Aggressive;
         }
@@ -30,7 +30,7 @@ namespace gs
     /// </summary>
     public class BridgeLinesFillPolygon : ParallelLinesFillPolygon
     {
-        public BridgeLinesFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings) : base(poly, new BridgeFillType(settings))
+        public BridgeLinesFillPolygon(GeneralPolygon2d poly, SingleMaterialFFFSettings settings) : base(poly, settings.FillTypeFactory.Bridge())
         {
             SimplifyAmount = SimplificationLevel.Minor;
         }
