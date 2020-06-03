@@ -31,6 +31,9 @@ namespace gs
         public string Name { get; }
         public string Description { get; }
 
+        public GCodeParserBase Parser { get; set; } = new GenericGCodeParser();
+        public GCodeWriterBase Writer { get; set; } = new StandardGCodeWriter();
+
         public PrintGeneratorManager(TPrintSettings settings, string id, string description, ILogger logger = null, bool acceptsParts = true)
         {
             AcceptsParts = acceptsParts;
@@ -111,16 +114,14 @@ namespace gs
             slices = slicer.Compute();
         }
 
-        public GCodeFile LoadGCode(TextReader input)
+        public virtual GCodeFile LoadGCode(TextReader input)
         {
-            GenericGCodeParser parser = new GenericGCodeParser();
-            return parser.Parse(input);
+            return Parser.Parse(input);
         }
 
-        public void SaveGCodeToFile(TextWriter output, GCodeFile file)
+        public virtual void SaveGCodeToFile(TextWriter output, GCodeFile file)
         {
-            StandardGCodeWriter writer = new StandardGCodeWriter();
-            writer.WriteFile(file, output);
+            Writer.WriteFile(file, output);
         }
     }
 }

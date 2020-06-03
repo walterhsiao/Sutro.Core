@@ -14,7 +14,7 @@ namespace Sutro.Core.Decompilers
         protected IFillType currentFillType;
         protected TPrintVertex currentVertex;
         protected TPrintVertex previousVertex;
-        protected LinearToolpath3<PrintVertex> toolpath;
+        protected LinearToolpath3<TPrintVertex> toolpath;
         protected bool extruderRelativeCoordinates = false;
 
         public event Action<IToolpath> OnToolpathComplete;
@@ -162,7 +162,7 @@ namespace Sutro.Core.Decompilers
             return line?.Comment?.Contains("Travel") ?? false;
         }
 
-        protected void EmitToolpath(LinearToolpath3<PrintVertex> travel)
+        protected void EmitToolpath(LinearToolpath3<TPrintVertex> travel)
         {
             OnToolpathComplete(travel);
         }
