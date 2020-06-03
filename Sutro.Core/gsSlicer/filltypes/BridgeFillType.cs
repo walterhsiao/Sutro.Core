@@ -4,7 +4,7 @@
     {
         private readonly double bridgeSpeed;
 
-        public BridgeFillType(double volumeScale, double speed) : base(volumeScale)
+        public BridgeFillType(double volumeScale = 1, double speed = 1) : base(volumeScale)
         {
             bridgeSpeed = speed;
         }

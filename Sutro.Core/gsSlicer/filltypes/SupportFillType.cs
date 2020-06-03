@@ -11,7 +11,7 @@
             return Label;
         }
 
-        public SupportFillType(double volumeScale, double carefulSpeedScale) : base(volumeScale)
+        public SupportFillType(double volumeScale = 1, double carefulSpeedScale = 1) : base(volumeScale)
         {
             this.carefulSpeedScale = carefulSpeedScale;
         }

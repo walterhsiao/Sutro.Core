@@ -11,7 +11,7 @@ namespace gs.FillTypes
             return Label;
         }
 
-        public OuterPerimeterFillType(double volumeScale, double speedScale) : base(volumeScale, speedScale)
+        public OuterPerimeterFillType(double volumeScale = 1, double speedScale = 1) : base(volumeScale, speedScale)
         {
         }
 

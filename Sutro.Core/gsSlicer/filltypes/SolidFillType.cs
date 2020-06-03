@@ -2,7 +2,7 @@
 {
     public class SolidFillType : BaseFillType
     {
-        public SolidFillType(double volumeScale, double speedScale) : base(volumeScale, speedScale)
+        public SolidFillType(double volumeScale = 1, double speedScale = 1) : base(volumeScale, speedScale)
         {
         }
 
