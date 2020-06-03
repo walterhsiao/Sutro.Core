@@ -163,9 +163,25 @@ namespace Sutro.Core.Decompilers
 
         protected void EmitToolpath(LinearToolpath3<TPrintVertex> travel)
         {
-            OnToolpathComplete(travel);
+            OnToolpathComplete?.Invoke(travel);
         }
 
         public abstract void ProcessGCodeLine(GCodeLine line);
+
+        protected void CreateTravelToolpath(TPrintVertex vertexStart, TPrintVertex vertexEnd)
+        {
+            var travel = new LinearToolpath3<TPrintVertex>(ToolpathTypes.Travel);
+            travel.AppendVertex(vertexStart, TPVertexFlags.IsPathStart);
+            travel.AppendVertex(vertexEnd, TPVertexFlags.None);
+            EmitToolpath(travel);
+        }
+
+        protected LinearToolpath3<TPrintVertex> StartNewToolpath(LinearToolpath3<TPrintVertex> toolpath, TPrintVertex currentVertex)
+        {
+            var newToolpath = new LinearToolpath3<TPrintVertex>(toolpath.Type);
+            newToolpath.FillType = toolpath.FillType;
+            newToolpath.AppendVertex(currentVertex, TPVertexFlags.IsPathStart);
+            return newToolpath;
+        }
     }
 }

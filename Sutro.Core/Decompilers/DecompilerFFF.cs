@@ -111,22 +111,6 @@ namespace Sutro.Core.Decompilers
             }
         }
 
-        private LinearToolpath3<PrintVertex> StartNewToolpath(LinearToolpath3<PrintVertex> toolpath, PrintVertex currentVertex)
-        {
-            var newToolpath = new LinearToolpath3<PrintVertex>(toolpath.Type);
-            newToolpath.FillType = toolpath.FillType;
-            newToolpath.AppendVertex(currentVertex, TPVertexFlags.IsPathStart);
-            return newToolpath;
-        }
-
-        private void CreateTravelToolpath(PrintVertex vertexStart, PrintVertex vertexEnd)
-        {
-            var travel = new LinearToolpath3<PrintVertex>(ToolpathTypes.Travel);
-            travel.AppendVertex(vertexStart, TPVertexFlags.IsPathStart);
-            travel.AppendVertex(vertexEnd, TPVertexFlags.None);
-            EmitToolpath(travel);
-        }
-
         protected override LinearToolpath3<PrintVertex> FinishToolpath()
         {
             if (toolpath == null)
