@@ -11,7 +11,6 @@ namespace Sutro.Core.Decompilers
     public abstract class DecompilerBase<TPrintVertex> where TPrintVertex : IToolpathVertex
     {
         protected int currentLayerIndex = 0;
-        protected IFillType currentFillType;
         protected TPrintVertex currentVertex;
         protected TPrintVertex previousVertex;
         protected LinearToolpath3<TPrintVertex> toolpath;

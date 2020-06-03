@@ -1,4 +1,5 @@
 ﻿using g3;
+using Sutro.Core.FunctionalTest.FeatureMismatchExceptions;
 
 namespace Sutro.Core.FunctionalTest
 {
@@ -51,19 +52,19 @@ namespace Sutro.Core.FunctionalTest
         public virtual void AssertEqualsExpected(FeatureInfo expected)
         {
             if (!BoundingBox.Equals(expected.BoundingBox, boundingBoxTolerance))
-                throw new FeatureBoundingBoxMismatchException($"Bounding boxes aren't equal; expected {expected.BoundingBox}, got {BoundingBox}");
+                throw new BoundingBoxException($"Bounding boxes aren't equal; expected {expected.BoundingBox}, got {BoundingBox}");
 
             if (!MathUtil.EpsilonEqual(Extrusion, expected.Extrusion, extrusionTolerance))
-                throw new FeatureCumulativeExtrusionMismatchException($"Cumulative extrusion amounts aren't equal; expected {expected.Extrusion}, got {Extrusion}");
+                throw new CumulativeExtrusionException($"Cumulative extrusion amounts aren't equal; expected {expected.Extrusion}, got {Extrusion}");
 
             if (!MathUtil.EpsilonEqual(Duration, expected.Duration, durationTolerance))
-                throw new FeatureCumulativeDurationMismatchException($"Cumulative durations aren't equal; expected {expected.Duration}, got {Duration}");
+                throw new CumulativeDurationException($"Cumulative durations aren't equal; expected {expected.Duration}, got {Duration}");
 
             if (!MathUtil.EpsilonEqual(Distance, expected.Distance, distanceTolerance))
-                throw new FeatureCumulativeDistanceMismatchException($"Cumulative distances aren't equal; expected {expected.Distance}, got {Distance}");
+                throw new CumulativeDistanceException($"Cumulative distances aren't equal; expected {expected.Distance}, got {Distance}");
 
             if (!CenterOfMass.EpsilonEqual(expected.CenterOfMass, centerOfMassTolerance))
-                throw new FeatureCenterOfMassMismatchException($"Centers of mass aren't equal; expected {expected.CenterOfMass}, got {CenterOfMass}");
+                throw new CenterOfMassException($"Centers of mass aren't equal; expected {expected.CenterOfMass}, got {CenterOfMass}");
         }
 
         public virtual void Add(FeatureInfo other)

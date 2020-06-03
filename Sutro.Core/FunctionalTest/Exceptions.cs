@@ -1,38 +1,38 @@
 ﻿using System;
 
-namespace Sutro.Core.FunctionalTest
+namespace Sutro.Core.FunctionalTest.FeatureMismatchExceptions
 {
-    public class FeatureCumulativeExtrusionMismatchException : Exception
+    public class CumulativeExtrusionException : Exception
     {
-        public FeatureCumulativeExtrusionMismatchException(string s) : base(s)
+        public CumulativeExtrusionException(string s) : base(s)
         {
         }
     }
 
-    public class FeatureCumulativeDistanceMismatchException : Exception
+    public class CumulativeDistanceException : Exception
     {
-        public FeatureCumulativeDistanceMismatchException(string s) : base(s)
+        public CumulativeDistanceException(string s) : base(s)
         {
         }
     }
 
-    public class FeatureCumulativeDurationMismatchException : Exception
+    public class CumulativeDurationException : Exception
     {
-        public FeatureCumulativeDurationMismatchException(string s) : base(s)
+        public CumulativeDurationException(string s) : base(s)
         {
         }
     }
 
-    public class FeatureCenterOfMassMismatchException : Exception
+    public class CenterOfMassException : Exception
     {
-        public FeatureCenterOfMassMismatchException(string s) : base(s)
+        public CenterOfMassException(string s) : base(s)
         {
         }
     }
 
-    public class FeatureBoundingBoxMismatchException : Exception
+    public class BoundingBoxException : Exception
     {
-        public FeatureBoundingBoxMismatchException(string s) : base(s)
+        public BoundingBoxException(string s) : base(s)
         {
         }
     }
@@ -44,9 +44,9 @@ namespace Sutro.Core.FunctionalTest
         }
     }
 
-    public class LayerCountMismatchException : Exception
+    public class LayerCountException : Exception
     {
-        public LayerCountMismatchException(string s) : base(s)
+        public LayerCountException(string s) : base(s)
         {
         }
     }

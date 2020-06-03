@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <NDepend AppName="Sutro.Core" Platform="DotNet" FileWrittenByProductVersion="2020.1.0.9404">
   <OutputDir KeepXmlFiles="False">.\NDependOut</OutputDir>
   <IDEFiles>
@@ -11,6 +11,10 @@
     <Name>clipper_library</Name>
     <Name>Newtonsoft.Json</Name>
     <Name>CommandLine</Name>
+    <Name>Sutro.Core.Models</Name>
+    <Name>System.Runtime</Name>
+    <Name>System.Collections</Name>
+    <Name>mscorlib</Name>
   </FrameworkAssemblies>
   <Dirs>
     <Dir>C:\windows\Microsoft.NET\Framework\v4.0.30319</Dir>
@@ -21,9 +25,9 @@
   <ZipSourceFiles>True</ZipSourceFiles>
   <Report Kind="0" SectionsEnabled="110591" XslPath="" Flags="261376" />
   <BuildComparisonSetting ProjectMode="CurrentProject" BuildMode="NDaysAgoAnalysisResult" ProjectFileToCompareWith="" BuildFileToCompareWith="" NDaysAgo="30" />
-  <BaselineInUISetting ProjectMode="CurrentProject" BuildMode="NDaysAgoAnalysisResult" ProjectFileToCompareWith=".\Sutro.Core.ndproj" BuildFileToCompareWith=".\NDependOut\NDependAnalysisResult_Sutro_Slicer_2020Mar02_21h26.ndar" NDaysAgo="90" />
+  <BaselineInUISetting ProjectMode="CurrentProject" BuildMode="NDaysAgoAnalysisResult" ProjectFileToCompareWith="" BuildFileToCompareWith="" NDaysAgo="30" />
   <CoverageFiles CoverageDir="" UncoverableAttribute="">
-    <CoverageFile>.\coverage\Coverage.xml</CoverageFile>
+    <CoverageFile>.\coverage\Coverage.coveragexml</CoverageFile>
   </CoverageFiles>
   <TrendMetrics UseCustomLog="False" LogRecurrence="3" LogLabel="2" UseCustomDir="False" CustomDir="">
     <Chart Name="Size" ShowInReport="True">
@@ -85,8 +89,7 @@
       <High2Critical_SeverityThreshold>72000000000</High2Critical_SeverityThreshold>
       <Critical2Blocker_SeverityThreshold>360000000000</Critical2Blocker_SeverityThreshold>
     </DebtSettings>
-  </ProjectDebtSettings>
-  <Queries>
+  </ProjectDebtSettings><Queries>
     <Group Name="Quality Gates" Active="True" ShownInReport="False">
       <Query Active="True" DisplayList="True" DisplayStat="True" DisplaySelectionView="False" IsCriticalRule="False"><![CDATA[// <Name>Quality Gates Evolution</Name>
 from qg in QualityGates
@@ -12521,5 +12524,4 @@ select new {
 //</HowToFix>]]></Query>
       </Group>
     </Group>
-  </Queries>
-</NDepend>
+  </Queries></NDepend>

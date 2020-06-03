@@ -1,6 +1,7 @@
 ﻿using gs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sutro.Core.FunctionalTest;
+using Sutro.Core.FunctionalTest.FeatureMismatchExceptions;
 using System;
 
 namespace gsCore.FunctionalTests
@@ -25,13 +26,13 @@ namespace gsCore.FunctionalTests
         [TestMethod]
         public void WrongLayerHeight()
         {
-            ExpectFailure<LayerCountMismatchException>(new GenericRepRapSettings() { LayerHeightMM = 0.3 });
+            ExpectFailure<LayerCountException>(new GenericRepRapSettings() { LayerHeightMM = 0.3 });
         }
 
         [TestMethod]
         public void WrongShells()
         {
-            ExpectFailure<FeatureCumulativeExtrusionMismatchException>(new GenericRepRapSettings() { Shells = 3 });
+            ExpectFailure<CumulativeExtrusionException>(new GenericRepRapSettings() { Shells = 3 });
         }
 
         [TestMethod]
@@ -52,7 +53,7 @@ namespace gsCore.FunctionalTests
             var settings = new GenericRepRapSettings();
             settings.Machine.BedOriginFactorX = 0.5;
             settings.Machine.BedOriginFactorY = 0.5;
-            ExpectFailure<FeatureBoundingBoxMismatchException>(settings);
+            ExpectFailure<BoundingBoxException>(settings);
         }
 
         public void ExpectFailure<ExceptionType>(GenericRepRapSettings settings) where ExceptionType : Exception
