@@ -123,7 +123,7 @@ namespace Sutro.Core.Decompilers
             var newToolpath = new LinearToolpath3<PrintVertex>(toolpath.Type);
             newToolpath.IsHole = toolpath.IsHole;
             newToolpath.FillType = toolpath.FillType;
-            newToolpath.AppendVertex(toolpath.End, TPVertexFlags.IsPathStart);
+            newToolpath.AppendVertex(toolpath.VertexCount > 0 ? toolpath.End : currentVertex, TPVertexFlags.IsPathStart);
 
             return newToolpath;
         }
