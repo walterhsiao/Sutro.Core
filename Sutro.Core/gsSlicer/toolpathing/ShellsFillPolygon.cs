@@ -121,7 +121,7 @@ namespace gs
             this.firstShellFillType = firstShellFillType;
         }
 
-        public bool Compute()
+        public virtual bool Compute()
         {
             bool enable_thin_check = false;
             double thin_check_offset = ToolWidth * 0.45;
@@ -379,7 +379,7 @@ namespace gs
             return paths;
         }
 
-        public List<FillBase> thin_offset(GeneralPolygon2d p)
+        protected virtual List<FillBase> thin_offset(GeneralPolygon2d p)
         {
             var result = new List<FillBase>();
 
@@ -404,7 +404,7 @@ namespace gs
             return result;
         }
 
-        public Polygon2d iterative_offset(GeneralPolygon2d poly, double fDist, int nSteps)
+        protected virtual Polygon2d iterative_offset(GeneralPolygon2d poly, double fDist, int nSteps)
         {
             int N = poly.Outer.VertexCount;
             double max_step = fDist / nSteps;
@@ -423,7 +423,7 @@ namespace gs
         // vertices are discarded if outside clipPoly, or within clip_dist
         // remaining polylines are returned
         // In all-pass case currently returns polyline w/ explicit first==last vertices
-        public List<FillBase> clip_to_band(Polygon2d insetpoly, GeneralPolygon2d clipPoly, double clip_dist)
+        protected virtual List<FillBase> clip_to_band(Polygon2d insetpoly, GeneralPolygon2d clipPoly, double clip_dist)
         {
             double clipSqr = clip_dist * clip_dist;
 
@@ -465,7 +465,7 @@ namespace gs
         }
 
         // extract set of spans from poly where clipped=false
-        private List<FillBase> find_polygon_spans(Vector2d[] poly, bool[] clipped)
+        protected virtual List<FillBase> find_polygon_spans(Vector2d[] poly, bool[] clipped)
         {
             // assumption: at least one vtx is clipped
             int iStart = 0;
@@ -514,7 +514,7 @@ namespace gs
         // Currently returns true/false test, which is stupid...
         //
         // Will definitely fail on: squares (w/ short seg near edge), thin narrow bits... ??
-        private bool is_too_thin(GeneralPolygon2d poly, double check_offset, double mindist_sqr)
+        protected virtual bool is_too_thin(GeneralPolygon2d poly, double check_offset, double mindist_sqr)
         {
             Debug.Assert(mindist_sqr < 0.95 * check_offset * check_offset);
 
