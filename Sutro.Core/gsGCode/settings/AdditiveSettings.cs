@@ -260,9 +260,6 @@ namespace gs
 
         private int LayerRangeFilterMax { get { return LayerRangeFilter.b; } set { LayerRangeFilter.b = value; } }
 
-
-        public bool RepairMesh = true;                  // run a mesh auto-repair after it's been loaded
-
         public bool GCodeAppendBeadDimensions { get; set; } = true;
 
         public override string ProfileName { get; set; } = "Default";

@@ -112,9 +112,11 @@ namespace gs
                 mesh = StandardMeshReader.ReadMesh(fMeshFilePath);
                 logger.WriteLine(" done.");
 
-                logger.Write("Repairing mesh... ");
-                bool repaired = new MeshAutoRepair(mesh).Apply();
-                logger.WriteLine(repaired ? "repaired." : "not repaired.");
+                if (o.Repair) {
+                    logger.Write("Repairing mesh... ");
+                    bool repaired = new MeshAutoRepair(mesh).Apply();
+                    logger.WriteLine(repaired ? "repaired." : "not repaired.");
+                }
 
                 if (o.CenterXY) CenterMeshAboveOrigin(mesh);
                 if (o.DropZ) DropMeshToBuildPlate(mesh);
